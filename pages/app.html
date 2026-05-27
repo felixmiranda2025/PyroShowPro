@@ -1670,50 +1670,53 @@ function spawnAnillo(ef,cx,cy,sc){
   }
 }
 function spawnBurst(ef,W,H,ch){
-  var cx, cy;
+  var ang  = ef.angulo||90;                        // grados: 90=vertical, 45=izq, 135=der
+  var rad  = ang * Math.PI / 180;                  // en radianes para canvas (Y invertido)
+  var dur  = Math.max(.4,(ef.fuseSeg||2)*.38+Math.random()*.12);
 
-  // Si hay una posición definida para este canal, usarla directamente
-  if(ch && POS.puntos.length > 0){
-    var pos = POS.puntos.find(function(p){ return p.ch === ch; });
+  // ── Punto de explosión (destino)
+  var cx, cy;
+  if(ch && POS.puntos.length>0){
+    var pos=POS.puntos.find(function(p){return p.ch===ch;});
     if(pos){
-      // Escalar de coordenadas del canvas de posiciones al canvas 3D actual
-      cx = pos.x * (W / (posCanvas ? posCanvas.width  : W));
-      cy = pos.y * (H / (posCanvas ? posCanvas.height : H));
-      cx = Math.max(W*.04, Math.min(W*.96, cx));
-      cy = Math.max(H*.04, Math.min(H*.72, cy));
-      var dur = Math.max(.3,(ef.fuseSeg||2)*.35+Math.random()*.15);
-      var groundY = H*.80;
-      S.rockets.push({
-        x: cx + (Math.random()-.5)*8,
-        y: groundY,
-        tx: cx, ty: cy,
-        t:0, dur:dur, ef:ef, trailTimer:0
-      });
-      return;
+      cx=pos.x*(W/(posCanvas?posCanvas.width:W));
+      cy=pos.y*(H/(posCanvas?posCanvas.height:H));
+      cx=Math.max(W*.04,Math.min(W*.96,cx));
+      cy=Math.max(H*.04,Math.min(H*.72,cy));
     }
   }
+  if(cx===undefined){
+    cx=W*.5+(ef.posX||0)/50*W*.42;
+    cx=Math.max(W*.05,Math.min(W*.95,cx));
+    var vn=((ef.velY||20)-5)/45;
+    cy=H*(.55-vn*.45);
+    cy=Math.max(H*.04,Math.min(H*.65,cy));
+  }
 
-  // Sin posición definida: usar posX/velY/angulo del efecto
-  cx = W*.5+(ef.posX||0)/50*W*.42;
-  cx = Math.max(W*.05, Math.min(W*.95, cx));
-  var vn = ((ef.velY||20)-5)/45;
-  cy = H*(.55-vn*.45);
-  cy = Math.max(H*.04, Math.min(H*.65, cy));
+  // ── Punto de salida en el suelo según el ángulo
+  // El cohete sale desde el suelo (H*.82) y llega a (cx,cy)
+  // La trayectoria es una LÍNEA RECTA en la dirección del ángulo
+  // 90° = vertical → sale justo debajo de cx
+  // 45° = inclinado izq → sale más a la derecha del suelo
+  // 135° = inclinado der → sale más a la izquierda
+  var groundY = H * .82;
+  var alturaVuelo = groundY - cy;                  // distancia vertical recorrida
+  // desplazamiento horizontal = altura / tan(ángulo_desde_horizontal)
+  // ángulo desde horizontal = (180-ang) para <90, ang para >90
+  var angDesdeHoriz = ang <= 90 ? ang : (180 - ang);
+  var tanAng = Math.tan(angDesdeHoriz * Math.PI / 180);
+  var despX  = tanAng > 0.1 ? alturaVuelo / tanAng : 0;
+  // <90 = cohete va hacia la izquierda → sale a la derecha del destino
+  var groundX = ang < 90  ? cx + despX :
+                ang > 90  ? cx - despX : cx;
 
-  // Aplicar ángulo: desplaza el punto de explosión lateralmente
-  // 90° = vertical (sin desplazamiento), <90 = izquierda, >90 = derecha
-  var ang = (ef.angulo||90);
-  var angRad = (ang - 90) * Math.PI / 180; // 0 = vertical
-  var longTray = cy + 60 + Math.random()*30; // longitud aprox de trayectoria
-  var desplazX = Math.tan(angRad) * longTray * 0.6;
-  var groundX = cx - desplazX; // punto de salida en el suelo
+  groundX = Math.max(W*.02, Math.min(W*.98, groundX));
 
-  var dur2 = Math.max(.3,(ef.fuseSeg||2)*.35+Math.random()*.15);
   S.rockets.push({
-    x: groundX + (Math.random()-.5)*8,
-    y: H*.82,
+    x:  groundX + (Math.random()-.5)*4,
+    y:  groundY,
     tx: cx, ty: cy,
-    t:0, dur:dur2, ef:ef, trailTimer:0,
+    t:0, dur:dur, ef:ef, trailTimer:0,
     angulo: ang,
   });
 }
@@ -2151,7 +2154,7 @@ function draw3D(dt){
   }
   x3.globalCompositeOperation='source-over';
 
-  // ── COHETES
+  // ── COHETES — trayectoria lineal para que el ángulo se vea correcto
   var aliveR=[];
   for(var ri=0;ri<S.rockets.length;ri++){
     var rk=S.rockets[ri]; rk.t+=dt;
@@ -2162,25 +2165,42 @@ function draw3D(dt){
       continue;
     }
     aliveR.push(rk);
-    var ep=prog*prog*(3-2*prog);
-    var rx2=rk.x+(rk.tx-rk.x)*ep + VIENTO.x*rk.t*30;
-    var ry2=rk.y+(rk.ty-rk.y)*ep;
 
-    // Scia
+    // Interpolación LINEAR — para preservar el ángulo visual real
+    var rx2 = rk.x + (rk.tx - rk.x) * prog + VIENTO.x * rk.t * 20;
+    var ry2 = rk.y + (rk.ty - rk.y) * prog;
+
+    // Scia — en la dirección opuesta al movimiento
     rk.trailTimer+=dt;
-    if(rk.trailTimer>.018){
+    if(rk.trailTimer>.016){
       rk.trailTimer=0;
-      S.particles.push(mkP(rx2+(Math.random()-.5)*2,ry2+(Math.random()-.5)*2,
-        VIENTO.x*20+(Math.random()-.5)*.4,Math.random()*1.2+.3,
-        .3+Math.random()*.15,1.2+Math.random()*1.5,[255,200,80],[40,20,5],.25,false,0,0));
+      var dvx = -(rk.tx-rk.x)/rk.dur * .01;
+      var dvy = -(rk.ty-rk.y)/rk.dur * .01;
+      S.particles.push(mkP(
+        rx2+(Math.random()-.5)*2, ry2+(Math.random()-.5)*2,
+        dvx + VIENTO.x*15 + (Math.random()-.5)*.3,
+        dvy + Math.random()*.8,
+        .28+Math.random()*.12, 1.0+Math.random()*1.2,
+        [255,200,80],[40,20,5],.2,false,0,0));
     }
-    // Flash ignición
-    if(prog<.08){
+
+    // Dibujar línea de trayectoria sutil
+    if(prog<.15){
+      x3.strokeStyle='rgba(255,200,80,.06)';
+      x3.lineWidth=1; x3.setLineDash([3,4]);
+      x3.beginPath(); x3.moveTo(rk.x,rk.y); x3.lineTo(rk.tx,rk.ty);
+      x3.stroke(); x3.setLineDash([]);
+    }
+
+    // Flash ignición inicial
+    if(prog<.06){
       x3.globalCompositeOperation='lighter';
-      x3.beginPath(); x3.arc(rx2,ry2,8*(1-prog/.08),0,Math.PI*2);
-      x3.fillStyle='rgba(255,200,50,.14)'; x3.fill();
+      x3.beginPath(); x3.arc(rx2,ry2,9*(1-prog/.06),0,Math.PI*2);
+      x3.fillStyle='rgba(255,200,50,.12)'; x3.fill();
       x3.globalCompositeOperation='source-over';
     }
+
+    // Cuerpo del cohete
     x3.beginPath(); x3.arc(rx2,ry2,2.5,0,Math.PI*2);
     x3.fillStyle='rgba(255,242,100,.95)'; x3.fill();
     x3.globalCompositeOperation='lighter';
@@ -3052,15 +3072,20 @@ function edSeleccionar(id){
       '</div>'+
     '</div>';
   // Live sliders
-  [['ed-pcount','rv-pcount','',true],['ed-minlife','rv-minlife','s'],['ed-maxlife','rv-maxlife','s'],['ed-minspd','rv-minspd',''],['ed-maxspd','rv-maxspd',''],['ed-grav','rv-grav',''],['ed-posx','rv-posx',''],['ed-vely','rv-vely',''],['ed-fuse','rv-fuse','s'],['ed-ang','rv-ang','°',true]].forEach(function(sl){
+  // Live sliders — actualización en tiempo real
+  [['ed-pcount','rv-pcount','',true],['ed-minlife','rv-minlife','s'],['ed-maxlife','rv-maxlife','s'],
+   ['ed-minspd','rv-minspd',''],['ed-maxspd','rv-maxspd',''],['ed-grav','rv-grav',''],
+   ['ed-posx','rv-posx',''],['ed-vely','rv-vely',''],['ed-fuse','rv-fuse','s'],
+   ['ed-ang','rv-ang','°',true]].forEach(function(sl){
     var inp=document.getElementById(sl[0]),rv=document.getElementById(sl[1]);if(!inp||!rv)return;
     inp.addEventListener('input',function(){
-      rv.textContent=(sl[3]?Math.round(+this.value):parseFloat(this.value).toFixed(1))+(sl[2]||'');
+      var val=sl[3]?Math.round(+this.value):parseFloat(this.value).toFixed(1);
+      rv.textContent=val+(sl[2]||'');
       if(sl[0]==='ed-ang') dibujarAnguloCanvas(+this.value);
     });
   });
   // Dibujar ángulo inicial
-  setTimeout(function(){ dibujarAnguloCanvas(ef.angulo||90); }, 50);
+  setTimeout(function(){ dibujarAnguloCanvas(ef.angulo||90); },50);
   ['ed-ci','ed-cf'].forEach(function(id2){var inp=document.getElementById(id2);if(!inp)return;inp.addEventListener('input',function(){var rv=document.getElementById('rv-'+id2.replace('ed-',''));if(rv)rv.textContent=this.value;});});
 }
 function edNuevoEfecto(){
@@ -3089,7 +3114,26 @@ function edEliminar(){
   S.effects=S.effects.filter(function(e){return e.id!==S.edSelId;});
   S.edSelId=S.effects[0].id;poblarEfectos();poblarModalEfectos();poblarBeatEffSel();edRenderLib();edSeleccionar(S.edSelId);notify('Efecto eliminado');
 }
-function edPreview(){edGuardar();var ef=S.effects.find(function(e){return e.id===S.edSelId;});if(!ef)return;ensureAudio();spawnBurst(ef,C3.width,C3.height);sonarCohete(Math.max(.3,(ef.fuseSeg||2)*.35));notify('Preview: '+ef.n,'success');}
+function edPreview(){
+  // Leer valores actuales de los sliders ANTES de guardar
+  // para que el preview refleje lo que se ve en el editor
+  edGuardar();
+  var ef=S.effects.find(function(e){return e.id===S.edSelId;});
+  if(!ef)return;
+  // Asegurar que el ángulo del slider esté aplicado
+  var angSlider=document.getElementById('ed-ang');
+  if(angSlider) ef.angulo=parseInt(angSlider.value)||90;
+  var fuseSlider=document.getElementById('ed-fuse');
+  if(fuseSlider) ef.fuseSeg=parseFloat(fuseSlider.value)||2;
+  var posxSlider=document.getElementById('ed-posx');
+  if(posxSlider) ef.posX=parseFloat(posxSlider.value)||0;
+  var velySlider=document.getElementById('ed-vely');
+  if(velySlider) ef.velY=parseFloat(velySlider.value)||20;
+  ensureAudio();
+  spawnBurst(ef,C3.width,C3.height,null);
+  sonarCohete(Math.max(.3,(ef.fuseSeg||2)*.35));
+  notify('Preview: '+ef.n+' ('+ef.angulo+'°)','success');
+}
 
 /* =================================================================
    EDITOR DE POSICIONES DE LANZAMIENTO
