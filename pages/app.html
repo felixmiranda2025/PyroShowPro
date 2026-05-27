@@ -262,7 +262,50 @@ canvas{display:block}
 .btn-pos.danger:hover{background:var(--reddim)}
 .pos-sel-info{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(6,7,14,.88);border:1px solid var(--b2);border-radius:6px;padding:6px 14px;font-size:11px;color:var(--m1);backdrop-filter:blur(8px);display:none}
 .pos-sel-info.show{display:block}
-#video-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9100;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+/* PATRONES / INVENTARIO / VOICE / CAMERA / UNDO */
+.modal-gen{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:8500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-gen.open{display:flex}
+.mgen-box{background:var(--s1);border:1px solid var(--b2);border-radius:12px;width:100%;max-width:620px;display:flex;flex-direction:column;overflow:hidden;max-height:90vh}
+.mgen-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:#07080f;border-bottom:1px solid var(--b2);flex-shrink:0}
+.mgen-hdr h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:500;color:var(--text)}
+.btn-mgen-close{padding:3px 9px;border-radius:5px;border:1px solid var(--b2);color:var(--m1);font-size:12px;background:none;cursor:pointer}
+.btn-mgen-close:hover{color:var(--text);background:var(--s2)}
+.mgen-body{padding:20px;overflow-y:auto;flex:1}
+.mgen-body::-webkit-scrollbar{width:4px}
+.mgen-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.mgen-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pat-card{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;cursor:pointer;transition:all .14s;text-align:center}
+.pat-card:hover{border-color:var(--b3);background:var(--s3)}
+.pat-card.sel{border-color:#e879f9;background:rgba(232,121,249,.1)}
+.pat-icon{font-size:26px;margin-bottom:6px}
+.pat-name{font-size:12px;font-weight:500;color:var(--text)}
+.pat-desc{font-size:10px;color:var(--m2);margin-top:3px;line-height:1.4}
+.mgen-opt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.mgen-field{display:flex;flex-direction:column;gap:4px}
+.mgen-field label{font-size:10px;color:var(--m2)}
+.mgen-field input,.mgen-field select{font-size:12px;padding:6px 8px}
+.mgen-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--b2);flex-shrink:0;background:#07080f}
+.btn-mgen-ok{padding:8px 20px;border-radius:6px;background:#e879f9;color:#0a0812;font-size:13px;font-weight:500;border:none;cursor:pointer}
+.btn-mgen-ok:hover{background:#f0a0ff}
+.btn-mgen-cancel{padding:8px 14px;border-radius:6px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none;cursor:pointer}
+.inv-table{width:100%;border-collapse:collapse;font-size:12px}
+.inv-table th{background:var(--s3);color:var(--m1);padding:7px 10px;text-align:left;border-bottom:1px solid var(--b2);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.inv-table td{padding:7px 10px;border-bottom:1px solid var(--b1);color:var(--text)}
+.inv-table tr:last-child td{border-bottom:none}
+.inv-table tr:hover td{background:rgba(255,255,255,.03)}
+.inv-btn{background:none;border:1px solid var(--b2);color:var(--m1);border-radius:3px;padding:2px 7px;font-size:10px;cursor:pointer}
+.inv-btn:hover{color:var(--text);border-color:var(--b3)}
+.inv-low{color:var(--red)!important;font-weight:500}
+.inv-add-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.inv-add-row input,.inv-add-row select{font-size:11px;padding:4px 7px}
+#undo-bar{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:6px 14px;font-size:11px;color:var(--m1);display:none;gap:10px;align-items:center;z-index:8000;box-shadow:0 4px 16px rgba(0,0,0,.5);white-space:nowrap}
+#undo-bar.show{display:flex}
+.btn-undo{padding:3px 10px;border-radius:4px;border:1px solid var(--b2);color:var(--text);font-size:11px;background:none;cursor:pointer;transition:all .14s}
+.btn-undo:hover{background:var(--s3)}
+#cam-selector{position:absolute;bottom:10px;left:10px;display:flex;gap:5px;z-index:100}
+.cam-btn{background:rgba(6,7,14,.8);border:1px solid var(--b2);border-radius:5px;padding:4px 9px;font-size:10px;color:var(--m1);cursor:pointer;backdrop-filter:blur(4px);transition:all .14s}
+.cam-btn:hover,.cam-btn.active{border-color:rgba(56,189,248,.5);color:#38bdf8;background:rgba(56,189,248,.08)}
+/* VIDEO DEMO MODAL */
 #video-overlay.open{display:flex}
 #video-box{width:min(92vw,960px);background:var(--s1);border:1px solid var(--b2);border-radius:14px;overflow:hidden}
 .video-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#07080f;border-bottom:1px solid var(--b2)}
@@ -349,11 +392,15 @@ canvas{display:block}
   <button class="tbtn" onclick="cargarProyecto()">Abrir</button>
   <button class="tbtn" onclick="exportCSV()">CSV</button>
   <button class="tbtn" onclick="exportarCobra()">Cobra</button>
+  <button class="tbtn" onclick="generarInformePDF()" style="color:#fb923c;border-color:rgba(251,146,60,.3)">&#128196; Informe</button>
   <button class="tbtn" id="btn-editor" onclick="toggleEditor()">&#9881; Efectos</button>
   <button class="tbtn" id="btn-beat" onclick="abrirBeatDetect()" style="color:var(--gold);border-color:rgba(232,160,32,.4)">&#9836; Beats</button>
   <button class="tbtn" id="btn-video" onclick="toggleVideo()" style="color:var(--blue);border-color:rgba(77,110,245,.4)">&#9711; Video</button>
   <button class="tbtn" onclick="abrirManual()" style="color:var(--green);border-color:rgba(34,197,94,.4)">&#63; Manual</button>
   <button class="tbtn" id="btn-posiciones" onclick="togglePosiciones()" style="color:#38bdf8;border-color:rgba(56,189,248,.4)">&#127757; Posiciones</button>
+  <button class="tbtn" id="btn-patrones" onclick="abrirPatrones()" style="color:#e879f9;border-color:rgba(232,121,249,.4)">&#9889; Patrones</button>
+  <button class="tbtn" onclick="abrirInventario()" style="color:#fb923c;border-color:rgba(251,146,60,.4)">&#128230; Inventario</button>
+  <button class="tbtn" onclick="abrirVoiceCues()" style="color:#a78bfa;border-color:rgba(167,139,250,.4)">&#127908; Voice</button>
   <button class="tbtn" onclick="abrirVideoDemo()" style="color:#e879f9;border-color:rgba(232,121,249,.4)">&#9654; Demo</button>
   <button class="tbtn gold" onclick="open('../pages/checkout.html?plan=pro','_blank')">Pro</button>
 </div>
@@ -376,6 +423,15 @@ canvas{display:block}
       <div class="btn-pos" style="color:var(--green);border-color:rgba(34,197,94,.4)" onclick="togglePosiciones()">&#10003; Cerrar</div>
     </div>
     <div class="pos-sel-info" id="pos-sel-info"></div>
+  </div>
+  <div id="cam-selector">
+    <div class="cam-btn active" id="cam-0" onclick="setCamera(0)">&#128065; Frontal</div>
+    <div class="cam-btn" id="cam-1" onclick="setCamera(1)">&#128249; Público</div>
+    <div class="cam-btn" id="cam-2" onclick="setCamera(2)">&#9992; Aérea</div>
+    <div class="cam-btn" id="cam-3" onclick="setCamera(3)">&#8596; Lateral</div>
+    <div class="cam-btn" onclick="document.getElementById('inp-bg-img').click()" title="Cargar imagen de fondo (Google Maps, foto, etc.)">&#127968; Fondo</div>
+    <div class="cam-btn" id="cam-reset-bg" onclick="resetFondo()" style="display:none;color:var(--red)" title="Quitar imagen de fondo">&#10005; Fondo</div>
+    <input type="file" id="inp-bg-img" accept="image/*" style="display:none" onchange="cargarFondo(this)"/>
   </div>
   <div class="vp-hud">
     <div class="hud-pill live" id="hud-parts">0 part.</div>
@@ -565,6 +621,106 @@ canvas{display:block}
 <div id="notif"></div>
 <input type="file" id="inp-load-proj" accept=".pshow,.json" style="display:none" onchange="leerProyecto(this)"/>
 
+<!-- ===== BARRA UNDO ===== -->
+<div id="undo-bar">
+  <span id="undo-msg">Accion deshecha</span>
+  <button class="btn-undo" onclick="undo()">&#8630; Deshacer</button>
+  <button class="btn-undo" onclick="redo()">&#8631; Rehacer</button>
+  <button onclick="document.getElementById('undo-bar').classList.remove('show')" style="background:none;border:none;color:var(--m2);font-size:14px;cursor:pointer;padding:0 2px">&#10005;</button>
+</div>
+
+<!-- ===== PATRONES DE DISPARO ===== -->
+<div class="modal-gen" id="pat-modal">
+  <div class="mgen-box">
+    <div class="mgen-hdr">
+      <h3>&#9889; Patrones de disparo automático</h3>
+      <button class="btn-mgen-close" onclick="cerrarPatrones()">&#10005;</button>
+    </div>
+    <div class="mgen-body">
+      <div style="font-size:12px;color:var(--m1);margin-bottom:14px">Selecciona un patrón y PyroShow genera los cues automáticamente sobre los canales y el tiempo configurados.</div>
+      <div class="mgen-row">
+        <div class="pat-card sel" id="pc-0" onclick="selPat(0)"><div class="pat-icon">&#8594;</div><div class="pat-name">Cascada</div><div class="pat-desc">Izq → Der secuencial</div></div>
+        <div class="pat-card" id="pc-1" onclick="selPat(1)"><div class="pat-icon">&#8596;</div><div class="pat-name">Abanico</div><div class="pat-desc">Centro → afuera</div></div>
+        <div class="pat-card" id="pc-2" onclick="selPat(2)"><div class="pat-icon">&#9651;</div><div class="pat-name">Ola sinusoidal</div><div class="pat-desc">Patrón ondulado</div></div>
+        <div class="pat-card" id="pc-3" onclick="selPat(3)"><div class="pat-icon">&#128165;</div><div class="pat-name">Final explosivo</div><div class="pat-desc">Todos simultáneos</div></div>
+        <div class="pat-card" id="pc-4" onclick="selPat(4)"><div class="pat-icon">&#9711;</div><div class="pat-name">Círculo</div><div class="pat-desc">Rotación continua</div></div>
+        <div class="pat-card" id="pc-5" onclick="selPat(5)"><div class="pat-icon">&#8679;</div><div class="pat-name">Alternado</div><div class="pat-desc">Par/impar intercalado</div></div>
+      </div>
+      <div class="mgen-opt">
+        <div class="mgen-field"><label>Efecto</label><select id="pat-eff"></select></div>
+        <div class="mgen-field"><label>Inicio en tiempo (s)</label><input type="number" id="pat-t0" value="0" min="0" step="0.5"/></div>
+        <div class="mgen-field"><label>Canales (ej: 1-8)</label><input type="text" id="pat-ch" value="1-8" placeholder="1-8 o 1,3,5"/></div>
+        <div class="mgen-field"><label>Intervalo entre cues (s)</label><input type="number" id="pat-int" value="0.3" min="0.05" step="0.05"/></div>
+        <div class="mgen-field"><label>Repetir N veces</label><input type="number" id="pat-rep" value="1" min="1" max="10"/></div>
+        <div class="mgen-field"><label>Vista previa</label><div id="pat-preview" style="font-size:10px;color:var(--m1);padding:6px 0;line-height:1.6"></div></div>
+      </div>
+    </div>
+    <div class="mgen-footer">
+      <button class="btn-mgen-cancel" onclick="cerrarPatrones()">Cancelar</button>
+      <button class="btn-mgen-ok" onclick="aplicarPatron()">&#9889; Generar cues</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INVENTARIO ===== -->
+<div class="modal-gen" id="inv-modal">
+  <div class="mgen-box" style="max-width:700px">
+    <div class="mgen-hdr">
+      <h3>&#128230; Inventario de productos</h3>
+      <button class="btn-mgen-close" onclick="cerrarInventario()">&#10005;</button>
+    </div>
+    <div class="mgen-body">
+      <div class="inv-add-row">
+        <input type="text"   id="inv-nombre" placeholder="Nombre producto" style="width:150px"/>
+        <select id="inv-calibre" style="width:80px">
+          <option>1.5"</option><option>2"</option><option>3"</option>
+          <option>4"</option><option>6"</option><option>Cake</option><option>Otro</option>
+        </select>
+        <input type="number" id="inv-qty"    placeholder="Qty" style="width:60px" min="0"/>
+        <input type="number" id="inv-precio" placeholder="Precio $" style="width:80px" min="0" step="0.5"/>
+        <button class="btn-mgen-ok" style="padding:5px 12px;font-size:11px" onclick="invAgregar()">+ Agregar</button>
+      </div>
+      <table class="inv-table">
+        <thead><tr><th>Producto</th><th>Calibre</th><th>Stock</th><th>En show</th><th>Precio</th><th>Total</th><th></th></tr></thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+      <div id="inv-resumen" style="margin-top:12px;font-size:11px;color:var(--m1)"></div>
+    </div>
+    <div class="mgen-footer">
+      <button class="btn-mgen-cancel" onclick="cerrarInventario()">Cerrar</button>
+      <button class="btn-mgen-ok" onclick="exportarInventario()">&#128229; Exportar CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VOICE CUES ===== -->
+<div class="modal-gen" id="voice-modal">
+  <div class="mgen-box" style="max-width:480px">
+    <div class="mgen-hdr">
+      <h3>&#127908; Voice Cues — pista de disparo</h3>
+      <button class="btn-mgen-close" onclick="cerrarVoiceCues()">&#10005;</button>
+    </div>
+    <div class="mgen-body">
+      <div style="font-size:12px;color:var(--m1);margin-bottom:16px;line-height:1.7">
+        Genera una pista de audio donde una voz anuncia cada disparo con anticipación. El operador escucha el audio por auricular y dispara manualmente en sincronía con la música.
+      </div>
+      <div class="mgen-opt">
+        <div class="mgen-field"><label>Anticipación (s antes del cue)</label><input type="number" id="vc-anticip" value="1.5" min="0.5" max="5" step="0.5"/></div>
+        <div class="mgen-field"><label>Voz</label><select id="vc-voz"><option value="es-ES-Standard-A">Español mujer</option><option value="es-ES-Standard-B">Español hombre</option><option value="es-MX-Standard-A">Mexicano mujer</option></select></div>
+        <div class="mgen-field"><label>Texto de anuncio</label><input type="text" id="vc-texto" value="FUEGO" placeholder="FUEGO"/></div>
+        <div class="mgen-field"><label>Incluir número de canal</label><select id="vc-ch"><option value="1">Sí — "Canal 3, FUEGO"</option><option value="0">No — solo "FUEGO"</option></select></div>
+      </div>
+      <div id="vc-preview" style="background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:12px;font-size:11px;color:var(--m1);max-height:120px;overflow-y:auto;margin-bottom:4px"></div>
+      <div style="font-size:10px;color:var(--m2);margin-top:6px">Vista previa de los primeros 5 anuncios. Se generan todos al exportar.</div>
+    </div>
+    <div class="mgen-footer">
+      <button class="btn-mgen-cancel" onclick="cerrarVoiceCues()">Cancelar</button>
+      <button class="btn-mgen-ok" style="background:var(--purple)" onclick="generarVoiceCues()">&#127908; Generar y descargar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIN MODALES NUEVOS ===== -->
 <!-- ===================== VIDEO DEMO MODAL ===================== -->
 <div id="video-overlay">
   <div id="video-box">
@@ -1004,25 +1160,25 @@ var S = {
   playing:false, t:0, dur:120, zoom:8, scrollX:0, scrollY:0,
   cues:[], nextId:0,
   effects:[
-    {id:0,n:'Peonia Roja',      fam:'Peonia',     c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:20},
-    {id:1,n:'Crisantemo Verde', fam:'Crisantemo', c:'#27ae60',ci:[39,174,96],  cf:[0,60,20],   pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:10, velY:22},
-    {id:2,n:'Sauce Dorado',     fam:'Sauce',      c:'#d4a017',ci:[212,160,23], cf:[100,70,0],  pCount:80,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:-30,velY:20},
-    {id:3,n:'Volcan Dorado',    fam:'Volcan',     c:'#e07820',ci:[224,120,32], cf:[100,40,0],  pCount:6, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0},
-    {id:4,n:'Anillo Azul',      fam:'Anillo',     c:'#2980b9',ci:[41,128,185], cf:[0,40,100],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-30,velY:20},
-    {id:5,n:'Peonia Azul',      fam:'Peonia',     c:'#3b5bdb',ci:[59,91,219],  cf:[0,20,100],  pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:5,  velY:20},
-    {id:6,n:'Crisantemo Blanco',fam:'Crisantemo', c:'#b0b8d0',ci:[176,184,208],cf:[80,80,100], pCount:55,minLife:1.2,maxLife:1.8,minSpd:16,maxSpd:26,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:22},
-    {id:7,n:'Sauce Plateado',   fam:'Sauce',      c:'#8899aa',ci:[136,153,170],cf:[40,50,60],  pCount:70,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.0,fuseSeg:2.0,posX:20, velY:20},
-    {id:8,n:'Volcan Rojo',      fam:'Volcan',     c:'#c92a2a',ci:[201,42,42],  cf:[80,0,0],    pCount:8, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0},
-    {id:9,n:'Anillo Dorado',    fam:'Anillo',     c:'#ca8a04',ci:[202,138,4],  cf:[100,60,0],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:15, velY:20},
-    {id:10,n:'Peonia Magenta',  fam:'Peonia',     c:'#d4538e',ci:[212,83,142], cf:[80,0,50],   pCount:55,minLife:1.1,maxLife:1.6,minSpd:18,maxSpd:30,gravMod:1.0,fuseSeg:2.0,posX:-10,velY:24},
-    {id:11,n:'Crisantemo Rojo', fam:'Crisantemo', c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:20, velY:20},
-    {id:12,n:'Sauce Azul',      fam:'Sauce',      c:'#2471a3',ci:[36,113,163], cf:[0,30,80],   pCount:75,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:30, velY:22},
-    {id:13,n:'Anillo Verde',    fam:'Anillo',    c:'#1a9e4a',ci:[26,158,74],  cf:[0,60,20],   pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-20,velY:20},
-    {id:14,n:'Cometa Dorada',   fam:'Cometa',    c:'#f0c030',ci:[240,192,48], cf:[100,60,0],  pCount:30,minLife:1.8,maxLife:2.0,minSpd:15,maxSpd:22,gravMod:1.8,fuseSeg:2.5,posX:0,  velY:28},
-    {id:15,n:'Mina Plateada',   fam:'Mina',      c:'#c0c8e0',ci:[192,200,224],cf:[60,60,80],  pCount:40,minLife:1.2,maxLife:1.8,minSpd:18,maxSpd:32,gravMod:1.2,fuseSeg:0,  posX:0,  velY:0},
-    {id:16,n:'Crossette Roja',  fam:'Crossette', c:'#e03030',ci:[224,48,48],  cf:[80,0,0],    pCount:60,minLife:1.0,maxLife:1.4,minSpd:16,maxSpd:24,gravMod:1.0,fuseSeg:2.2,posX:5,  velY:22},
-    {id:17,n:'Palmera Dorada',  fam:'Palmera',   c:'#d4a820',ci:[212,168,32], cf:[90,60,0],   pCount:56,minLife:2.2,maxLife:2.2,minSpd:12,maxSpd:14,gravMod:2.4,fuseSeg:2.5,posX:-15,velY:24},
-    {id:18,n:'Sparkler Blanco', fam:'Sparkler',  c:'#e8e8f8',ci:[232,232,248],cf:[80,80,100], pCount:60,minLife:0.5,maxLife:0.8,minSpd:10,maxSpd:20,gravMod:0.8,fuseSeg:0,  posX:0,  velY:0},
+    {id:0,n:'Peonia Roja',      fam:'Peonia',     c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:20,angulo:90},
+    {id:1,n:'Crisantemo Verde', fam:'Crisantemo', c:'#27ae60',ci:[39,174,96],  cf:[0,60,20],   pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:10, velY:22,angulo:90},
+    {id:2,n:'Sauce Dorado',     fam:'Sauce',      c:'#d4a017',ci:[212,160,23], cf:[100,70,0],  pCount:80,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:-30,velY:20,angulo:90},
+    {id:3,n:'Volcan Dorado',    fam:'Volcan',     c:'#e07820',ci:[224,120,32], cf:[100,40,0],  pCount:6, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0, angulo:90},
+    {id:4,n:'Anillo Azul',      fam:'Anillo',     c:'#2980b9',ci:[41,128,185], cf:[0,40,100],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-30,velY:20,angulo:90},
+    {id:5,n:'Peonia Azul',      fam:'Peonia',     c:'#3b5bdb',ci:[59,91,219],  cf:[0,20,100],  pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:5,  velY:20,angulo:90},
+    {id:6,n:'Crisantemo Blanco',fam:'Crisantemo', c:'#b0b8d0',ci:[176,184,208],cf:[80,80,100], pCount:55,minLife:1.2,maxLife:1.8,minSpd:16,maxSpd:26,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:22,angulo:90},
+    {id:7,n:'Sauce Plateado',   fam:'Sauce',      c:'#8899aa',ci:[136,153,170],cf:[40,50,60],  pCount:70,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.0,fuseSeg:2.0,posX:20, velY:20,angulo:90},
+    {id:8,n:'Volcan Rojo',      fam:'Volcan',     c:'#c92a2a',ci:[201,42,42],  cf:[80,0,0],    pCount:8, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0, angulo:90},
+    {id:9,n:'Anillo Dorado',    fam:'Anillo',     c:'#ca8a04',ci:[202,138,4],  cf:[100,60,0],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:15, velY:20,angulo:90},
+    {id:10,n:'Peonia Magenta',  fam:'Peonia',     c:'#d4538e',ci:[212,83,142], cf:[80,0,50],   pCount:55,minLife:1.1,maxLife:1.6,minSpd:18,maxSpd:30,gravMod:1.0,fuseSeg:2.0,posX:-10,velY:24,angulo:90},
+    {id:11,n:'Crisantemo Rojo', fam:'Crisantemo', c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:20, velY:20,angulo:90},
+    {id:12,n:'Sauce Azul',      fam:'Sauce',      c:'#2471a3',ci:[36,113,163], cf:[0,30,80],   pCount:75,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:30, velY:22,angulo:90},
+    {id:13,n:'Anillo Verde',    fam:'Anillo',    c:'#1a9e4a',ci:[26,158,74],  cf:[0,60,20],   pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-20,velY:20,angulo:90},
+    {id:14,n:'Cometa Dorada',   fam:'Cometa',    c:'#f0c030',ci:[240,192,48], cf:[100,60,0],  pCount:30,minLife:1.8,maxLife:2.0,minSpd:15,maxSpd:22,gravMod:1.8,fuseSeg:2.5,posX:0,  velY:28,angulo:75},
+    {id:15,n:'Mina Plateada',   fam:'Mina',      c:'#c0c8e0',ci:[192,200,224],cf:[60,60,80],  pCount:40,minLife:1.2,maxLife:1.8,minSpd:18,maxSpd:32,gravMod:1.2,fuseSeg:0,  posX:0,  velY:0, angulo:90},
+    {id:16,n:'Crossette Roja',  fam:'Crossette', c:'#e03030',ci:[224,48,48],  cf:[80,0,0],    pCount:60,minLife:1.0,maxLife:1.4,minSpd:16,maxSpd:24,gravMod:1.0,fuseSeg:2.2,posX:5,  velY:22,angulo:90},
+    {id:17,n:'Palmera Dorada',  fam:'Palmera',   c:'#d4a820',ci:[212,168,32], cf:[90,60,0],   pCount:56,minLife:2.2,maxLife:2.2,minSpd:12,maxSpd:14,gravMod:2.4,fuseSeg:2.5,posX:-15,velY:24,angulo:90},
+    {id:18,n:'Sparkler Blanco', fam:'Sparkler',  c:'#e8e8f8',ci:[232,232,248],cf:[80,80,100], pCount:60,minLife:0.5,maxLife:0.8,minSpd:10,maxSpd:20,gravMod:0.8,fuseSeg:0,  posX:0,  velY:0, angulo:90},
   ],
   nextEffId:19,
   esp32:[], nextEspId:1,
@@ -1040,6 +1196,9 @@ var S = {
   editorOpen:false, edSelId:0,
   recMediaRec:null, recChunks:[], recActive:false, recStart:0,
   beatBeats:[], beatApplied:false,
+  camera:{mode:0},
+  bgCanvases:{},
+  smokeParticles:[],
 };
 
 /* =================================================================
@@ -1534,18 +1693,28 @@ function spawnBurst(ef,W,H,ch){
     }
   }
 
-  // Sin posición definida: usar posX/velY del efecto
+  // Sin posición definida: usar posX/velY/angulo del efecto
   cx = W*.5+(ef.posX||0)/50*W*.42;
   cx = Math.max(W*.05, Math.min(W*.95, cx));
   var vn = ((ef.velY||20)-5)/45;
   cy = H*(.55-vn*.45);
   cy = Math.max(H*.04, Math.min(H*.65, cy));
+
+  // Aplicar ángulo: desplaza el punto de explosión lateralmente
+  // 90° = vertical (sin desplazamiento), <90 = izquierda, >90 = derecha
+  var ang = (ef.angulo||90);
+  var angRad = (ang - 90) * Math.PI / 180; // 0 = vertical
+  var longTray = cy + 60 + Math.random()*30; // longitud aprox de trayectoria
+  var desplazX = Math.tan(angRad) * longTray * 0.6;
+  var groundX = cx - desplazX; // punto de salida en el suelo
+
   var dur2 = Math.max(.3,(ef.fuseSeg||2)*.35+Math.random()*.15);
   S.rockets.push({
-    x: cx+(Math.random()-.5)*20,
-    y: cy+60+Math.random()*30,
+    x: groundX + (Math.random()-.5)*8,
+    y: H*.82,
     tx: cx, ty: cy,
-    t:0, dur:dur2, ef:ef, trailTimer:0
+    t:0, dur:dur2, ef:ef, trailTimer:0,
+    angulo: ang,
   });
 }
 function explodeBurst(ef,cx,cy,W,H){
@@ -1764,107 +1933,274 @@ function agregarReflejo(cx,cy,r,color,W,H){
   REFLEJOS.push({x:cx,y:ry,r:r,color:color,life:1,W:W,H:H});
 }
 
+/* ─── CÁMARA: parámetros por modo ─────────────────────────────── */
+var CAMS = [
+  // Frontal: visión clásica pirotécnica
+  { ox:0, oy:0, scaleX:1,   scaleY:1,    pivotX:.5, pivotY:.85,
+    groundRatio:.80, skyTint:'#010207', fogAlpha:.18 },
+  // Público: punto de fuga bajo, perspectiva de espectador
+  { ox:0, oy:.08, scaleX:.88, scaleY:.70, pivotX:.5, pivotY:1.0,
+    groundRatio:.88, skyTint:'#010409', fogAlpha:.22 },
+  // Aérea: vista desde arriba — todo aplastado y más ancho
+  { ox:0, oy:-.18, scaleX:1.20, scaleY:.40, pivotX:.5, pivotY:.5,
+    groundRatio:.65, skyTint:'#000306', fogAlpha:.28 },
+  // Lateral: desplazada, ángulo oblicuo
+  { ox:.15, oy:0, scaleX:.75, scaleY:.90, pivotX:.2, pivotY:.85,
+    groundRatio:.82, skyTint:'#010309', fogAlpha:.20 },
+];
+
+/* ─── Fondos por cámara (se regeneran al cambiar modo) ─────────── */
+function getBgCanvas(W, H, camMode){
+  var key = camMode+'_'+W+'_'+H+(S.bgImagen?'_custom':'');
+  if(S.bgCanvases[key]) return S.bgCanvases[key];
+
+  var cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+  var cx = cv.getContext('2d');
+
+  // ── IMAGEN PERSONALIZADA (Google Maps, foto, etc.)
+  if(S.bgImagen){
+    // Dibujar la imagen cubriendo todo el fondo
+    cx.drawImage(S.bgImagen, 0, 0, W, H);
+    // Oscurecer levemente para que las explosiones resalten
+    cx.fillStyle='rgba(0,0,8,0.45)'; cx.fillRect(0,0,W,H);
+    // Indicador de la ubicación
+    cx.fillStyle='rgba(255,255,255,.12)';
+    cx.font='10px DM Sans,sans-serif';
+    cx.textBaseline='bottom';
+    cx.fillText('📍 Ubicación personalizada',8,H-4);
+    S.bgCanvases[key]=cv;
+    return cv;
+  }
+
+  var cv = document.createElement('canvas'); cv.width=W; cv.height=H;
+  var cx = cv.getContext('2d');
+  var cam = CAMS[camMode];
+  var gH  = H * cam.groundRatio; // Y del suelo para esta cámara
+
+  // ── Cielo
+  var grd = cx.createLinearGradient(0,0,0,H);
+  if(camMode===2){ // Aérea: más oscuro, casi negro
+    grd.addColorStop(0,'#000204'); grd.addColorStop(.6,'#010510'); grd.addColorStop(1,'#020816');
+  } else if(camMode===1){ // Público: más cálido abajo (brillo de la ciudad)
+    grd.addColorStop(0,'#010206'); grd.addColorStop(.5,'#02060f'); grd.addColorStop(1,'#0a1530');
+  } else {
+    grd.addColorStop(0,'#010207'); grd.addColorStop(.4,'#020510'); grd.addColorStop(.75,'#040a18'); grd.addColorStop(1,'#060d1f');
+  }
+  cx.fillStyle=grd; cx.fillRect(0,0,W,H);
+
+  // ── Vía Láctea
+  var vl=cx.createRadialGradient(W*.45,H*.2,0,W*.45,H*.2,W*.45);
+  vl.addColorStop(0,'rgba(70,90,180,.07)'); vl.addColorStop(1,'transparent');
+  cx.fillStyle=vl; cx.fillRect(0,0,W,H);
+
+  // ── Estrellas (más en vista aérea, menos en público)
+  var nStars = camMode===2 ? 400 : camMode===1 ? 150 : 280;
+  var maxY   = camMode===2 ? H*.5 : H*.68;
+  for(var s=0;s<nStars;s++){
+    var sx=Math.random()*W, sy=Math.random()*maxY;
+    var sr=Math.random()<.07 ? Math.random()*1.8+.8 : Math.random()*.9+.2;
+    var sa=Math.random()*.65+.15;
+    cx.beginPath(); cx.arc(sx,sy,sr,0,Math.PI*2);
+    cx.fillStyle='rgba(210,225,255,'+sa+')'; cx.fill();
+    if(sr>1.2){ cx.beginPath(); cx.arc(sx,sy,sr*3,0,Math.PI*2); cx.fillStyle='rgba(180,200,255,.04)'; cx.fill(); }
+  }
+
+  // ── Luna (posición diferente por cámara)
+  var lx = [.84,.78,.60,.30][camMode], ly=[.11,.09,.18,.13][camMode], lr=[.042,.038,.035,.040][camMode];
+  cx.beginPath(); cx.arc(W*lx,H*ly,H*lr,0,Math.PI*2);
+  cx.fillStyle='rgba(255,252,215,.88)'; cx.fill();
+  cx.beginPath(); cx.arc(W*(lx+.02),H*(ly-.015),H*(lr-.004),0,Math.PI*2);
+  cx.fillStyle=cam.skyTint; cx.fill();
+
+  // ── Montañas / horizonte lejano
+  if(camMode!==2){
+    cx.fillStyle='rgba(5,9,22,.82)';
+    cx.beginPath(); cx.moveTo(0,gH*.9);
+    for(var mx=0;mx<=W;mx+=W*.08){
+      cx.lineTo(mx, gH*.9-Math.sin(mx/W*Math.PI*2.5+1.2)*gH*.07-Math.random()*gH*.03);
+    }
+    cx.lineTo(W,H); cx.lineTo(0,H); cx.closePath(); cx.fill();
+  }
+
+  // ── Edificios (3 capas — distinto densidad/escala por cámara)
+  var escala = [1, 1.1, 0.5, 0.85][camMode];
+  var capas=[
+    {n:Math.floor(W/22*escala)+2, wMin:10, wMax:18, hMin:.10, hMax:.25, col:'rgba(8,14,30,.98)', wS:5, wG:6},
+    {n:Math.floor(W/32*escala)+2, wMin:16, wMax:30, hMin:.16, hMax:.35, col:'rgba(5,9,19,.98)', wS:4, wG:7},
+    {n:Math.floor(W/50*escala)+1, wMin:24, wMax:50, hMin:.20, hMax:.42, col:'rgba(3,6,14,.98)', wS:5, wG:8},
+  ];
+  // Vista aérea: solo tejados pequeños
+  if(camMode===2){
+    capas=[{n:Math.floor(W/12)+3, wMin:20, wMax:60, hMin:.06, hMax:.12, col:'rgba(6,10,22,.98)', wS:4, wG:6}];
+  }
+  capas.forEach(function(capa,ci){
+    for(var b=0;b<capa.n;b++){
+      var bx=b*W/capa.n+(Math.random()-.5)*W/capa.n*.5;
+      var bw=capa.wMin+Math.random()*(capa.wMax-capa.wMin);
+      var bh=(capa.hMin+Math.random()*(capa.hMax-capa.hMin))*H;
+      var by=gH-bh;
+      cx.fillStyle=capa.col; cx.fillRect(bx,by,bw,bh);
+      if(camMode!==2&&Math.random()>.65){ // antena
+        cx.fillStyle='rgba(5,8,17,.99)'; cx.fillRect(bx+bw*.5-1,by-H*.018,2,H*.018);
+        if(Math.random()>.5){ cx.beginPath(); cx.arc(bx+bw*.5,by-H*.018,1.5,0,Math.PI*2); cx.fillStyle='rgba(255,50,50,.7)'; cx.fill(); }
+      }
+      var cols=Math.max(1,Math.floor(bw/capa.wG));
+      var rows=Math.max(1,Math.floor(bh/10));
+      for(var row=0;row<rows;row++){
+        for(var col=0;col<cols;col++){
+          if(Math.random()>.44){
+            var wx=bx+col*capa.wG+2, wy=by+row*10+3;
+            var warm=Math.random(), wa=.3+Math.random()*.55;
+            cx.fillStyle=warm>.6?'rgba(255,238,165,'+wa+')':warm>.3?'rgba(190,215,255,'+(wa*.7)+')':'rgba(12,22,48,.55)';
+            cx.fillRect(wx,wy,capa.wS-1,Math.floor(8-ci*.5));
+          }
+        }
+      }
+    }
+  });
+
+  // ── Suelo / plataforma de lanzamiento
+  var grd2=cx.createLinearGradient(0,gH*.78,0,H);
+  grd2.addColorStop(0,'rgba(3,6,16,0)');
+  grd2.addColorStop(.25,'rgba(3,7,18,.88)');
+  grd2.addColorStop(1,'rgba(1,4,10,1)');
+  cx.fillStyle=grd2; cx.fillRect(0,gH*.78,W,H-gH*.78);
+
+  // Línea de horizonte
+  cx.strokeStyle='rgba(18,32,68,.5)'; cx.lineWidth=1;
+  cx.beginPath(); cx.moveTo(0,gH); cx.lineTo(W,gH); cx.stroke();
+
+  // Reflejo del suelo — agua / pavimento húmedo (solo frontal y público)
+  if(camMode===0||camMode===1){
+    var wr=cx.createLinearGradient(0,gH,0,gH+H*.08);
+    wr.addColorStop(0,'rgba(8,18,45,.35)'); wr.addColorStop(1,'rgba(3,8,18,0)');
+    cx.fillStyle=wr; cx.fillRect(0,gH,W,H*.08);
+    // Ondas de agua
+    cx.strokeStyle='rgba(30,60,120,.15)'; cx.lineWidth=.5;
+    for(var wi=0;wi<6;wi++){
+      cx.beginPath(); cx.moveTo(0,gH+wi*6+3); cx.lineTo(W,gH+wi*6+3); cx.stroke();
+    }
+  }
+
+  // Vista aérea: cuadrícula de calles
+  if(camMode===2){
+    cx.strokeStyle='rgba(10,18,40,.4)'; cx.lineWidth=1;
+    for(var gi=0;gi<8;gi++){
+      cx.beginPath(); cx.moveTo(gi*W/7,0); cx.lineTo(gi*W/7,H); cx.stroke();
+      cx.beginPath(); cx.moveTo(0,gi*H/7); cx.lineTo(W,gi*H/7); cx.stroke();
+    }
+  }
+
+  // Vista lateral: perspectiva con vanishing point izquierda
+  if(camMode===3){
+    cx.strokeStyle='rgba(15,28,65,.25)'; cx.lineWidth=.8;
+    for(var li=0;li<12;li++){
+      var yy=gH*.3+li*(H-gH*.3)/12;
+      cx.beginPath(); cx.moveTo(0,yy); cx.lineTo(W,gH+li*3); cx.stroke();
+    }
+  }
+
+  // Niebla de distancia (gradiente horizontal)
+  if(camMode===3){
+    var fog=cx.createLinearGradient(W*.6,0,W,0);
+    fog.addColorStop(0,'rgba(2,6,18,0)'); fog.addColorStop(1,'rgba(2,6,18,.45)');
+    cx.fillStyle=fog; cx.fillRect(W*.6,0,W*.4,H);
+  }
+
+  S.bgCanvases[key]=cv;
+  return cv;
+}
+
 function draw3D(dt){
   var W=C3.width, H=C3.height;
+  var cm=Math.min(S.camera.mode||0, CAMS.length-1);
+  var cam=CAMS[cm];
+  var groundY=H*cam.groundRatio;
 
   // Viento
   actualizarViento(dt);
 
-  // Fondo ciudad
-  dibujarFondoCiudad(W,H);
+  // ── FONDO dinámico por cámara
+  var bg=getBgCanvas(W,H,cm);
+  x3.drawImage(bg,0,0);
 
-  // Fade muy suave para persistencia de luz (trail)
+  // ── TRANSFORMACIÓN DE CÁMARA al canvas completo
+  // Esto hace que TODO lo que se dibuje después use la perspectiva correcta
+  x3.save();
+  var px=W*cam.pivotX, py=H*cam.pivotY;
+  x3.translate(px + cam.ox*W, py + cam.oy*H);
+  x3.scale(cam.scaleX, cam.scaleY);
+  x3.translate(-px, -py);
+
+  // ── Fade de persistencia (trail)
   x3.globalCompositeOperation='source-over';
-  x3.fillStyle='rgba(1,2,6,0.18)'; x3.fillRect(0,0,W,H);
+  x3.fillStyle='rgba(1,2,6,'+cam.fogAlpha+')'; x3.fillRect(0,0,W,H);
 
-  // ── REFLEJOS en suelo (modo lighter para que sumen)
+  // ── REFLEJOS en suelo
   x3.globalCompositeOperation='lighter';
   for(var ri2=REFLEJOS.length-1;ri2>=0;ri2--){
     var ref=REFLEJOS[ri2];
     ref.life-=dt*1.8;
     if(ref.life<=0){REFLEJOS.splice(ri2,1);continue;}
-    var rAlpha=ref.life*.25;
-    // Elipse aplastada para simular reflejo en suelo
     x3.save();
-    x3.scale(1,.25);
+    x3.scale(1,.22);
     x3.beginPath();
-    x3.arc(ref.x,ref.y*4,ref.r*(2-ref.life*.5),0,Math.PI*2);
-    x3.fillStyle='rgba('+ref.color+','+rAlpha+')'; x3.fill();
+    x3.arc(ref.x,ref.y*4.5, ref.r*(1.8-ref.life*.4),0,Math.PI*2);
+    x3.fillStyle='rgba('+ref.color+','+ref.life*.2+')'; x3.fill();
     x3.restore();
   }
   x3.globalCompositeOperation='source-over';
 
-  // ── COHETES ascendentes mejorados
+  // ── COHETES
   var aliveR=[];
   for(var ri=0;ri<S.rockets.length;ri++){
     var rk=S.rockets[ri]; rk.t+=dt;
     var prog=Math.min(rk.t/rk.dur,1);
     if(prog>=1){
       explodeBurst(rk.ef,rk.tx,rk.ty,W,H);
-      // Agregar reflejo al explotar
-      agregarReflejo(rk.tx,rk.ty,40,
-        rk.ef.ci[0]+','+rk.ef.ci[1]+','+rk.ef.ci[2], W,H);
+      agregarReflejo(rk.tx,rk.ty,40,rk.ef.ci[0]+','+rk.ef.ci[1]+','+rk.ef.ci[2],W,H);
       continue;
     }
     aliveR.push(rk);
+    var ep=prog*prog*(3-2*prog);
+    var rx2=rk.x+(rk.tx-rk.x)*ep + VIENTO.x*rk.t*30;
+    var ry2=rk.y+(rk.ty-rk.y)*ep;
 
-    // Trayectoria parabólica con viento acumulado
-    var windAccX = VIENTO.x * rk.t * 30;
-    var rx2=rk.x+(rk.tx-rk.x)*prog + windAccX;
-    var ry2=rk.y+(rk.ty-rk.y)*prog;
-    // Easing: cohete acelera al final (ease-in para el suelo, ease-out arriba)
-    var easedProg=prog*prog*(3-2*prog);
-    ry2=rk.y+(rk.ty-rk.y)*easedProg;
-
-    // Scia del cohete con viento
+    // Scia
     rk.trailTimer+=dt;
     if(rk.trailTimer>.018){
       rk.trailTimer=0;
-      S.particles.push(mkP(
-        rx2+(Math.random()-.5)*2, ry2+(Math.random()-.5)*2,
-        VIENTO.x*20+(Math.random()-.5)*.4,
-        Math.random()*1.2+.3,
-        .3+Math.random()*.2, 1.2+Math.random()*1.5,
-        [255,200,80],[40,20,5],.25,false,0,0));
+      S.particles.push(mkP(rx2+(Math.random()-.5)*2,ry2+(Math.random()-.5)*2,
+        VIENTO.x*20+(Math.random()-.5)*.4,Math.random()*1.2+.3,
+        .3+Math.random()*.15,1.2+Math.random()*1.5,[255,200,80],[40,20,5],.25,false,0,0));
     }
-
-    // Flash de ignición al inicio
+    // Flash ignición
     if(prog<.08){
       x3.globalCompositeOperation='lighter';
       x3.beginPath(); x3.arc(rx2,ry2,8*(1-prog/.08),0,Math.PI*2);
-      x3.fillStyle='rgba(255,200,50,.15)'; x3.fill();
+      x3.fillStyle='rgba(255,200,50,.14)'; x3.fill();
       x3.globalCompositeOperation='source-over';
     }
-
-    // Cuerpo del cohete
     x3.beginPath(); x3.arc(rx2,ry2,2.5,0,Math.PI*2);
-    x3.fillStyle='rgba(255,240,100,.95)'; x3.fill();
-    // Halo luminoso
+    x3.fillStyle='rgba(255,242,100,.95)'; x3.fill();
     x3.globalCompositeOperation='lighter';
     x3.beginPath(); x3.arc(rx2,ry2,5,0,Math.PI*2);
-    x3.fillStyle='rgba(255,160,30,.18)'; x3.fill();
+    x3.fillStyle='rgba(255,160,30,.16)'; x3.fill();
     x3.globalCompositeOperation='source-over';
   }
   S.rockets=aliveR;
 
-  // ── PARTÍCULAS con bloom (globalCompositeOperation lighter = GL_ONE como el shader original)
+  // ── PARTÍCULAS con bloom
   x3.globalCompositeOperation='lighter';
   var toAdd=[]; var alive=0;
-
   for(var i=S.particles.length-1;i>=0;i--){
     var p=S.particles[i];
-
-    // Física con viento
-    p.vx += VIENTO.x * dt * 60 * .4;
-    p.vy += VIENTO.y * dt * 60 * .4;
-    p.x += p.vx*dt*60;
-    p.y += p.vy*dt*60;
-    p.vy += .08*p.grav*dt*60;
-    p.life -= p.decay*dt*60;
-
-    if(p.life<=0){ S.particles.splice(i,1); continue; }
+    p.vx+=VIENTO.x*dt*60*.4; p.vy+=VIENTO.y*dt*60*.4;
+    p.x+=p.vx*dt*60; p.y+=p.vy*dt*60;
+    p.vy+=.08*p.grav*dt*60;
+    p.life-=p.decay*dt*60;
+    if(p.life<=0){S.particles.splice(i,1);continue;}
     alive++;
-
     var lp=p.life/p.initialLife;
     var alpha=Math.min(p.life*2,1);
     var pr=1-lp;
@@ -1873,55 +2209,68 @@ function draw3D(dt){
     var b2=Math.round(p.ci[2]+(p.cf[2]-p.ci[2])*pr);
     var sz=p.size*Math.max(.12,lp);
 
-    // Humo en partículas viejas (cuando life < 30%)
+    // Humo
     if(lp<.3&&p.grav>.5){
       x3.beginPath(); x3.arc(p.x,p.y,sz*2.5,0,Math.PI*2);
-      x3.fillStyle='rgba(40,40,50,'+(lp*.08)+')'; x3.fill();
+      x3.fillStyle='rgba(40,40,52,'+(lp*.08)+')'; x3.fill();
     }
-
-    // Núcleo blanco brillante
+    // Núcleo
     x3.beginPath(); x3.arc(p.x,p.y,sz*.35,0,Math.PI*2);
     x3.fillStyle='rgba(255,255,255,'+alpha*.65+')'; x3.fill();
-    // Cuerpo principal
+    // Cuerpo
     x3.beginPath(); x3.arc(p.x,p.y,sz,0,Math.PI*2);
     x3.fillStyle='rgba('+r2+','+g2+','+b2+','+alpha*.88+')'; x3.fill();
     // Halo
-    if(sz>1.2&&lp>.25){
+    if(sz>1.2&&lp>.22){
       x3.beginPath(); x3.arc(p.x,p.y,sz*2.5,0,Math.PI*2);
       x3.fillStyle='rgba('+r2+','+g2+','+b2+','+(alpha*.06)+')'; x3.fill();
     }
-
-    // Sub-emisor (Crisantemo, Sauce, Mina, Palm)
+    // Sub-emisor
     if(p.isEmitter&&p.emitInterval>0){
       p.emitTimer+=dt;
       if(p.emitTimer>=p.emitInterval){
         p.emitTimer=0;
-        toAdd.push(mkP(
-          p.x+(Math.random()-.5)*2, p.y+(Math.random()-.5)*2,
-          p.vx*.08+(Math.random()-.5)*.25,
-          p.vy*.08+(Math.random()-.5)*.25,
-          p.subLife, .8+Math.random()*.8,
-          [255,248,200],[60,55,50],.18,false,0,0));
+        toAdd.push(mkP(p.x+(Math.random()-.5)*2,p.y+(Math.random()-.5)*2,
+          p.vx*.08+(Math.random()-.5)*.25,p.vy*.08+(Math.random()-.5)*.25,
+          p.subLife,.8+Math.random()*.8,[255,248,200],[60,55,50],.18,false,0,0));
       }
     }
   }
-
   x3.globalCompositeOperation='source-over';
-
-  // Humo residual oscuro sobre todo (modo multiply-like)
+  // Humo residual
   if(S.smokeParticles){
     for(var si2=S.smokeParticles.length-1;si2>=0;si2--){
       var sm=S.smokeParticles[si2];
-      sm.x+=sm.vx*dt*60+VIENTO.x*dt*20;
-      sm.y+=sm.vy*dt*60;
+      sm.x+=sm.vx*dt*60+VIENTO.x*dt*20; sm.y+=sm.vy*dt*60;
       sm.r+=dt*12; sm.life-=dt*.4;
       if(sm.life<=0){S.smokeParticles.splice(si2,1);continue;}
       x3.beginPath(); x3.arc(sm.x,sm.y,sm.r,0,Math.PI*2);
       x3.fillStyle='rgba(20,22,30,'+sm.life*.06+')'; x3.fill();
     }
   }
-
   for(var ai=0;ai<toAdd.length;ai++) S.particles.push(toAdd[ai]);
+
+  // ── RESTAURAR transformación de cámara
+  x3.restore();
+
+  // ── HUD info después de restore (sin transform)
+  if(cm===2){ // Vista aérea: mostrar grid de posiciones en overlay
+    x3.fillStyle='rgba(56,189,248,.35)';
+    x3.font='10px JetBrains Mono,monospace';
+    x3.textBaseline='top';
+    x3.fillText('VISTA AÉREA',8,8);
+  } else if(cm===1){
+    x3.fillStyle='rgba(180,200,255,.3)';
+    x3.font='10px JetBrains Mono,monospace';
+    x3.textBaseline='top';
+    x3.fillText('PERSPECTIVA PÚBLICO',8,8);
+  } else if(cm===3){
+    x3.fillStyle='rgba(180,200,255,.3)';
+    x3.font='10px JetBrains Mono,monospace';
+    x3.textBaseline='top';
+    x3.fillText('VISTA LATERAL',8,8);
+  }
+
   document.getElementById('hud-parts').textContent=alive+' part.';
 }
 
@@ -2130,7 +2479,7 @@ function resizeAll(){
   TC.width=Math.max(1,ts.offsetWidth||400);TC.height=Math.max(1,ts.offsetHeight||200);
   C3.width=Math.max(1,vp.offsetWidth||800);C3.height=Math.max(1,vp.offsetHeight||200);
   AC.width=Math.max(1,document.getElementById('audio-bar').offsetWidth-220);AC.height=22;
-  S.cityCanvas=null;S.stars=null;
+  S.cityCanvas=null;S.stars=null;S.bgCanvases={};
   if(posCanvas){posCanvas.width=C3.width;posCanvas.height=C3.height;dibujarPosiciones();}
   renderRuler();renderTracks();updateSB();
   if(S.waveform)renderWaveform();syncScrollSlider();
@@ -2690,16 +3039,32 @@ function edSeleccionar(id){
     '<div class="ed-section">Lanzamiento</div>'+
     '<div class="ed-row"><label>Posicion X</label><input type="range" id="ed-posx" min="-50" max="50" step="1" value="'+(ef.posX||0)+'"/><span class="rv" id="rv-posx">'+(ef.posX||0)+'</span></div>'+
     '<div class="ed-row"><label>Vel. Y (altura)</label><input type="range" id="ed-vely" min="5" max="50" step="1" value="'+(ef.velY||20)+'"/><span class="rv" id="rv-vely">'+(ef.velY||20)+'</span></div>'+
-    '<div class="ed-row"><label>Tiempo mecha (s)</label><input type="range" id="ed-fuse" min="0.2" max="5" step="0.1" value="'+(ef.fuseSeg||2)+'"/><span class="rv" id="rv-fuse">'+(ef.fuseSeg||2).toFixed(1)+'s</span></div>';
+    '<div class="ed-row"><label>Tiempo mecha (s)</label><input type="range" id="ed-fuse" min="0.2" max="5" step="0.1" value="'+(ef.fuseSeg||2)+'"/><span class="rv" id="rv-fuse">'+(ef.fuseSeg||2).toFixed(1)+'s</span></div>'+
+    '<div class="ed-row"><label>Angulo disparo (°)</label><input type="range" id="ed-ang" min="10" max="170" step="1" value="'+(ef.angulo||90)+'"/><span class="rv" id="rv-ang">'+(ef.angulo||90)+'°</span></div>'+
+    '<div style="display:flex;gap:10px;align-items:center;margin:4px 0 8px">'+
+      '<canvas id="ed-ang-canvas" width="100" height="70" style="border-radius:6px;background:#07080f;border:1px solid var(--b2);flex-shrink:0"></canvas>'+
+      '<div style="font-size:10px;color:var(--m2);line-height:1.65">'+
+        '<strong style="color:var(--m1)">Ángulo de disparo</strong><br>'+
+        '90° = vertical (normal)<br>'+
+        '45° = inclinado izq<br>'+
+        '135° = inclinado der<br>'+
+        '&lt;45° o &gt;135° = muy oblicuo'+
+      '</div>'+
+    '</div>';
   // Live sliders
-  [['ed-pcount','rv-pcount','',true],['ed-minlife','rv-minlife','s'],['ed-maxlife','rv-maxlife','s'],['ed-minspd','rv-minspd',''],['ed-maxspd','rv-maxspd',''],['ed-grav','rv-grav',''],['ed-posx','rv-posx',''],['ed-vely','rv-vely',''],['ed-fuse','rv-fuse','s']].forEach(function(sl){
+  [['ed-pcount','rv-pcount','',true],['ed-minlife','rv-minlife','s'],['ed-maxlife','rv-maxlife','s'],['ed-minspd','rv-minspd',''],['ed-maxspd','rv-maxspd',''],['ed-grav','rv-grav',''],['ed-posx','rv-posx',''],['ed-vely','rv-vely',''],['ed-fuse','rv-fuse','s'],['ed-ang','rv-ang','°',true]].forEach(function(sl){
     var inp=document.getElementById(sl[0]),rv=document.getElementById(sl[1]);if(!inp||!rv)return;
-    inp.addEventListener('input',function(){rv.textContent=(sl[3]?Math.round(+this.value):parseFloat(this.value).toFixed(1))+(sl[2]||'');});
+    inp.addEventListener('input',function(){
+      rv.textContent=(sl[3]?Math.round(+this.value):parseFloat(this.value).toFixed(1))+(sl[2]||'');
+      if(sl[0]==='ed-ang') dibujarAnguloCanvas(+this.value);
+    });
   });
+  // Dibujar ángulo inicial
+  setTimeout(function(){ dibujarAnguloCanvas(ef.angulo||90); }, 50);
   ['ed-ci','ed-cf'].forEach(function(id2){var inp=document.getElementById(id2);if(!inp)return;inp.addEventListener('input',function(){var rv=document.getElementById('rv-'+id2.replace('ed-',''));if(rv)rv.textContent=this.value;});});
 }
 function edNuevoEfecto(){
-  var ef={id:S.nextEffId++,n:'Nuevo '+(S.nextEffId-1),fam:'Peonia',c:'#e83030',ci:[232,48,48],cf:[80,0,0],pCount:50,minLife:1,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1,fuseSeg:2,posX:0,velY:20};
+  var ef={id:S.nextEffId++,n:'Nuevo '+(S.nextEffId-1),fam:'Peonia',c:'#e83030',ci:[232,48,48],cf:[80,0,0],pCount:50,minLife:1,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1,fuseSeg:2,posX:0,velY:20,angulo:90};
   S.effects.push(ef);S.edSelId=ef.id;
   poblarEfectos();poblarModalEfectos();poblarBeatEffSel();edRenderLib();edSeleccionar(ef.id);
   notify('Nuevo efecto creado','success');
@@ -2711,6 +3076,7 @@ function edGuardar(){
   ef.pCount=parseInt(g('ed-pcount')||ef.pCount);ef.minLife=parseFloat(g('ed-minlife')||ef.minLife);ef.maxLife=parseFloat(g('ed-maxlife')||ef.maxLife);
   ef.minSpd=parseFloat(g('ed-minspd')||ef.minSpd);ef.maxSpd=parseFloat(g('ed-maxspd')||ef.maxSpd);ef.gravMod=parseFloat(g('ed-grav')||ef.gravMod);
   ef.posX=parseFloat(g('ed-posx')||ef.posX);ef.velY=parseFloat(g('ed-vely')||ef.velY);ef.fuseSeg=parseFloat(g('ed-fuse')||ef.fuseSeg);
+  ef.angulo=parseInt(g('ed-ang')||ef.angulo||90);
   function hex2rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
   var ci=g('ed-ci');if(ci){ef.ci=hex2rgb(ci);ef.c=ci;}
   var cf=g('ed-cf');if(cf)ef.cf=hex2rgb(cf);
@@ -3013,6 +3379,79 @@ function aplicarPosicionesAEfectos(){
   notify('Posiciones aplicadas a '+POS.puntos.length+' canales','success');
   renderTracks();
 }
+/* =================================================================
+   FONDO PERSONALIZADO — Google Maps / foto propia
+   ================================================================= */
+S.bgImagen = null; // Image object cuando hay imagen cargada
+S.bgImagenURL = null;
+
+function cargarFondo(inp){
+  if(!inp.files||!inp.files[0])return;
+  var file=inp.files[0];
+  var url=URL.createObjectURL(file);
+  var img=new Image();
+  img.onload=function(){
+    S.bgImagen=img;
+    S.bgImagenURL=url;
+    S.bgCanvases={}; // forzar regeneración
+    S.cityCanvas=null;
+    document.getElementById('cam-reset-bg').style.display='flex';
+    notify('Fondo cargado: '+file.name,'success');
+  };
+  img.onerror=function(){ notify('Error al cargar imagen','error'); };
+  img.src=url;
+}
+
+function resetFondo(){
+  if(S.bgImagenURL) URL.revokeObjectURL(S.bgImagenURL);
+  S.bgImagen=null; S.bgImagenURL=null;
+  S.bgCanvases={}; S.cityCanvas=null;
+  document.getElementById('cam-reset-bg').style.display='none';
+  notify('Fondo restaurado a ciudad nocturna');
+}
+
+/* Instrucciones para Google Maps:
+   1. Abre maps.google.com
+   2. Busca la ubicacion del espectaculo
+   3. Activa Vista Satelital (icono abajo izquierda)
+   4. Ajusta el zoom para ver el area completa
+   5. Captura pantalla (Windows: Win+Shift+S)
+   6. Usa el boton "🏠 Fondo" para cargarla
+*/
+function dibujarAnguloCanvas(deg){
+  var cv=document.getElementById('ed-ang-canvas'); if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(56,189,248,.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,H*.85); ctx.lineTo(W,H*.85); ctx.stroke();
+  var ox=W/2, oy=H*.85;
+  var rad=(deg-90)*Math.PI/180;
+  var len=H*.62;
+  var tx=ox+Math.sin(rad)*len, ty=oy-Math.cos(rad)*len;
+  // Arco
+  var a1=Math.PI*1.5, a2=a1+rad;
+  if(a1>a2){var tmp=a1;a1=a2;a2=tmp;}
+  ctx.strokeStyle='rgba(232,160,32,.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(ox,oy,16,a1,a2); ctx.stroke();
+  // Línea cohete
+  ctx.strokeStyle='rgba(255,160,50,.85)'; ctx.lineWidth=2;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(tx,ty); ctx.stroke();
+  ctx.setLineDash([]);
+  // Punta
+  ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,200,80,.95)'; ctx.fill();
+  // Base
+  ctx.beginPath(); ctx.arc(ox,oy,4,0,Math.PI*2);
+  ctx.fillStyle='rgba(56,189,248,.9)'; ctx.fill();
+  // Texto
+  ctx.fillStyle='rgba(232,160,32,.85)';
+  ctx.font='bold 10px DM Sans,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(deg+'°',W/2,2); ctx.textAlign='left';
+}
+
 function abrirVideoDemo(){
   var overlay=document.getElementById('video-overlay');
   overlay.classList.add('open');
@@ -3072,6 +3511,223 @@ function cargarVideoDemo(inp){
 }
 
 // Cerrar video con Escape (ya manejado en el listener global)
+
+/* =================================================================
+   SISTEMA UNDO / REDO
+   ================================================================= */
+var HISTORIA = { stack:[], ptr:-1, MAX:50 };
+function guardarEstado(desc){
+  var est={desc:desc,cues:JSON.parse(JSON.stringify(S.cues)),nextId:S.nextId};
+  HISTORIA.stack=HISTORIA.stack.slice(0,HISTORIA.ptr+1);
+  HISTORIA.stack.push(est);
+  if(HISTORIA.stack.length>HISTORIA.MAX) HISTORIA.stack.shift();
+  HISTORIA.ptr=HISTORIA.stack.length-1;
+}
+function undo(){
+  if(HISTORIA.ptr<=0){notify('Sin más acciones para deshacer','error');return;}
+  HISTORIA.ptr--;
+  var est=HISTORIA.stack[HISTORIA.ptr];
+  S.cues=JSON.parse(JSON.stringify(est.cues));S.nextId=est.nextId;
+  updateCueCount();renderTracks();updateSB();mostrarUndoBar('Deshecho: '+est.desc);
+}
+function redo(){
+  if(HISTORIA.ptr>=HISTORIA.stack.length-1){notify('Sin más acciones para rehacer','error');return;}
+  HISTORIA.ptr++;
+  var est=HISTORIA.stack[HISTORIA.ptr];
+  S.cues=JSON.parse(JSON.stringify(est.cues));S.nextId=est.nextId;
+  updateCueCount();renderTracks();updateSB();mostrarUndoBar('Rehecho: '+est.desc);
+}
+function mostrarUndoBar(msg){
+  var bar=document.getElementById('undo-bar');
+  document.getElementById('undo-msg').textContent=msg;
+  bar.classList.add('show');
+  clearTimeout(HISTORIA._timer);
+  HISTORIA._timer=setTimeout(function(){bar.classList.remove('show');},3000);
+}
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('manual-overlay').classList.contains('open')) return;
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undo();}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redo();}
+});
+
+/* =================================================================
+   PATRONES DE DISPARO AUTOMÁTICO
+   ================================================================= */
+var PAT_SEL=0;
+function abrirPatrones(){
+  document.getElementById('pat-modal').classList.add('open');
+  var sel=document.getElementById('pat-eff');sel.innerHTML='';
+  S.effects.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.n;sel.appendChild(o);});
+  actualizarPreviewPatron();
+  ['pat-t0','pat-ch','pat-int','pat-rep'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.oninput=actualizarPreviewPatron;
+  });
+}
+function cerrarPatrones(){document.getElementById('pat-modal').classList.remove('open');}
+function selPat(n){
+  PAT_SEL=n;
+  document.querySelectorAll('.pat-card').forEach(function(c,i){c.classList.toggle('sel',i===n);});
+  actualizarPreviewPatron();
+}
+function parsearCanales(str){
+  var chs=[];
+  str.split(',').forEach(function(part){
+    part=part.trim();
+    if(part.indexOf('-')>=0){var r=part.split('-');for(var i=+r[0];i<=+r[1];i++)chs.push(i);}
+    else if(+part)chs.push(+part);
+  });
+  return chs;
+}
+function generarCuesPatron(pat,chs,t0,intv,reps,eid){
+  var cues=[];
+  for(var rep=0;rep<reps;rep++){
+    var base=t0+rep*(chs.length*intv+intv);
+    var orden=[];
+    switch(pat){
+      case 0:orden=chs.slice();break;
+      case 1:var mid=Math.floor(chs.length/2);for(var i=0;i<chs.length;i++)orden.push(i%2===0?chs[mid+Math.floor(i/2)]||chs[i]:chs[mid-Math.ceil(i/2)]||chs[i]);break;
+      case 2:orden=chs.slice().sort(function(a,b){return Math.sin(a*1.3)-Math.sin(b*1.3);});break;
+      case 3:chs.forEach(function(ch){cues.push({eid:eid,t:base,ch:ch});});continue;
+      case 4:orden=chs.slice();break;
+      case 5:var par=chs.filter(function(c){return c%2===0;}),imp=chs.filter(function(c){return c%2!==0;});
+        par.forEach(function(c,i){cues.push({eid:eid,t:base+i*intv,ch:c});});
+        imp.forEach(function(c,i){cues.push({eid:eid,t:base+i*intv+intv*.5,ch:c});});continue;
+    }
+    orden.forEach(function(ch,i){if(ch)cues.push({eid:eid,t:base+i*intv,ch:ch});});
+  }
+  return cues;
+}
+function actualizarPreviewPatron(){
+  var chs=parsearCanales(document.getElementById('pat-ch').value||'1-8');
+  var t0=+(document.getElementById('pat-t0').value)||0;
+  var intv=+(document.getElementById('pat-int').value)||.3;
+  var reps=+(document.getElementById('pat-rep').value)||1;
+  var eid=+(document.getElementById('pat-eff').value)||0;
+  var todos=generarCuesPatron(PAT_SEL,chs,t0,intv,reps,eid);
+  var prev=todos.slice(0,6).map(function(c){return 't='+c.t.toFixed(2)+'s CH'+c.ch;}).join('\n');
+  if(todos.length>6)prev+=' (+'+( todos.length-6)+' más)';
+  var el=document.getElementById('pat-preview');if(el)el.textContent=prev||'—';
+}
+function aplicarPatron(){
+  var chs=parsearCanales(document.getElementById('pat-ch').value||'1-8');
+  var t0=+(document.getElementById('pat-t0').value)||0;
+  var intv=+(document.getElementById('pat-int').value)||.3;
+  var reps=+(document.getElementById('pat-rep').value)||1;
+  var eid=+(document.getElementById('pat-eff').value)||0;
+  guardarEstado('Patrón aplicado');
+  var nuevos=generarCuesPatron(PAT_SEL,chs,t0,intv,reps,eid);
+  nuevos.forEach(function(c){S.cues.push({id:S.nextId++,eid:c.eid,t:Math.min(c.t,S.dur),ch:c.ch,fired:false,chain:null});});
+  updateCueCount();renderTracks();updateSB();cerrarPatrones();
+  notify(nuevos.length+' cues generados','success');
+}
+
+/* =================================================================
+   INVENTARIO DE PRODUCTOS
+   ================================================================= */
+S.inventario=S.inventario||[];
+function abrirInventario(){document.getElementById('inv-modal').classList.add('open');renderInventario();}
+function cerrarInventario(){document.getElementById('inv-modal').classList.remove('open');}
+function invAgregar(){
+  var n=document.getElementById('inv-nombre').value.trim();if(!n){notify('Escribe un nombre','error');return;}
+  S.inventario.push({id:Date.now(),nombre:n,calibre:document.getElementById('inv-calibre').value,stock:+(document.getElementById('inv-qty').value)||0,precio:+(document.getElementById('inv-precio').value)||0});
+  document.getElementById('inv-nombre').value='';document.getElementById('inv-qty').value='';document.getElementById('inv-precio').value='';
+  renderInventario();notify('Producto agregado','success');
+}
+function renderInventario(){
+  var tbody=document.getElementById('inv-tbody');tbody.innerHTML='';
+  var totalC=0;
+  S.inventario.forEach(function(item,i){
+    var usado=S.cues.filter(function(c){return eff(c.eid).n.toLowerCase().indexOf(item.nombre.toLowerCase())>=0;}).length;
+    var falta=usado>item.stock;
+    var tot=item.stock*item.precio;totalC+=tot;
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+escapeHtml(item.nombre)+'</td><td>'+item.calibre+'</td>'+
+      '<td class="'+(falta?'inv-low':'')+'">'+item.stock+'</td>'+
+      '<td class="'+(falta?'inv-low':'')+'">'+usado+(falta?' ⚠':'')+'</td>'+
+      '<td>$'+item.precio.toFixed(2)+'</td><td>$'+tot.toFixed(2)+'</td>'+
+      '<td><button class="inv-btn" onclick="invEliminar('+i+')">&#10005;</button></td>';
+    tbody.appendChild(tr);
+  });
+  var res=document.getElementById('inv-resumen');
+  if(res)res.innerHTML='<strong>Total: $'+totalC.toFixed(2)+'</strong> &nbsp;|&nbsp; '+S.inventario.length+' productos &nbsp;|&nbsp; '+S.cues.length+' cues en show';
+}
+function invEliminar(i){S.inventario.splice(i,1);renderInventario();}
+function exportarInventario(){
+  var rows=['Producto,Calibre,Stock,En show,Precio,Total'];
+  S.inventario.forEach(function(item){
+    var usado=S.cues.filter(function(c){return eff(c.eid).n.toLowerCase().indexOf(item.nombre.toLowerCase())>=0;}).length;
+    rows.push([item.nombre,item.calibre,item.stock,usado,'$'+item.precio,'$'+(item.stock*item.precio).toFixed(2)].join(','));
+  });
+  download(rows.join('\n'),'inventario_'+S.projName+'.csv','text/csv');notify('Inventario exportado','success');
+}
+
+/* =================================================================
+   VOICE CUES
+   ================================================================= */
+function abrirVoiceCues(){
+  document.getElementById('voice-modal').classList.add('open');
+  actualizarPreviewVoice();
+  ['vc-anticip','vc-texto','vc-ch'].forEach(function(id){var el=document.getElementById(id);if(el)el.oninput=el.onchange=actualizarPreviewVoice;});
+}
+function cerrarVoiceCues(){document.getElementById('voice-modal').classList.remove('open');}
+function actualizarPreviewVoice(){
+  var anticip=+(document.getElementById('vc-anticip').value)||1.5;
+  var texto=document.getElementById('vc-texto').value||'FUEGO';
+  var conCH=document.getElementById('vc-ch').value==='1';
+  var sorted=S.cues.slice().sort(function(a,b){return a.t-b.t;}).slice(0,6);
+  var lines=sorted.map(function(c){var t=Math.max(0,c.t-anticip);var msg=conCH?'Canal '+c.ch+', '+texto:texto;return 't='+t.toFixed(1)+'s → "'+msg+'"';});
+  var el=document.getElementById('vc-preview');if(el)el.textContent=lines.join('\n')||'Sin cues';
+}
+function generarVoiceCues(){
+  var anticip=+(document.getElementById('vc-anticip').value)||1.5;
+  var texto=document.getElementById('vc-texto').value||'FUEGO';
+  var conCH=document.getElementById('vc-ch').value==='1';
+  var sorted=S.cues.slice().sort(function(a,b){return a.t-b.t;});
+  if(!sorted.length){notify('Sin cues en el proyecto','error');return;}
+  // Exportar CSV de voice cues
+  var rows=['#Tiempo(s),Canal,Anuncio'];
+  sorted.forEach(function(c){
+    var t=Math.max(0,c.t-anticip);
+    var msg=conCH?'Canal '+c.ch+', '+texto:texto;
+    rows.push(t.toFixed(2)+','+c.ch+',"'+msg+'"');
+  });
+  download(rows.join('\n'),'voice_cues_'+S.projName+'.csv','text/csv');
+  // Demo en vivo con Speech API
+  if(window.speechSynthesis){
+    sorted.slice(0,3).forEach(function(c,i){
+      var msg=conCH?'Canal '+c.ch+', '+texto:texto;
+      setTimeout(function(){var u=new SpeechSynthesisUtterance(msg);u.lang='es-MX';u.rate=1.1;window.speechSynthesis.speak(u);},i*1800);
+    });
+  }
+  cerrarVoiceCues();notify('Voice cues exportados ('+sorted.length+' entradas) + demo en voz','success');
+}
+
+/* =================================================================
+   CÁMARA DEL VIEWPORT
+   ================================================================= */
+function setCamera(n){
+  S.camera.mode=n;
+  S.bgCanvases={};
+  S.cityCanvas=null;
+  document.querySelectorAll('.cam-btn').forEach(function(b,i){b.classList.toggle('active',i===n);});
+  // Limpiar partículas al cambiar cámara para evitar posiciones incorrectas
+  S.particles=[]; S.rockets=[]; REFLEJOS.length=0;
+  notify(['Vista frontal','Vista público','Vista aérea','Vista lateral'][n],'info');
+}
+
+/* =================================================================
+   INFORME SHOW
+   ================================================================= */
+function generarInformePDF(){
+  var lineas=['INFORME DE SHOW — '+S.projName,'Fecha: '+new Date().toLocaleDateString(),'Duracion: '+S.dur+'s | Cues: '+S.cues.length,'','LISTA DE CUES:','Tiempo,Canal,Efecto,Familia'];
+  S.cues.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(c){var e=eff(c.eid);lineas.push(c.t.toFixed(3)+',CH'+c.ch+','+e.n+','+e.fam);});
+  lineas.push('','RESUMEN POR CANAL:');
+  var pch={};S.cues.forEach(function(c){pch[c.ch]=(pch[c.ch]||0)+1;});
+  Object.keys(pch).sort(function(a,b){return a-b;}).forEach(function(ch){lineas.push('CH'+ch+': '+pch[ch]+' cues');});
+  download(lineas.join('\n'),'informe_'+S.projName+'.txt','text/plain');
+  notify('Informe generado','success');
+}
+
 function abrirManual(){
   document.getElementById('manual-overlay').classList.add('open');
 }
@@ -3089,10 +3745,11 @@ function manualTab(n){
 // Cerrar con Escape
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
-    cerrarManual();
-    cerrarVideoDemo();
-    closeModal();
-    cerrarBeatModal();
+    cerrarManual(); cerrarVideoDemo(); closeModal(); cerrarBeatModal();
+    cerrarPatrones(); cerrarInventario(); cerrarVoiceCues();
+    document.getElementById('pat-modal').classList.remove('open');
+    document.getElementById('inv-modal').classList.remove('open');
+    document.getElementById('voice-modal').classList.remove('open');
   }
 });
 document.getElementById('manual-overlay').addEventListener('click',function(e){
