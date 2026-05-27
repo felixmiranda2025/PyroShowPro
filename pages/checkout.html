@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comprar PyroShow Pro — $149</title>
+  <link rel="stylesheet" href="../css/variables.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/nav.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    body{background:var(--bg)}
+    .checkout-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 20px 60px}
+    .checkout-grid{display:grid;grid-template-columns:1fr 400px;gap:40px;max-width:900px;width:100%}
+    .checkout-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px}
+    .checkout-summary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;align-self:start;position:sticky;top:90px}
+    .form-title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .form-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+    .form-section{margin-bottom:24px}
+    .form-section-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;font-family:var(--font-display)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    label{font-size:13px;color:var(--muted)}
+    input,select{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:10px 14px;font-size:14px;font-family:var(--font-body);transition:border-color 0.15s;width:100%}
+    input:focus,select:focus{outline:none;border-color:var(--gold)}
+    .card-icons{display:flex;gap:6px;margin-bottom:12px}
+    .card-icon{background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:11px;color:var(--muted)}
+    .submit-btn{width:100%;background:var(--gold);color:#0a0800;font-size:15px;font-weight:600;padding:14px;border-radius:var(--radius-md);border:none;cursor:pointer;transition:background 0.15s;font-family:var(--font-body);margin-top:4px}
+    .submit-btn:hover{background:var(--gold2)}
+    .secure-badge{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--muted2);margin-top:14px}
+    .summary-product{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+    .summary-icon{width:44px;height:44px;background:var(--gold-dim);border:1px solid rgba(232,160,32,0.3);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .summary-name{font-size:15px;font-weight:500}
+    .summary-tier{font-size:12px;color:var(--muted)}
+    .summary-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px}
+    .summary-line .lbl{color:var(--muted)}
+    .summary-total{display:flex;justify-content:space-between;font-size:16px;font-weight:600;padding-top:16px;border-top:1px solid var(--border);margin-top:6px}
+    .summary-total .amt{color:var(--gold)}
+    .summary-features{margin-top:20px}
+    .summary-feat{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px}
+    .summary-feat::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+    .guarantee{background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);border-radius:var(--radius-md);padding:12px 14px;font-size:12px;color:var(--text);margin-top:16px;display:flex;gap:8px}
+    @media(max-width:720px){.checkout-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <span class="nav-logo-icon">&#127878;</span>
+        <span>PyroShow <strong>Pro</strong></span>
+      </a>
+      <div class="nav-actions" style="margin-left:auto">
+        <span style="font-size:13px;color:var(--muted)">&#128274; Pago seguro</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="checkout-wrap">
+    <div class="checkout-grid">
+
+      <!-- Formulario -->
+      <div class="checkout-form">
+        <h1 class="form-title">Completa tu compra</h1>
+        <p class="form-sub">Recibirasun email con tu licencia en menos de 5 minutos.</p>
+
+        <div class="form-section">
+          <div class="form-section-title">Informacion de contacto</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" placeholder="Roberto" autocomplete="given-name"/>
+            </div>
+            <div class="form-group">
+              <label for="apellido">Apellido</label>
+              <input type="text" id="apellido" placeholder="Castellanos" autocomplete="family-name"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="roberto@pirotecnia.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label for="empresa">Empresa (opcional)</label>
+            <input type="text" id="empresa" placeholder="Pirotecnia Castellanos S.A."/>
+          </div>
+          <div class="form-group">
+            <label for="pais">Pais</label>
+            <select id="pais">
+              <option value="">Selecciona tu pais</option>
+              <option>Mexico</option>
+              <option>Colombia</option>
+              <option>Argentina</option>
+              <option>Peru</option>
+              <option>Chile</option>
+              <option>Venezuela</option>
+              <option>Ecuador</option>
+              <option>Bolivia</option>
+              <option>Paraguay</option>
+              <option>Uruguay</option>
+              <option>Costa Rica</option>
+              <option>Guatemala</option>
+              <option>Honduras</option>
+              <option>El Salvador</option>
+              <option>Panama</option>
+              <option>Espana</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Metodo de pago</div>
+          <div class="card-icons">
+            <span class="card-icon">VISA</span>
+            <span class="card-icon">MC</span>
+            <span class="card-icon">AMEX</span>
+            <span class="card-icon">PayPal</span>
+          </div>
+          <div class="form-group">
+            <label for="card">Numero de tarjeta</label>
+            <input type="text" id="card" placeholder="1234 5678 9012 3456" maxlength="19"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiry">Vencimiento</label>
+              <input type="text" id="expiry" placeholder="MM/AA" maxlength="5"/>
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input type="text" id="cvv" placeholder="123" maxlength="4"/>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="handleCheckout()">
+          Comprar PyroShow Pro — $149
+        </button>
+        <div class="secure-badge">
+          &#128274; Pago cifrado con SSL. No almacenamos datos de tarjeta.
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="checkout-summary">
+        <div class="summary-product">
+          <div class="summary-icon">&#127878;</div>
+          <div>
+            <div class="summary-name">PyroShow Pro</div>
+            <div class="summary-tier">Licencia de por vida</div>
+          </div>
+        </div>
+        <div class="summary-line"><span class="lbl">Plan</span><span>Pro</span></div>
+        <div class="summary-line"><span class="lbl">Licencias</span><span>1 usuario</span></div>
+        <div class="summary-line"><span class="lbl">Actualizaciones</span><span>1 año</span></div>
+        <div class="summary-line"><span class="lbl">Subtotal</span><span>$149.00</span></div>
+        <div class="summary-line"><span class="lbl">Impuestos</span><span>$0.00</span></div>
+        <div class="summary-total"><span>Total</span><span class="amt">$149.00 USD</span></div>
+
+        <div class="summary-features">
+          <div class="summary-feat">Timeline ilimitado con musica</div>
+          <div class="summary-feat">Hasta 20 canales ESP32 WiFi</div>
+          <div class="summary-feat">Simulacion 3D OpenGL</div>
+          <div class="summary-feat">Exportacion Cobra / CSV</div>
+          <div class="summary-feat">Uso comercial ilimitado</div>
+          <div class="summary-feat">Soporte en espanol</div>
+        </div>
+
+        <div class="guarantee">
+          <span>&#128737;</span>
+          <span>Garantia de devolucion de 30 dias. Sin preguntas.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    // Formateo de campos
+    document.getElementById('card').addEventListener('input', function() {
+      var v = this.value.replace(/\D/g,'').substring(0,16);
+      this.value = v.replace(/(.{4})/g,'$1 ').trim();
+    });
+    document.getElementById('expiry').addEventListener('input', function() {
+      var v = this.value.replace(/\D/g,'').substring(0,4);
+      if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+      this.value = v;
+    });
+
+    function handleCheckout() {
+      var nombre = document.getElementById('nombre').value.trim();
+      var email  = document.getElementById('email').value.trim();
+      if (!nombre || !email) {
+        alert('Por favor completa al menos nombre y email.');
+        return;
+      }
+      // Aqui integrarias Stripe, Paddle, Lemon Squeezy, etc.
+      // Por ahora mostramos confirmacion
+      alert('¡Gracias ' + nombre + '! En la version de produccion aqui se procesaria el pago con Stripe.');
+    }
+  </script>
+</body>
+</html>

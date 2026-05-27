@@ -1,0 +1,42 @@
+/* variables.css — Tokens de diseño globales */
+:root {
+  --bg:        #07080f;
+  --surface:   #0d0f1a;
+  --surface2:  #111326;
+  --surface3:  #161830;
+  --border:    #1c1f35;
+  --border2:   #252845;
+
+  --gold:      #e8a020;
+  --gold2:     #f5c842;
+  --gold-dim:  rgba(232,160,32,0.12);
+
+  --red:       #e03030;
+  --red-dim:   rgba(224,48,48,0.12);
+
+  --blue:      #4d6ef5;
+  --blue-dim:  rgba(77,110,245,0.12);
+
+  --green:     #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+
+  --orange:    #e07820;
+
+  --text:      #eef0f8;
+  --muted:     #7880a0;
+  --muted2:    #505570;
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+
+  --transition: 0.18s ease;
+}

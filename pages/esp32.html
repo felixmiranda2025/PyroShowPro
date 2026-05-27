@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guia ESP32 — PyroShow Pro</title>
+  <link rel="stylesheet" href="../css/variables.css"/>
+  <link rel="stylesheet" href="../css/base.css"/>
+  <link rel="stylesheet" href="../css/nav.css"/>
+  <link rel="stylesheet" href="../css/footer.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    .page-hero{padding:120px 0 60px;border-bottom:1px solid var(--border);background:var(--surface)}
+    .page-hero h1{font-size:42px;margin-bottom:14px}
+    .page-hero p{font-size:16px;color:var(--muted);max-width:580px;line-height:1.7}
+    .docs-layout{display:grid;grid-template-columns:220px 1fr;gap:48px;padding:60px 0}
+    .docs-sidebar{position:sticky;top:80px;align-self:start}
+    .docs-nav-title{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:var(--font-display)}
+    .docs-nav a{display:block;font-size:13px;color:var(--muted);padding:5px 0;border-left:2px solid transparent;padding-left:12px;transition:all 0.15s}
+    .docs-nav a:hover,.docs-nav a.active{color:var(--text);border-left-color:var(--gold)}
+    .docs-nav-group{margin-bottom:24px}
+    .docs-content h2{font-size:26px;margin:36px 0 12px;padding-top:36px;border-top:1px solid var(--border)}
+    .docs-content h2:first-child{margin-top:0;padding-top:0;border-top:none}
+    .docs-content h3{font-size:18px;margin:28px 0 10px;color:var(--gold)}
+    .docs-content p{font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.75}
+    .docs-content ul{margin:0 0 16px 20px;display:flex;flex-direction:column;gap:6px}
+    .docs-content li{font-size:15px;color:var(--muted);line-height:1.65}
+    .code-block{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-md);padding:20px 24px;margin:16px 0 24px;overflow-x:auto}
+    .code-block pre{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);line-height:1.7;margin:0}
+    .code-block .kw{color:#f5c842}
+    .code-block .cm{color:var(--muted2);font-style:italic}
+    .code-block .str{color:#86efac}
+    .code-block .num{color:#fb923c}
+    .alert{display:flex;gap:12px;padding:16px 18px;border-radius:var(--radius-md);margin:20px 0;font-size:14px;line-height:1.6}
+    .alert-info{background:var(--blue-dim);border:1px solid rgba(77,110,245,0.3);color:var(--text)}
+    .alert-warn{background:rgba(232,160,32,0.10);border:1px solid rgba(232,160,32,0.3);color:var(--text)}
+    .alert-icon{font-size:18px;flex-shrink:0;line-height:1.4}
+    .step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin:12px 0;display:flex;gap:16px}
+    .step-num{width:32px;height:32px;background:var(--gold-dim);border:1px solid rgba(232,160,32,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:var(--gold);flex-shrink:0;font-size:14px}
+    .step-body h4{font-size:14px;font-weight:500;margin-bottom:6px}
+    .step-body p{font-size:13px;color:var(--muted);margin:0}
+    .wiring-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+    .wiring-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+    .wiring-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+    .wiring-table tr:last-child td{border-bottom:none}
+    .pin{display:inline-block;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px}
+    .pin-gpio{background:var(--gold-dim);color:var(--gold)}
+    .pin-vcc{background:var(--red-dim);color:var(--red)}
+    .pin-gnd{background:rgba(100,100,100,0.2);color:var(--muted)}
+  </style>
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <span class="nav-logo-icon">&#127878;</span>
+        <span>PyroShow <strong>Pro</strong></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html#features">Caracteristicas</a></li>
+        <li><a href="../index.html#pricing">Precios</a></li>
+        <li><a href="esp32.html" class="active">ESP32</a></li>
+        <li><a href="docs.html">Docs</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="../index.html#pricing" class="btn-cta">Descargar</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="container">
+      <div class="section-label">Hardware</div>
+      <h1>Guia de configuracion ESP32</h1>
+      <p>Conecta hasta 20 modulos ESP32 a PyroShow Pro para disparo pirotecnico inalambrico via WiFi. Esta guia cubre todo: desde el cableado hasta el firmware y la configuracion de red.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="docs-layout">
+
+      <!-- Sidebar -->
+      <aside class="docs-sidebar">
+        <nav class="docs-nav">
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Inicio rapido</div>
+            <a href="#hardware">Materiales necesarios</a>
+            <a href="#cableado">Cableado del relay</a>
+            <a href="#firmware">Instalar firmware</a>
+            <a href="#red">Configurar red WiFi</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Integracion</div>
+            <a href="#software">Agregar en PyroShow</a>
+            <a href="#prueba">Probar conexion</a>
+            <a href="#disparo">Disparo automatico</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Referencia</div>
+            <a href="#api">API HTTP del ESP32</a>
+            <a href="#firmware-code">Codigo firmware</a>
+            <a href="#faq">Preguntas frecuentes</a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Contenido -->
+      <main class="docs-content">
+
+        <h2 id="hardware">Materiales necesarios</h2>
+        <p>Para cada canal de disparo necesitas un modulo ESP32 con un relay o MOSFET de potencia. Aqui el listado:</p>
+        <ul>
+          <li>ESP32 DevKit v1 (cualquier variante con WiFi)</li>
+          <li>Modulo relay de 5V (recomendado: SRD-05VDC-SL-C) o MOSFET IRF540N para cargas inductivas</li>
+          <li>Fuente de alimentacion 5V/1A por modulo</li>
+          <li>Cable de par trenzado para conectar al iniciador electrico</li>
+          <li>Caja IP65 para uso exterior</li>
+        </ul>
+
+        <div class="alert alert-warn">
+          <span class="alert-icon">&#9888;</span>
+          <span><strong>Seguridad:</strong> Siempre trabaja con los iniciadores electricos DESCONECTADOS durante la instalacion del hardware. Nunca conectes un iniciador mientras el sistema esta energizado.</span>
+        </div>
+
+        <h2 id="cableado">Cableado del relay</h2>
+        <p>Conecta el modulo relay al ESP32 segun esta tabla. Usa el GPIO 2 por defecto (configurable en el firmware):</p>
+
+        <table class="wiring-table">
+          <thead>
+            <tr><th>Pin ESP32</th><th>Pin Relay</th><th>Descripcion</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="pin pin-vcc">5V</span></td><td>VCC</td><td>Alimentacion del relay</td></tr>
+            <tr><td><span class="pin pin-gnd">GND</span></td><td>GND</td><td>Tierra comun</td></tr>
+            <tr><td><span class="pin pin-gpio">GPIO 2</span></td><td>IN</td><td>Señal de control</td></tr>
+            <tr><td colspan="3" style="color:var(--muted);font-size:12px">Salida del relay (NO y COM) → Iniciador electrico</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="firmware">Instalar el firmware</h2>
+
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Instalar Arduino IDE y la placa ESP32</h4>
+            <p>Descarga Arduino IDE 2.x. En Preferencias agrega: <code>https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</code> y luego instala la plataforma "ESP32 by Espressif".</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Abrir el firmware</h4>
+            <p>En PyroShow Pro ve a Herramientas → Firmware ESP32 → Abrir en Arduino. El archivo es <code>esp32_firmware/esp32_canal.ino</code>.</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Configurar credenciales WiFi e IP</h4>
+            <p>Edita las primeras lineas del archivo con tu SSID, contrasena e IP estatica unica para cada modulo.</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>Flashear al ESP32</h4>
+            <p>Conecta el ESP32 por USB. Selecciona placa "ESP32 Dev Module" y el puerto correcto. Presiona Subir.</p>
+          </div>
+        </div>
+
+        <h2 id="firmware-code">Codigo del firmware</h2>
+        <div class="code-block">
+<pre><span class="cm">// Firmware PyroShow Pro — Canal de Disparo v2.0
+// Cambia SSID, PASSWORD e IP_LOCAL para cada ESP32</span>
+
+<span class="kw">#include</span> &lt;WiFi.h&gt;
+<span class="kw">#include</span> &lt;WebServer.h&gt;
+
+<span class="kw">const char*</span> SSID     = <span class="str">"TuRedWiFi"</span>;
+<span class="kw">const char*</span> PASSWORD = <span class="str">"TuContrasena"</span>;
+
+IPAddress IP_LOCAL(<span class="num">192</span>, <span class="num">168</span>, <span class="num">1</span>, <span class="num">101</span>); <span class="cm">// IP unica por modulo</span>
+IPAddress GATEWAY (<span class="num">192</span>, <span class="num">168</span>, <span class="num">1</span>,   <span class="num">1</span>);
+IPAddress SUBNET  (<span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>, <span class="num">0</span>);
+
+<span class="kw">const int</span> FIRE_PIN          = <span class="num">2</span>;
+<span class="kw">const int</span> DURACION_PULSO_MS = <span class="num">500</span>;
+
+WebServer servidor(<span class="num">80</span>);
+
+<span class="kw">void</span> setup() {
+  Serial.begin(<span class="num">115200</span>);
+  pinMode(FIRE_PIN, OUTPUT);
+  digitalWrite(FIRE_PIN, LOW);
+
+  WiFi.config(IP_LOCAL, GATEWAY, SUBNET);
+  WiFi.begin(SSID, PASSWORD);
+  <span class="kw">while</span> (WiFi.status() != WL_CONNECTED) { delay(<span class="num">500</span>); }
+
+  servidor.on(<span class="str">"/ping"</span>, []() {
+    servidor.send(<span class="num">200</span>, <span class="str">"text/plain"</span>, <span class="str">"OK"</span>);
+  });
+
+  servidor.on(<span class="str">"/fire"</span>, []() {
+    digitalWrite(FIRE_PIN, HIGH);
+    delay(DURACION_PULSO_MS);
+    digitalWrite(FIRE_PIN, LOW);
+    servidor.send(<span class="num">200</span>, <span class="str">"text/plain"</span>, <span class="str">"OK FIRED"</span>);
+  });
+
+  servidor.on(<span class="str">"/status"</span>, []() {
+    String r = <span class="str">"{\"ip\":\""</span> + WiFi.localIP().toString() +
+               <span class="str">"\",\"rssi\":"</span> + WiFi.RSSI() + <span class="str">"}"</span>;
+    servidor.send(<span class="num">200</span>, <span class="str">"application/json"</span>, r);
+  });
+
+  servidor.begin();
+}
+
+<span class="kw">void</span> loop() {
+  servidor.handleClient();
+}</pre>
+        </div>
+
+        <h2 id="api">API HTTP del ESP32</h2>
+        <table class="wiring-table">
+          <thead><tr><th>Endpoint</th><th>Metodo</th><th>Respuesta</th><th>Descripcion</th></tr></thead>
+          <tbody>
+            <tr><td><code>/ping</code></td><td>GET</td><td><code>OK</code></td><td>Verifica que el modulo esta en linea</td></tr>
+            <tr><td><code>/fire</code></td><td>GET</td><td><code>OK FIRED</code></td><td>Activa GPIO HIGH por DURACION_PULSO_MS ms</td></tr>
+            <tr><td><code>/status</code></td><td>GET</td><td>JSON</td><td>Retorna IP y nivel de señal WiFi</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="faq">Preguntas frecuentes</h2>
+        <h3>El ESP32 no responde al ping</h3>
+        <p>Verifica que el ESP32 y la computadora esten en la misma red WiFi. Comprueba que la IP estatica configurada no este siendo usada por otro dispositivo. Abre el monitor serial de Arduino para ver los logs de conexion.</p>
+
+        <h3>¿Puedo usar mas de 20 ESP32?</h3>
+        <p>La version Enterprise permite extender el limite. Contacta a ventas para configuraciones especiales de mas de 20 canales.</p>
+
+        <h3>¿Que pasa si la red WiFi falla durante el espectaculo?</h3>
+        <p>Se recomienda usar un router WiFi dedicado solo para el sistema de disparo, sin otros dispositivos conectados. Un router 5GHz de doble banda con los ESP32 en 2.4GHz da la mejor estabilidad.</p>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">&#127878; PyroShow Pro</div>
+        <p class="footer-tagline">Software pirotecnico profesional.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Producto</div>
+        <a href="../index.html#features">Caracteristicas</a>
+        <a href="../index.html#pricing">Precios</a>
+        <a href="download.html">Descargar</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Recursos</div>
+        <a href="docs.html">Documentacion</a>
+        <a href="esp32.html">Guia ESP32</a>
+        <a href="firmware.html">Firmware</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <span>2025 PyroShow Pro.</span>
+        <span>Hecho para la comunidad pirotecnica</span>
+      </div>
+    </div>
+  </footer>
+  <script src="../js/nav.js"></script>
+</body>
+</html>

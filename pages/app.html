@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PyroShow Pro — Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#06070e;color:#eef0f8;font-family:'DM Sans',sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+:root{
+  --bg:#06070e;--s1:#0b0d1a;--s2:#0f1124;--s3:#141628;
+  --b1:#191c30;--b2:#222540;--b3:#303560;
+  --gold:#e8a020;--gold2:#f5c842;--golddim:rgba(232,160,32,0.13);
+  --red:#e03030;--reddim:rgba(224,48,48,0.13);
+  --blue:#4d6ef5;--bluedim:rgba(77,110,245,0.13);
+  --green:#22c55e;--greendim:rgba(34,197,94,0.13);
+  --purple:#8b5cf6;--purpledim:rgba(139,92,246,0.13);
+  --text:#eef0f8;--m1:#8890a8;--m2:#555870;
+  --tbar:40px;--ruler:26px;--track:28px;--label:68px;--addbar:34px;--sbw:10px;
+}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none}
+input,select{font-family:'DM Sans',sans-serif;background:var(--s2);color:var(--text);border:1px solid var(--b2);border-radius:4px;padding:3px 7px;font-size:12px}
+input:focus,select:focus{outline:none;border-color:var(--gold)}
+canvas{display:block}
+#app{display:flex;flex-direction:column;height:100vh}
+/* TOPBAR */
+#topbar{height:36px;background:#08090f;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:0;padding:0 10px;flex-shrink:0;z-index:100;overflow-x:auto}
+.tl{font-family:'Syne',sans-serif;font-size:14px;display:flex;align-items:center;gap:6px;color:var(--text);margin-right:12px;flex-shrink:0}
+.tl-icon{width:20px;height:20px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.tl strong{color:var(--gold)}
+.tsep{width:1px;height:18px;background:var(--b2);margin:0 6px;flex-shrink:0}
+.tfile{font-size:12px;color:var(--m1);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:80px}
+.tbtn{padding:3px 9px;border-radius:4px;font-size:11px;border:1px solid var(--b2);color:var(--m1);transition:all .14s;margin-left:3px;flex-shrink:0;white-space:nowrap}
+.tbtn:hover{color:var(--text);border-color:var(--b3);background:var(--s2)}
+.tbtn.gold{background:var(--gold);color:#08060a;border-color:transparent;font-weight:500}
+.tbtn.gold:hover{background:var(--gold2)}
+.tbtn.active{color:var(--purple);border-color:rgba(139,92,246,.5);background:var(--purpledim)}
+/* VIEWPORT */
+#viewport{flex:1;min-height:0;position:relative;overflow:hidden}
+#c3d{width:100%;height:100%;display:block}
+#vp-overlay{position:absolute;inset:0;pointer-events:none}
+.vp-hud{position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.hud-pill{background:rgba(6,7,14,.8);border:1px solid var(--b2);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--m1);font-family:'JetBrains Mono',monospace}
+.hud-pill.live{color:var(--green)}
+.hud-pill.rec{color:var(--red)}
+#rec-bar{position:absolute;top:8px;left:10px;display:none;align-items:center;gap:6px;background:rgba(224,48,48,.9);padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;color:#fff}
+#rec-bar span.dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink .7s infinite}
+/* PANEL */
+#resize-handle{height:4px;background:var(--b2);cursor:ns-resize;flex-shrink:0;transition:background .15s}
+#resize-handle:hover,#resize-handle.drag{background:var(--gold)}
+#panel{display:flex;flex-direction:column;flex-shrink:0;background:var(--s1);border-top:2px solid var(--b2)}
+/* TOOLBAR */
+#toolbar{height:var(--tbar);display:flex;align-items:center;gap:4px;padding:0 10px;background:#080913;border-bottom:1px solid var(--b1);flex-shrink:0;overflow-x:auto}
+.led{width:9px;height:9px;border-radius:50%;background:var(--m2);flex-shrink:0;transition:all .2s}
+.led.play{background:var(--green);box-shadow:0 0 6px var(--green)}
+.tp{background:#16a34a;color:#fff;padding:4px 11px;border-radius:4px;font-size:11px;font-weight:500;flex-shrink:0}
+.tp:hover{background:#22c55e}
+.tpa{background:#ca8a04;color:#fff;padding:4px 11px;border-radius:4px;font-size:11px;font-weight:500;flex-shrink:0}
+.tpa:hover{background:#eab308}
+.tr{background:#dc2626;color:#fff;padding:4px 11px;border-radius:4px;font-size:11px;font-weight:500;flex-shrink:0}
+.tr:hover{background:#ef4444}
+#ttime{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);background:#04050b;padding:3px 9px;border-radius:4px;border:1px solid var(--b2);margin:0 4px;min-width:88px;text-align:center;flex-shrink:0}
+.tsep2{width:1px;height:16px;background:var(--b2);margin:0 3px;flex-shrink:0}
+.tlbl{font-size:10px;color:var(--m2);flex-shrink:0}
+#inp-zoom{width:70px;accent-color:var(--gold)}
+#zv{font-size:10px;color:var(--m1);min-width:24px;flex-shrink:0}
+#cue-count{font-size:10px;color:var(--m2);flex-shrink:0}
+.flex1{flex:1}
+#esp-st{font-size:10px;color:var(--m2);flex-shrink:0}
+#esp-st.on{color:var(--green)}
+.btn-tesp{padding:3px 9px;border-radius:4px;font-size:11px;border:1px solid var(--b2);color:var(--m1);transition:all .14s;white-space:nowrap;flex-shrink:0}
+.btn-tesp:hover{color:var(--text);border-color:var(--b3)}
+.btn-tesp.on{border-color:rgba(224,48,48,.4);color:var(--red)}
+/* AUDIO BAR */
+#audio-bar{height:28px;display:flex;align-items:center;gap:6px;padding:0 10px;background:#07080f;border-bottom:1px solid var(--b1);flex-shrink:0}
+.ab-lbl{font-size:10px;color:var(--m2);flex-shrink:0}
+#audio-file-name{font-size:10px;color:var(--m1);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:60px}
+#btn-load-audio{padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid var(--b2);color:var(--m1);flex-shrink:0}
+#btn-load-audio:hover{color:var(--text);border-color:var(--b3)}
+#audio-canvas{flex:1;height:22px;border-radius:3px;background:rgba(77,110,245,.06);border:1px solid var(--b1);cursor:pointer;min-width:0}
+#vol-input{width:60px;accent-color:var(--blue);flex-shrink:0}
+#inp-audio{display:none}
+/* MAIN ROW */
+#main-row{display:flex;flex:1;min-height:0;overflow:hidden}
+/* TIMELINE */
+#tl{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden}
+#ruler-row{display:flex;height:var(--ruler);flex-shrink:0;border-bottom:1px solid var(--b1)}
+#rc{width:var(--label);flex-shrink:0;background:#06070d;border-right:1px solid var(--b1);display:flex;align-items:center;padding-left:6px;font-size:9px;color:var(--m2)}
+#ruler-c{flex:1}
+#tracks-row{display:flex;flex:1;min-height:0;overflow:hidden}
+#lbl-col{width:var(--label);flex-shrink:0;background:#08090f;border-right:1px solid var(--b1);overflow:hidden;position:relative}
+#tracks-scroll{flex:1;overflow:hidden;position:relative}
+#tracks-c{cursor:crosshair}
+#sbv{width:var(--sbw);flex-shrink:0;background:#06070d;border-left:1px solid var(--b1);position:relative;cursor:pointer}
+#sbthumb{position:absolute;left:1px;right:1px;background:var(--b2);border-radius:3px;min-height:18px;transition:background .14s}
+#sbthumb:hover,#sbthumb.d{background:var(--b3)}
+#addbar{height:var(--addbar);display:flex;align-items:center;gap:6px;padding:0 10px;background:#07080f;border-top:1px solid var(--b1);flex-shrink:0;flex-wrap:nowrap;overflow-x:auto}
+.albl{font-size:10px;color:var(--m2);flex-shrink:0}
+#sel-eff{width:140px;font-size:11px}
+#inp-ch{width:40px;font-size:11px}
+#btn-add{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.3);border-radius:4px;padding:3px 10px;font-size:11px;transition:background .14s;white-space:nowrap;flex-shrink:0}
+#btn-add:hover{background:rgba(34,197,94,.22)}
+#btn-chain{background:var(--purpledim);color:var(--purple);border:1px solid rgba(139,92,246,.3);border-radius:4px;padding:3px 10px;font-size:11px;white-space:nowrap;flex-shrink:0}
+#btn-chain:hover{background:rgba(139,92,246,.2)}
+#btn-chain.on{background:rgba(139,92,246,.25);font-weight:500}
+.ahint{font-size:10px;color:var(--m2);white-space:nowrap;flex-shrink:0}
+/* ESP32 PANEL */
+#ep{width:0;flex-shrink:0;display:flex;flex-direction:column;background:#060710;border-left:2px solid transparent;transition:width .2s ease,opacity .2s,border-color .2s;overflow:hidden;opacity:0}
+#ep.open{width:310px;border-left-color:var(--red);opacity:1}
+.ep-hdr{height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.ep-title{font-size:11px;color:var(--red);font-weight:500;letter-spacing:.5px}
+.ep-badge{font-size:9px;}
+.ep-badge.all-ok{color:var(--green)}
+.ep-badge.some-err{color:var(--red)}
+.ep-badge.none{color:var(--m2)}
+/* Barra de diagnóstico */
+.ep-diag{padding:6px 8px;border-bottom:1px solid var(--b1);flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.ep-diag-row{display:flex;align-items:center;gap:6px;font-size:10px}
+.ep-net-indicator{display:flex;align-items:center;gap:5px;flex:1}
+.ep-net-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ep-net-dot.ok{background:var(--green);box-shadow:0 0 5px var(--green)}
+.ep-net-dot.err{background:var(--red)}
+.ep-net-dot.unknown{background:var(--m2)}
+.ep-net-dot.checking{background:var(--gold);animation:blink .4s infinite}
+.ep-net-label{font-size:10px}
+.ep-net-label.ok{color:var(--green)}
+.ep-net-label.err{color:var(--red)}
+.ep-net-label.unknown{color:var(--m2)}
+.btn-diag{padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid var(--b2);color:var(--m1);white-space:nowrap}
+.btn-diag:hover{color:var(--text);border-color:var(--b3)}
+.btn-diag.checking{border-color:rgba(232,160,32,.4);color:var(--gold)}
+/* Agregar módulo */
+.ep-add{display:flex;gap:4px;padding:6px 8px;border-bottom:1px solid var(--b1);flex-shrink:0;flex-wrap:wrap}
+.ep-add input{font-size:10px;padding:3px 5px}
+.btn-eadd{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.3);border-radius:3px;padding:3px 7px;font-size:10px;white-space:nowrap}
+.btn-ping{background:var(--s2);color:var(--m1);border:1px solid var(--b2);border-radius:3px;padding:3px 7px;font-size:10px}
+/* Lista módulos */
+#ep-list{flex:1;overflow-y:auto;min-height:0}
+.erow{display:flex;flex-direction:column;gap:0;border-bottom:1px solid #0c0d1c}
+.erow-main{display:flex;align-items:center;gap:4px;padding:6px 8px;font-size:10px}
+.erow-detail{padding:3px 8px 5px 22px;font-size:9px;color:var(--m2);display:none}
+.erow-detail.show{display:block}
+.eled{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--m2);transition:all .2s}
+.eled.ok{background:var(--green);box-shadow:0 0 5px var(--green)}
+.eled.err{background:var(--red);box-shadow:0 0 4px var(--red)}
+.eled.ld{background:var(--gold);animation:blink .4s infinite}
+.eled.warn{background:#f59e0b}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.eip{color:var(--m1);min-width:86px;font-size:9px;font-family:'JetBrains Mono',monospace}
+.ename{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.ems{min-width:32px;text-align:right;font-size:9px;font-family:'JetBrains Mono',monospace}
+.ems.fast{color:var(--green)}
+.ems.slow{color:var(--gold)}
+.ems.err{color:var(--red)}
+.btn-ef{background:rgba(224,48,48,.7);color:#fff;border:none;border-radius:3px;padding:2px 7px;font-size:9px;white-space:nowrap;flex-shrink:0}
+.btn-ef:hover{background:var(--red)}
+.btn-ef.ok{background:var(--green)!important}
+.btn-ef.err{background:rgba(100,30,30,.8)!important;cursor:not-allowed}
+.btn-reping{background:var(--s2);color:var(--m2);border:1px solid var(--b2);border-radius:3px;padding:2px 5px;font-size:9px;flex-shrink:0}
+.btn-reping:hover{color:var(--text)}
+.ep-ft{background:var(--red);color:#fff;font-size:11px;font-weight:600;padding:9px;border:none;width:100%;flex-shrink:0;transition:background .14s;letter-spacing:.5px}
+.ep-ft:hover{background:#ff2020}
+.ep-ft:disabled{background:#441010;cursor:not-allowed;color:#888}
+/* Barra de estado de la red WiFi propia */
+.ep-wifi-warn{padding:5px 10px;background:rgba(224,48,48,.1);border-bottom:1px solid rgba(224,48,48,.2);font-size:9px;color:var(--red);display:none;align-items:center;gap:5px;flex-shrink:0}
+.ep-wifi-warn.show{display:flex}
+/* EDITOR DRAWER */
+#editor-drawer{position:fixed;top:36px;right:0;bottom:0;z-index:500;width:0;overflow:hidden;background:var(--s1);border-left:2px solid var(--purple);display:flex;flex-direction:column;transition:width .2s ease;box-shadow:-6px 0 24px rgba(0,0,0,.6)}
+#editor-drawer.open{width:420px}
+.ed-hdr{height:36px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--b1);flex-shrink:0;background:#070918}
+.ed-title{font-size:12px;color:var(--purple);font-weight:500;letter-spacing:.8px}
+.btn-ed-close{font-size:15px;color:var(--m2);padding:3px 8px;border-radius:3px;line-height:1}
+.btn-ed-close:hover{color:var(--text);background:var(--s2)}
+.ed-body{display:flex;flex:1;min-height:0;overflow:hidden}
+.ed-lib{width:120px;flex-shrink:0;border-right:1px solid var(--b1);overflow-y:auto;background:#07080e;display:flex;flex-direction:column}
+.ed-lib-title{font-size:9px;color:var(--m2);text-transform:uppercase;letter-spacing:1.2px;padding:8px 8px 4px}
+.ed-lib-item{display:flex;align-items:center;gap:6px;padding:7px 8px;font-size:11px;color:var(--m1);cursor:pointer;border-bottom:1px solid #0d0e1e;transition:all .14s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-lib-item:hover{background:var(--s2);color:var(--text)}
+.ed-lib-item.sel{background:rgba(139,92,246,.18);color:#c4b5fd;border-left:2px solid var(--purple)}
+.ed-lib-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.btn-ed-new{display:block;width:100%;padding:7px 8px;font-size:10px;font-weight:500;color:var(--green);background:var(--greendim);border:none;border-bottom:1px solid var(--b1);text-align:left;cursor:pointer}
+.btn-ed-new:hover{background:rgba(34,197,94,.22)}
+.ed-props{flex:1;overflow-y:auto;padding:12px 14px;min-width:0}
+.ed-props::-webkit-scrollbar{width:4px}
+.ed-props::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.ed-section{font-size:10px;color:var(--purple);text-transform:uppercase;letter-spacing:1.2px;margin:14px 0 8px;font-weight:600;border-bottom:1px solid var(--b1);padding-bottom:4px}
+.ed-section:first-child{margin-top:0}
+.ed-row{display:grid;grid-template-columns:102px 1fr 38px;align-items:center;gap:8px;margin-bottom:8px}
+.ed-row label{font-size:10px;color:var(--m2);text-align:right;line-height:1.3}
+.ed-row input[type=text],.ed-row input[type=number]{font-size:11px;padding:4px 7px;grid-column:2/-1;width:100%}
+.ed-row select{font-size:11px;padding:4px 7px;grid-column:2/-1;width:100%}
+.ed-row input[type=range]{accent-color:var(--purple);width:100%}
+.ed-row .rv{font-size:10px;color:var(--gold);text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.ed-color-row{display:grid;grid-template-columns:102px 32px 1fr;align-items:center;gap:8px;margin-bottom:8px}
+.ed-color-row label{font-size:10px;color:var(--m2);text-align:right}
+.ed-color-picker{width:32px;height:24px;padding:0 1px;border:1px solid var(--b2);border-radius:4px;cursor:pointer;background:none}
+.ed-color-hex{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--m1)}
+.ed-actions{padding:10px 14px;border-top:1px solid var(--b1);display:flex;gap:8px;flex-shrink:0;background:#070918}
+.btn-ed-save{flex:1;padding:8px;border-radius:6px;background:var(--purple);color:#fff;font-size:12px;font-weight:500;border:none;transition:background .14s}
+.btn-ed-save:hover{background:#a78bfa}
+.btn-ed-del{padding:8px 12px;border-radius:6px;border:1px solid rgba(224,48,48,.35);color:var(--red);font-size:12px;background:var(--reddim)}
+.btn-ed-del:hover{background:rgba(224,48,48,.22)}
+.btn-ed-preview{padding:8px 12px;border-radius:6px;border:1px solid rgba(232,160,32,.35);color:var(--gold);font-size:12px;background:var(--golddim)}
+.btn-ed-preview:hover{background:rgba(232,160,32,.22)}
+/* BEAT MODAL */
+#beat-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:8000;display:none;align-items:center;justify-content:center}
+#beat-modal.open{display:flex}
+.beat-box{background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:26px;width:420px;max-width:95vw}
+.beat-title{font-family:'Syne',sans-serif;font-size:16px;margin-bottom:6px}
+.beat-sub{font-size:12px;color:var(--m1);margin-bottom:18px;line-height:1.5}
+.beat-progress{height:6px;background:var(--b1);border-radius:3px;margin-bottom:16px;overflow:hidden}
+#beat-bar{height:100%;background:var(--gold);border-radius:3px;width:0;transition:width .15s}
+#beat-result{font-size:12px;color:var(--m1);margin-bottom:16px}
+.beat-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.beat-opt{background:var(--s1);border:1px solid var(--b2);border-radius:7px;padding:10px 12px}
+.beat-opt label{font-size:11px;color:var(--m2);display:block;margin-bottom:4px}
+.beat-opt input,.beat-opt select{width:100%;font-size:12px}
+.beat-acts{display:flex;gap:8px;justify-content:flex-end}
+.btn-beat-cancel{padding:7px 14px;border-radius:6px;border:1px solid var(--b2);color:var(--m1);font-size:12px;background:none}
+.btn-beat-apply{padding:7px 18px;border-radius:6px;background:var(--gold);color:#08060a;font-size:12px;font-weight:500;border:none}
+/* CONTEXT MENU */
+#ctx{position:fixed;z-index:9999;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.65);display:none}
+.ci{padding:6px 13px;font-size:12px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:7px}
+.ci:hover{background:rgba(255,255,255,.055)}
+.ci.d{color:var(--red)}
+.csep{height:1px;background:var(--b1);margin:3px 0}
+.clbl{padding:3px 13px;font-size:9px;color:var(--m2);font-weight:500}
+/* MODAL CUE EDIT */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:8888;display:none;align-items:center;justify-content:center}
+#ov.open{display:flex}
+.mbox{background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:24px;min-width:300px;max-width:400px;width:90%}
+.mtitle{font-family:'Syne',sans-serif;font-size:16px;margin-bottom:16px}
+.mrow{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.mrow label{font-size:11px;color:var(--m1)}
+.mrow input,.mrow select{font-size:13px;padding:7px 9px;border-radius:5px;width:100%}
+.mact{display:flex;gap:7px;justify-content:flex-end;margin-top:16px}
+.btn-mc{padding:7px 14px;border-radius:5px;border:1px solid var(--b2);color:var(--m1);font-size:12px;background:none}
+.btn-mc:hover{border-color:var(--b3);color:var(--text)}
+.btn-mo{padding:7px 18px;border-radius:5px;background:var(--gold);color:#08060a;font-size:12px;font-weight:500;border:none}
+/* NOTIFICATIONS */
+#notif{position:fixed;bottom:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.notif-pill{background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:8px 14px;font-size:12px;color:var(--text);opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.notif-pill.show{opacity:1;transform:translateY(0)}
+.notif-pill.success{border-color:rgba(34,197,94,.4);color:var(--green)}
+.notif-pill.error{border-color:rgba(224,48,48,.4);color:var(--red)}
+.notif-pill.info{border-color:rgba(77,110,245,.4);color:var(--blue)}
+/* SCROLLBAR */
+#ep-list::-webkit-scrollbar{width:4px}
+#ep-list::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+/* EDITOR DE POSICIONES */
+#pos-overlay{position:absolute;inset:0;z-index:200;display:none;cursor:crosshair}
+#pos-overlay.active{display:block}
+#pos-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#pos-toolbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(6,7,14,.88);border:1px solid var(--b2);border-radius:8px;padding:7px 14px;backdrop-filter:blur(8px);white-space:nowrap;z-index:10}
+#pos-toolbar span{font-size:11px;color:var(--m1)}
+#pos-toolbar strong{color:#38bdf8;font-size:11px}
+.btn-pos{padding:4px 10px;border-radius:5px;font-size:11px;border:1px solid var(--b2);color:var(--m1);cursor:pointer;background:none;transition:all .14s}
+.btn-pos:hover{color:var(--text);border-color:var(--b3);background:var(--s2)}
+.btn-pos.active{color:#38bdf8;border-color:rgba(56,189,248,.5);background:rgba(56,189,248,.1)}
+.btn-pos.danger{color:var(--red);border-color:rgba(224,48,48,.4)}
+.btn-pos.danger:hover{background:var(--reddim)}
+.pos-sel-info{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(6,7,14,.88);border:1px solid var(--b2);border-radius:6px;padding:6px 14px;font-size:11px;color:var(--m1);backdrop-filter:blur(8px);display:none}
+.pos-sel-info.show{display:block}
+#video-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9100;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#video-overlay.open{display:flex}
+#video-box{width:min(92vw,960px);background:var(--s1);border:1px solid var(--b2);border-radius:14px;overflow:hidden}
+.video-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#07080f;border-bottom:1px solid var(--b2)}
+.video-hdr-title{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text)}
+.video-hdr-title span{font-size:16px}
+.btn-video-close{padding:4px 10px;border-radius:5px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none;cursor:pointer}
+.btn-video-close:hover{color:var(--text);background:var(--s2)}
+#video-player-wrap{position:relative;width:100%;background:#000;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
+#video-player{width:100%;height:100%;display:block;outline:none}
+#video-no-file{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 20px;text-align:center;width:100%;height:100%;position:absolute;inset:0;background:#07080f}
+#video-no-file .icon{font-size:40px;opacity:.4}
+#video-no-file p{font-size:13px;color:var(--m1);line-height:1.7;max-width:480px}
+#video-no-file code{font-family:'JetBrains Mono',monospace;background:var(--s2);border:1px solid var(--b2);border-radius:5px;padding:6px 12px;font-size:12px;color:var(--text);display:block;margin:4px auto;width:fit-content}
+#video-no-file .btn-pick{background:var(--gold);color:#08060a;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;margin-top:6px}
+#video-no-file .btn-pick:hover{background:var(--gold2)}
+#inp-video-file{display:none}
+.video-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-top:1px solid var(--b2);font-size:11px;color:var(--m2)}
+.video-footer a{color:var(--gold);text-decoration:none;font-size:11px}
+.video-footer a:hover{color:var(--gold2)}
+#manual-overlay{position:fixed;inset:0;background:rgba(0,0,0,.80);z-index:9000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+#manual-overlay.open{display:flex}
+#manual-box{background:var(--s1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:860px;display:flex;flex-direction:column;overflow:hidden;margin:auto}
+.manual-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:#08090f;border-bottom:1px solid var(--b2);flex-shrink:0}
+.manual-hdr-left{display:flex;align-items:center;gap:10px}
+.manual-logo{width:28px;height:28px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.manual-hdr h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:500;color:var(--text)}
+.manual-hdr p{font-size:11px;color:var(--m2);margin-top:1px}
+.btn-manual-close{padding:4px 10px;border-radius:5px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none}
+.btn-manual-close:hover{color:var(--text);background:var(--s2)}
+.manual-tabs{display:flex;gap:0;border-bottom:1px solid var(--b2);background:#07080f;overflow-x:auto;flex-shrink:0}
+.manual-tab{padding:9px 18px;font-size:12px;color:var(--m2);cursor:pointer;border-bottom:2px solid transparent;transition:all .14s;white-space:nowrap;flex-shrink:0}
+.manual-tab:hover{color:var(--text)}
+.manual-tab.active{color:var(--text);border-bottom-color:var(--gold)}
+.manual-body{padding:24px 28px;overflow-y:auto;max-height:72vh;line-height:1.7}
+.manual-body::-webkit-scrollbar{width:5px}
+.manual-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.manual-section{display:none}
+.manual-section.active{display:block}
+.msec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:500;color:var(--text);margin-bottom:6px}
+.msec-sub{font-size:13px;color:var(--m1);margin-bottom:22px;line-height:1.6}
+.mcard{background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.mcard-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.mcard-num{width:22px;height:22px;border-radius:50%;background:var(--golddim);border:1px solid rgba(232,160,32,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--gold);flex-shrink:0}
+.mcard p{font-size:12px;color:var(--m1);line-height:1.7;margin-bottom:8px}
+.mcard p:last-child{margin-bottom:0}
+.mcard code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:3px;font-size:11px;color:var(--text)}
+.mcard ul{margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px}
+.mcard ul li{font-size:12px;color:var(--m1);line-height:1.6}
+.mcard ul li strong{color:var(--text)}
+.mtag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;margin-right:4px;margin-bottom:2px}
+.mtag-green{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.mtag-gold{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+.mtag-blue{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.3)}
+.mtag-red{background:var(--reddim);color:var(--red);border:1px solid rgba(224,48,48,.3)}
+.mtag-purple{background:var(--purpledim);color:var(--purple);border:1px solid rgba(139,92,246,.3)}
+.mkb{display:inline-block;background:var(--s3);border:1px solid var(--b3);border-radius:4px;padding:1px 6px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text)}
+.mwarn{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:12px;color:var(--gold);display:flex;gap:8px;line-height:1.6}
+.mdanger{background:var(--reddim);border:1px solid rgba(224,48,48,.25);border-radius:8px;padding:12px 14px;margin:14px 0;font-size:12px;color:var(--red);display:flex;gap:8px;line-height:1.6}
+.mtable{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}
+.mtable th{background:var(--s3);color:var(--m1);padding:7px 10px;text-align:left;border-bottom:1px solid var(--b2);font-weight:500}
+.mtable td{padding:7px 10px;border-bottom:1px solid var(--b1);color:var(--m1);vertical-align:top}
+.mtable td:first-child{color:var(--text);white-space:nowrap}
+.mtable tr:last-child td{border-bottom:none}
+.mcolumns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.mcolumns{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- Info si se abre como file:// -->
+<div id="file-warning" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#92400e;color:#fef3c7;font-size:11px;padding:5px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <span>ℹ️ Abierto como archivo local — conectando al ESP32 via método alternativo (img tag). Si no conecta, usa <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:3px">python servidor.py</code></span>
+  <button onclick="this.parentElement.style.display='none'" style="margin-left:auto;background:rgba(0,0,0,.25);color:#fef3c7;border:none;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px">✕</button>
+</div>
+
+<div id="app">
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tl"><div class="tl-icon">&#127878;</div>PyroShow <strong>Pro</strong></div>
+  <div class="tsep"></div>
+  <span class="tfile" id="proj-name">Sin titulo.pshow</span>
+  <button class="tbtn" onclick="nuevoProyecto()">Nuevo</button>
+  <button class="tbtn" onclick="guardarProyecto()">Guardar</button>
+  <button class="tbtn" onclick="cargarProyecto()">Abrir</button>
+  <button class="tbtn" onclick="exportCSV()">CSV</button>
+  <button class="tbtn" onclick="exportarCobra()">Cobra</button>
+  <button class="tbtn" id="btn-editor" onclick="toggleEditor()">&#9881; Efectos</button>
+  <button class="tbtn" id="btn-beat" onclick="abrirBeatDetect()" style="color:var(--gold);border-color:rgba(232,160,32,.4)">&#9836; Beats</button>
+  <button class="tbtn" id="btn-video" onclick="toggleVideo()" style="color:var(--blue);border-color:rgba(77,110,245,.4)">&#9711; Video</button>
+  <button class="tbtn" onclick="abrirManual()" style="color:var(--green);border-color:rgba(34,197,94,.4)">&#63; Manual</button>
+  <button class="tbtn" id="btn-posiciones" onclick="togglePosiciones()" style="color:#38bdf8;border-color:rgba(56,189,248,.4)">&#127757; Posiciones</button>
+  <button class="tbtn" onclick="abrirVideoDemo()" style="color:#e879f9;border-color:rgba(232,121,249,.4)">&#9654; Demo</button>
+  <button class="tbtn gold" onclick="open('../pages/checkout.html?plan=pro','_blank')">Pro</button>
+</div>
+
+<!-- VIEWPORT 3D -->
+<div id="viewport">
+  <canvas id="c3d"></canvas>
+  <!-- Editor de posiciones de lanzamiento -->
+  <div id="pos-overlay">
+    <canvas id="pos-canvas"></canvas>
+    <div id="pos-toolbar">
+      <strong>&#127757; Editor de posiciones</strong>
+      <div class="btn-pos active" id="btn-pos-add" onclick="setPosMode('add')">&#10011; Agregar punto</div>
+      <div class="btn-pos" id="btn-pos-move" onclick="setPosMode('move')">&#8689; Mover</div>
+      <div class="btn-pos danger" id="btn-pos-del" onclick="setPosMode('del')">&#10005; Eliminar</div>
+      <div style="width:1px;height:16px;background:var(--b2)"></div>
+      <div class="btn-pos" onclick="limpiarPosiciones()">&#128465; Limpiar todo</div>
+      <div class="btn-pos" onclick="distribuirPosiciones()">&#8801; Distribuir equidistante</div>
+      <div style="width:1px;height:16px;background:var(--b2)"></div>
+      <div class="btn-pos" style="color:var(--green);border-color:rgba(34,197,94,.4)" onclick="togglePosiciones()">&#10003; Cerrar</div>
+    </div>
+    <div class="pos-sel-info" id="pos-sel-info"></div>
+  </div>
+  <div class="vp-hud">
+    <div class="hud-pill live" id="hud-parts">0 part.</div>
+    <div class="hud-pill" id="hud-fps">-- fps</div>
+    <div class="hud-pill" id="hud-zoom">zoom 8.0x</div>
+    <div class="hud-pill" id="hud-pos" style="display:none;color:#38bdf8">0 posiciones</div>
+    <div class="hud-pill rec" id="hud-rec" style="display:none">&#9679; REC <span id="rec-time">0:00</span> <button onclick="pararVideo()" style="margin-left:6px;background:rgba(255,255,255,.2);border:none;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;cursor:pointer">Detener</button></div>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="resize-handle" title="Arrastra para redimensionar"></div>
+<div id="panel">
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <div class="led" id="led"></div>
+    <button class="tp" onclick="tlPlay()">&#9654; PLAY</button>
+    <button class="tpa" onclick="tlPause()">&#9646;&#9646; PAUSA</button>
+    <button class="tr" onclick="tlReset()">&#9632; RESET</button>
+    <span id="ttime">00:00.00</span>
+    <div class="tsep2"></div>
+    <span class="tlbl">Dur:</span>
+    <input type="number" id="inp-dur" value="120" min="10" max="600" step="5" style="width:50px"/>
+    <span class="tlbl">s</span>
+    <div class="tsep2"></div>
+    <span class="tlbl">Zoom:</span>
+    <input type="range" id="inp-zoom" min="1" max="80" value="8" step="0.5" style="width:70px"/>
+    <span id="zv">8.0</span>
+    <div class="tsep2"></div>
+    <span class="tlbl">H:</span>
+    <input type="range" id="inp-scrollx" min="0" max="100" value="0" step="0.5" style="width:70px;accent-color:var(--m1)"/>
+    <div class="tsep2"></div>
+    <span id="cue-count">0 cues</span>
+    <div class="flex1"></div>
+    <span id="esp-st">ESP32: 0/0</span>
+    <button class="btn-tesp" id="btn-tesp" onclick="toggleEsp()">&#128268; Disparo</button>
+  </div>
+  <!-- AUDIO BAR -->
+  <div id="audio-bar">
+    <span class="ab-lbl">&#9834;</span>
+    <button id="btn-load-audio" onclick="document.getElementById('inp-audio').click()">Cargar Audio</button>
+    <input type="file" id="inp-audio" accept=".mp3,.wav,.ogg,.aac,.flac" onchange="cargarAudio(this)"/>
+    <span id="audio-file-name">Sin audio — arrastra MP3/WAV/FLAC aqui</span>
+    <canvas id="audio-canvas" title="Clic para scrubbing / Waveform"></canvas>
+    <span class="ab-lbl">Vol:</span>
+    <input type="range" id="vol-input" min="0" max="1" value="0.8" step="0.05" onchange="setVolumen(this.value)"/>
+  </div>
+  <!-- MAIN ROW -->
+  <div id="main-row">
+    <div id="tl">
+      <div id="ruler-row">
+        <div id="rc"><span>POS</span></div>
+        <canvas id="ruler-c"></canvas>
+      </div>
+      <div id="tracks-row">
+        <div id="lbl-col"></div>
+        <div id="tracks-scroll"><canvas id="tracks-c"></canvas></div>
+        <div id="sbv"><div id="sbthumb"></div></div>
+      </div>
+      <div id="addbar">
+        <span class="albl">Agregar:</span>
+        <select id="sel-eff"></select>
+        <span class="albl">CH:</span>
+        <input type="number" id="inp-ch" value="1" min="1" max="32"/>
+        <button id="btn-add" onclick="addCue()">+ Agregar @ t</button>
+        <button id="btn-chain" onclick="toggleModoChain()">&#128279; Cadena</button>
+        <span class="ahint">Clic der=opciones | Drag=mover | DblClic=agregar | Shift+Rueda=scroll V</span>
+      </div>
+    </div>
+    <!-- ESP32 -->
+    <div id="ep">
+      <div class="ep-hdr">
+        <span class="ep-title">DISPARO ESP32</span>
+        <span class="ep-badge none" id="ep-badge">0/0 online</span>
+      </div>
+      <!-- Advertencia si no está en la red correcta -->
+      <div class="ep-wifi-warn" id="ep-wifi-warn">
+        &#9888; No conectado a PyroShow_Master — conecta tu PC a esa red WiFi
+      </div>
+      <!-- Diagnóstico de red -->
+      <div class="ep-diag">
+        <div class="ep-diag-row">
+          <div class="ep-net-indicator">
+            <div class="ep-net-dot unknown" id="diag-dot"></div>
+            <span class="ep-net-label unknown" id="diag-label">Sin verificar</span>
+          </div>
+          <button class="btn-diag" id="btn-full-diag" onclick="diagnosticoCompleto()">&#128270; Diagnóstico</button>
+        </div>
+        <div id="diag-detail" style="font-size:9px;color:var(--m2);display:none;line-height:1.6;padding-top:2px"></div>
+      </div>
+      <!-- Agregar módulo -->
+      <div class="ep-add">
+        <input type="text" id="en" placeholder="Nombre" style="width:68px"/>
+        <input type="text" id="eip" placeholder="192.168.4.1" style="width:100px"/>
+        <button class="btn-eadd" onclick="espAdd()">+Add</button>
+        <button class="btn-ping" onclick="espPingAll()">Ping All</button>
+      </div>
+      <div id="ep-list"></div>
+      <button class="ep-ft" id="btn-fuego-total" onclick="espFireAll()">!! FUEGO TOTAL !!</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EDITOR DRAWER -->
+<div id="editor-drawer">
+  <div class="ed-hdr">
+    <span class="ed-title">&#9881; EDITOR DE FUEGOS</span>
+    <button class="btn-ed-close" onclick="toggleEditor()">&#10005;</button>
+  </div>
+  <div class="ed-body">
+    <div class="ed-lib">
+      <button class="btn-ed-new" onclick="edNuevoEfecto()">+ Nuevo tipo</button>
+      <div class="ed-lib-title">Biblioteca</div>
+      <div id="ed-lib-list"></div>
+    </div>
+    <div class="ed-props" id="ed-props">
+      <div style="font-size:12px;color:var(--m2);padding:20px 0;text-align:center">Selecciona un efecto</div>
+    </div>
+  </div>
+  <div class="ed-actions">
+    <button class="btn-ed-preview" onclick="edPreview()">&#9654; Preview</button>
+    <button class="btn-ed-save" onclick="edGuardar()">Guardar</button>
+    <button class="btn-ed-del" onclick="edEliminar()">&#10007;</button>
+  </div>
+</div>
+
+<!-- BEAT DETECTION MODAL -->
+<div id="beat-modal">
+  <div class="beat-box">
+    <div class="beat-title">&#9836; Deteccion de beats automatica</div>
+    <div class="beat-sub" id="beat-sub">Analizara el audio cargado y generara cues en cada beat de la musica. Ajusta la sensibilidad y el efecto a usar.</div>
+    <div class="beat-progress"><div id="beat-bar"></div></div>
+    <div id="beat-result" style="display:none"></div>
+    <div class="beat-opts">
+      <div class="beat-opt">
+        <label>Efecto a colocar</label>
+        <select id="beat-eff-sel"></select>
+      </div>
+      <div class="beat-opt">
+        <label>Canal CH</label>
+        <input type="number" id="beat-ch" value="1" min="1" max="32"/>
+      </div>
+      <div class="beat-opt">
+        <label>Sensibilidad (1-3)</label>
+        <input type="range" id="beat-sens" min="1" max="3" value="1.5" step="0.1" style="width:100%;accent-color:var(--gold)"/>
+      </div>
+      <div class="beat-opt">
+        <label>Espaciado min (s)</label>
+        <input type="number" id="beat-gap" value="0.3" min="0.1" max="2" step="0.05"/>
+      </div>
+    </div>
+    <div class="beat-acts">
+      <button class="btn-beat-cancel" onclick="cerrarBeatModal()">Cancelar</button>
+      <button class="btn-beat-apply" id="btn-beat-run" onclick="ejecutarBeatDetect()">Analizar y generar cues</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx">
+  <div class="clbl" id="ctx-lbl">Cue</div>
+  <div class="csep"></div>
+  <div class="ci" onclick="ctxEdit()">&#9998; Editar</div>
+  <div class="ci" onclick="ctxDup()">&#10063; Duplicar</div>
+  <div class="ci" onclick="ctxChain()">&#128279; Encadenar con siguiente</div>
+  <div class="ci" onclick="ctxMoveLeft()">&#8592; -0.5s</div>
+  <div class="ci" onclick="ctxMoveRight()">&#8594; +0.5s</div>
+  <div class="csep"></div>
+  <div class="ci d" onclick="ctxDel()">&#10007; Borrar</div>
+</div>
+
+<!-- MODAL EDITAR CUE -->
+<div id="ov">
+  <div class="mbox">
+    <div class="mtitle">Editar cue</div>
+    <div class="mrow"><label>Tipo de efecto</label><select id="m-eff"></select></div>
+    <div class="mrow"><label>Tiempo (s)</label><input type="number" id="m-t" step="0.01" min="0"/></div>
+    <div class="mrow"><label>Canal CH</label><input type="number" id="m-ch" min="1" max="32"/></div>
+    <div class="mact">
+      <button class="btn-mc" onclick="closeModal()">Cancelar</button>
+      <button class="btn-mo" onclick="saveModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="notif"></div>
+<input type="file" id="inp-load-proj" accept=".pshow,.json" style="display:none" onchange="leerProyecto(this)"/>
+
+<!-- ===================== VIDEO DEMO MODAL ===================== -->
+<div id="video-overlay">
+  <div id="video-box">
+    <div class="video-hdr">
+      <div class="video-hdr-title">
+        <span>&#127909;</span>
+        PyroShow Pro — Video de demostración
+      </div>
+      <button class="btn-video-close" onclick="cerrarVideoDemo()">&#10005; Cerrar</button>
+    </div>
+    <div id="video-player-wrap">
+      <video id="video-player" controls preload="metadata">
+        Tu navegador no soporta el elemento video.
+      </video>
+      <!-- Pantalla si no hay archivo cargado -->
+      <div id="video-no-file">
+        <div class="icon">&#127916;</div>
+        <p>El video de demostración está en tu disco.<br>
+        Haz clic en <strong>Seleccionar video</strong> y busca el archivo:</p>
+        <code>D:\Externos\Noe\Imagen\PyroShow Pro.mp4</code>
+        <p style="font-size:11px;color:var(--m2)">Solo se carga localmente — no se sube a ningún servidor.</p>
+        <button class="btn-pick" onclick="document.getElementById('inp-video-file').click()">
+          &#128193; Seleccionar video
+        </button>
+        <input type="file" id="inp-video-file" accept="video/*,.mp4,.webm,.avi,.mov" onchange="cargarVideoDemo(this)"/>
+      </div>
+    </div>
+    <div class="video-footer">
+      <span>PyroShow Pro v2.0 — Software pirotécnico profesional</span>
+      <button onclick="document.getElementById('inp-video-file').click()" style="background:none;border:1px solid var(--b2);color:var(--m1);border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer">&#128196; Cambiar video</button>
+    </div>
+  </div>
+</div>
+<!-- ===================== FIN VIDEO MODAL ===================== -->
+
+<!-- ===================== MANUAL DE INSTRUCCIONES ===================== -->
+<div id="manual-overlay">
+<div id="manual-box">
+  <div class="manual-hdr">
+    <div class="manual-hdr-left">
+      <div class="manual-logo">&#127878;</div>
+      <div>
+        <h2>Manual de instrucciones — PyroShow Pro</h2>
+        <p>Version 2.0 &nbsp;|&nbsp; Software pirotecnico profesional</p>
+      </div>
+    </div>
+    <button class="btn-manual-close" onclick="cerrarManual()">&#10005; Cerrar</button>
+  </div>
+  <div class="manual-tabs">
+    <div class="manual-tab active" onclick="manualTab(0)">&#128640; Inicio rapido</div>
+    <div class="manual-tab" onclick="manualTab(1)">&#127926; Timeline</div>
+    <div class="manual-tab" onclick="manualTab(2)">&#9836; Audio y Beats</div>
+    <div class="manual-tab" onclick="manualTab(3)">&#127744; Simulacion 3D</div>
+    <div class="manual-tab" onclick="manualTab(4)">&#9881; Editor efectos</div>
+    <div class="manual-tab" onclick="manualTab(5)">&#128268; ESP32 WiFi</div>
+    <div class="manual-tab" onclick="manualTab(6)">&#128190; Proyectos</div>
+    <div class="manual-tab" onclick="manualTab(7)">&#9889; Atajos</div>
+  </div>
+  <div class="manual-body">
+
+    <!-- ── TAB 0: INICIO RAPIDO ── -->
+    <div class="manual-section active" id="mtab-0">
+      <div class="msec-title">Inicio rapido</div>
+      <div class="msec-sub">Crea tu primer espectaculo pirotecnico en 5 pasos.</div>
+
+      <div class="mcard">
+        <div class="mcard-title"><div class="mcard-num">1</div>Cargar musica</div>
+        <p>Haz clic en <strong>Cargar Audio</strong> en la barra de audio, o <strong>arrastra un archivo MP3/WAV</strong> directamente sobre el viewport 3D. La forma de onda aparecera en la barra superior y tambien dentro de la timeline.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title"><div class="mcard-num">2</div>Detectar beats automaticamente</div>
+        <p>Haz clic en <span class="mtag mtag-gold">♬ Beats</span> en la barra superior. Ajusta la sensibilidad y presiona <strong>Analizar y generar cues</strong>. PyroShow detectara los beats del audio y colocara cues automaticamente sobre ellos.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title"><div class="mcard-num">3</div>Agregar cues manualmente</div>
+        <p>Selecciona el tipo de efecto y el canal en la barra inferior, luego presiona <strong>+ Agregar @ t actual</strong>. O simplemente <strong>haz doble clic</strong> en cualquier carril de la timeline para agregar un cue en ese punto.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title"><div class="mcard-num">4</div>Previsualizar el show</div>
+        <p>Presiona <span class="mtag mtag-green">PLAY</span> para reproducir el show. Los cohetes subiran y explotaran sincronizados con la musica. El audio y la simulacion 3D van en perfecta sincronizacion.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title"><div class="mcard-num">5</div>Conectar ESP32 y disparar</div>
+        <p>Abre el <strong>Panel Disparo</strong>, agrega la IP del maestro ESP32 (default: <code>192.168.4.1</code>), haz clic en <strong>Ping All</strong> para verificar conexion, y presiona <span class="mtag mtag-red">PLAY</span> — los modulos fisicos dispararan en sincronizacion.</p>
+      </div>
+
+      <div class="mwarn">
+        <span>&#128276;</span>
+        <span>El auto-guardado funciona cada 30 segundos. Si cierras la ventana accidentalmente, al reabrir la app se ofrecera recuperar el ultimo estado.</span>
+      </div>
+    </div>
+
+    <!-- ── TAB 1: TIMELINE ── -->
+    <div class="manual-section" id="mtab-1">
+      <div class="msec-title">Timeline — Editor de cues</div>
+      <div class="msec-sub">La timeline es el corazon del software. Aqui posicionas y gestionas todos los efectos del show.</div>
+
+      <div class="mcolumns">
+        <div class="mcard">
+          <div class="mcard-title">Agregar cues</div>
+          <ul>
+            <li><strong>Doble clic</strong> en carril vacio → agrega cue en ese tiempo y canal</li>
+            <li><strong>Boton + Agregar</strong> → agrega en el tiempo actual del playhead</li>
+            <li><strong>Beats automaticos</strong> → desde el boton ♬ Beats</li>
+          </ul>
+        </div>
+        <div class="mcard">
+          <div class="mcard-title">Mover y editar</div>
+          <ul>
+            <li><strong>Arrastrar</strong> un cue → cambia su tiempo de disparo</li>
+            <li><strong>Clic derecho</strong> → menu: editar, duplicar, mover, borrar</li>
+            <li><strong>Editar</strong> → cambia efecto, tiempo exacto y canal</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Cadenas de cues <span class="mtag mtag-purple">FWsim style</span></div>
+        <p>Una cadena conecta dos cues para que disparen con un solo canal ESP32. Util para <strong>cascadas</strong>, <strong>finales multiples</strong> y para ahorrar canales de disparo.</p>
+        <ul>
+          <li>Haz clic en <span class="mtag mtag-purple">🔗 Cadena</span> → activa el modo cadena</li>
+          <li>Haz clic en el primer cue, luego en el segundo → quedan encadenados</li>
+          <li>O usa clic derecho → "Encadenar con siguiente"</li>
+          <li>Los cues encadenados se muestran con una <strong>flecha morada</strong> entre ellos</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Navegacion en la timeline</div>
+        <table class="mtable">
+          <tr><th>Accion</th><th>Como hacerlo</th></tr>
+          <tr><td>Zoom horizontal</td><td>Rueda del mouse sobre la timeline</td></tr>
+          <tr><td>Scroll horizontal</td><td><span class="mkb">Ctrl</span> + rueda &nbsp; o &nbsp; Slider H en toolbar</td></tr>
+          <tr><td>Scroll vertical</td><td><span class="mkb">Shift</span> + rueda &nbsp; o &nbsp; Scrollbar lateral</td></tr>
+          <tr><td>Scrubbing</td><td>Clic en el ruler (regla de tiempo)</td></tr>
+          <tr><td>Pan horizontal</td><td>Boton medio del mouse &nbsp; o &nbsp; <span class="mkb">Alt</span> + arrastrar</td></tr>
+        </table>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Canales (CH)</div>
+        <p>Cada carril horizontal corresponde a un canal de disparo. <strong>CH 1-8</strong> son del maestro ESP32. <strong>CH 9-16</strong> del esclavo 1, <strong>CH 17-24</strong> del esclavo 2, y asi sucesivamente hasta 72 canales con 8 esclavos.</p>
+        <p>Un punto verde en la etiqueta del carril indica que hay al menos un cue en ese canal.</p>
+      </div>
+    </div>
+
+    <!-- ── TAB 2: AUDIO Y BEATS ── -->
+    <div class="manual-section" id="mtab-2">
+      <div class="msec-title">Audio y deteccion de beats</div>
+      <div class="msec-sub">PyroShow Pro sincroniza perfectamente el show con la musica usando analisis de audio en tiempo real.</div>
+
+      <div class="mcard">
+        <div class="mcard-title">Cargar audio</div>
+        <ul>
+          <li>Clic en <strong>Cargar Audio</strong> → seleccionar MP3, WAV, OGG, AAC o FLAC</li>
+          <li>Arrastrar el archivo directamente sobre el <strong>viewport 3D</strong></li>
+          <li>La forma de onda aparece en la barra de audio y como overlay en la timeline</li>
+          <li>Clic en la forma de onda → <strong>scrubbing</strong> directo al tiempo</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Deteccion de beats automatica <span class="mtag mtag-gold">FWsim style</span></div>
+        <p>Algoritmo de deteccion de energia: analiza ventanas de 50ms y detecta picos de energia respecto al promedio local, exactamente como FWsim Pro.</p>
+        <ul>
+          <li><strong>Sensibilidad 1-3:</strong> valor bajo = detecta mas beats, valor alto = solo beats fuertes</li>
+          <li><strong>Espaciado minimo:</strong> tiempo minimo entre dos beats detectados (evita duplicados)</li>
+          <li><strong>Efecto a colocar:</strong> tipo de efecto que se asigna a todos los cues generados</li>
+          <li><strong>Canal CH:</strong> canal de disparo para todos los cues generados</li>
+        </ul>
+        <p>Los beats detectados se marcan como <strong>lineas doradas</strong> en la forma de onda y en la regla de tiempo.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Sincronizacion durante PLAY</div>
+        <p>Cuando hay audio cargado, el playhead se sincroniza con el <strong>AudioContext del navegador</strong> para maxima precision. Sin audio, usa un contador de tiempo interno a 60fps.</p>
+        <p>El volumen se controla con el slider <strong>Vol:</strong> en la barra de audio.</p>
+      </div>
+    </div>
+
+    <!-- ── TAB 3: SIMULACION 3D ── -->
+    <div class="manual-section" id="mtab-3">
+      <div class="msec-title">Simulacion 3D</div>
+      <div class="msec-sub">Motor de particulas portado directamente del codigo C++ del FireShow original. Fisica real, no decoracion.</div>
+
+      <div class="mcard">
+        <div class="mcard-title">Tipos de efecto y su fisica</div>
+        <table class="mtable">
+          <tr><th>Familia</th><th>Comportamiento fisico</th></tr>
+          <tr><td>Peonia</td><td>Distribucion gaussiana esfera completa, velocidades aleatorias naturales</td></tr>
+          <tr><td>Crisantemo</td><td>Igual que Peonia + sub-emisores de chispas doradas cada 0.02s</td></tr>
+          <tr><td>Sauce</td><td>Solo hemisferio superior, gravedad 2.2x, colas largas (subLife 2.0s)</td></tr>
+          <tr><td>Volcan</td><td>Abanico de 8 estrellas en 180 grados, desde el suelo hacia arriba</td></tr>
+          <tr><td>Anillo</td><td>Distribucion perfectamente circular, particulas equidistantes en 360°</td></tr>
+        </table>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Cohete ascendente</div>
+        <p>Cada disparo genera primero un <strong>cohete que sube</strong> desde el suelo con scia de particulas doradas, y al llegar a la altura configurada <strong>explota</strong> en el efecto correspondiente.</p>
+        <ul>
+          <li><strong>Tiempo de mecha:</strong> controla cuanto sube (configurable en Editor de Efectos)</li>
+          <li><strong>Posicion X:</strong> desde donde sube (-50=izquierda, 0=centro, 50=derecha)</li>
+          <li><strong>Velocidad Y:</strong> altura de la explosion (5=bajo, 50=muy alto)</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Calidad visual y bloom</div>
+        <p>Las particulas usan <strong>globalCompositeOperation = lighter</strong> (equivalente al shader OpenGL GL_SRC_ALPHA, GL_ONE del original). Las particulas cercanas se suman y crean <strong>bloom natural</strong> sin filtros adicionales.</p>
+        <p>Cada particula tiene: nucleo blanco brillante + cuerpo de color + halo suave de 2.2x el radio.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Grabacion de video</div>
+        <p>Clic en <span class="mtag mtag-blue">⬤ Video</span> → inicia grabacion del viewport en tiempo real. Al detener, se descarga automaticamente el archivo <code>.webm</code> de alta calidad (6 Mbps, 30fps). Muestra el tiempo de grabacion en el HUD.</p>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Sonidos de explosion</div>
+        <p>Cada disparo genera audio sintetizado con Web Audio API — sin archivos externos. Cada familia tiene su propio perfil de sonido:</p>
+        <ul>
+          <li><strong>Todas:</strong> BOOM (ruido de bajo) + CRACK (impulso de alta frecuencia)</li>
+          <li><strong>Crisantemo/Sauce:</strong> + crepitar de chispas (decay 1.2s)</li>
+          <li><strong>Anillo:</strong> + tono metalico descendente 800→200 Hz</li>
+          <li><strong>Volcan:</strong> + 6 disparos individuales con delay entre ellos</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ── TAB 4: EDITOR DE EFECTOS ── -->
+    <div class="manual-section" id="mtab-4">
+      <div class="msec-title">Editor de efectos</div>
+      <div class="msec-sub">Crea y personaliza tipos de fuegos artificiales con control total sobre la fisica de particulas.</div>
+
+      <div class="mcard">
+        <div class="mcard-title">Abrir el editor</div>
+        <p>Clic en <span class="mtag mtag-purple">⚙ Efectos</span> en la barra superior. Se abre un panel lateral derecho con la biblioteca de efectos a la izquierda y las propiedades a la derecha.</p>
+      </div>
+
+      <div class="mcolumns">
+        <div class="mcard">
+          <div class="mcard-title">Propiedades de particulas</div>
+          <ul>
+            <li><strong>Familia:</strong> Peonia, Crisantemo, Sauce, Volcan o Anillo</li>
+            <li><strong>Cantidad:</strong> numero de particulas (5-500)</li>
+            <li><strong>Vida min/max:</strong> duracion en segundos</li>
+            <li><strong>Vel. min/max:</strong> velocidad de dispersion</li>
+            <li><strong>Gravedad:</strong> 0=sin caida, 5=cae muy rapido</li>
+          </ul>
+        </div>
+        <div class="mcard">
+          <div class="mcard-title">Propiedades de lanzamiento</div>
+          <ul>
+            <li><strong>Color inicial:</strong> color al explotar</li>
+            <li><strong>Color final:</strong> color al apagarse</li>
+            <li><strong>Posicion X:</strong> -50 a 50 (izq → der)</li>
+            <li><strong>Vel. Y:</strong> altura de explosion</li>
+            <li><strong>Tiempo mecha:</strong> duracion del cohete (s)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Botones del editor</div>
+        <ul>
+          <li><span class="mtag mtag-gold">▶ Preview</span> Guarda y dispara el efecto inmediatamente para verlo</li>
+          <li><span class="mtag mtag-purple">Guardar</span> Aplica todos los cambios a la biblioteca</li>
+          <li><span class="mtag mtag-red">✕</span> Elimina el efecto de la biblioteca (minimo 1 debe quedar)</li>
+          <li><strong>+ Nuevo tipo</strong> Crea un efecto en blanco para personalizar</li>
+        </ul>
+        <p>Los efectos personalizados se guardan en el archivo <code>.pshow</code> del proyecto.</p>
+      </div>
+    </div>
+
+    <!-- ── TAB 5: ESP32 WIFI ── -->
+    <div class="manual-section" id="mtab-5">
+      <div class="msec-title">Sistema de disparo ESP32 WiFi</div>
+      <div class="msec-sub">Control inalambrico de hasta 72 canales de disparo fisico con latencia menor a 100ms.</div>
+
+      <div class="mcard">
+        <div class="mcard-title">Arquitectura maestro / esclavo</div>
+        <p>El <strong>ESP32 Maestro</strong> crea su propia red WiFi (<code>PyroShow_Master</code>). Tu PC se conecta a esa red. Los <strong>ESP32 Esclavos</strong> tambien se conectan a esa red automaticamente al encenderse.</p>
+        <ul>
+          <li>Maestro: <code>192.168.4.1</code> — CH 1-8 locales</li>
+          <li>Esclavo 1: <code>192.168.4.2</code> — CH 9-16</li>
+          <li>Esclavo 2: <code>192.168.4.3</code> — CH 17-24</li>
+          <li>Hasta 8 esclavos = 72 canales totales</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Conectar modulos en la app</div>
+        <ul>
+          <li>Abre el <strong>Panel Disparo</strong> con el boton en la toolbar</li>
+          <li>Escribe el nombre y la IP del modulo (default: <code>192.168.4.1</code>)</li>
+          <li>Clic <strong>+Add</strong> → el modulo aparece en la lista</li>
+          <li>Clic <strong>Ping All</strong> → verifica todos los modulos a la vez</li>
+          <li>LED verde = online / LED rojo = sin respuesta</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Diagnostico de conexion</div>
+        <p>Si un modulo no responde, clic en <strong>Diagnostico</strong> para ver el detalle:</p>
+        <ul>
+          <li>Intenta XHR y si falla usa img tag (bypass CORS)</li>
+          <li>Timeout 3s = IP incorrecta o ESP32 apagado</li>
+          <li>Error CORS = firma de respuesta invalida</li>
+        </ul>
+      </div>
+
+      <div class="mdanger">
+        <span>&#9888;</span>
+        <div><strong>Seguridad en campo:</strong> conecta los iniciadores electricos SOLO despues de verificar todos los modulos con Ping All. El boton STOP fisico (GPIO 0 del ESP32) pone todos los canales en LOW inmediatamente.</div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Protocolo de seguridad</div>
+        <ol style="margin-left:16px;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--m1)">
+          <li>Encender maestro → esperar LED parpadeo (5 veces)</li>
+          <li>Encender esclavos → esperar LED fijo (conectado)</li>
+          <li>Conectar PC a red <code>PyroShow_Master</code></li>
+          <li>Abrir Panel Disparo → Ping All → todos en verde</li>
+          <li>Conectar iniciadores SOLO despues de confirmar</li>
+          <li>Presionar PLAY para iniciar el show</li>
+          <li>Emergencia: boton fisico GPIO 0 o llamar <code>/stop</code></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ── TAB 6: PROYECTOS ── -->
+    <div class="manual-section" id="mtab-6">
+      <div class="msec-title">Gestion de proyectos</div>
+      <div class="msec-sub">Guarda, carga y exporta tus espectaculos pirotecnicos.</div>
+
+      <div class="mcard">
+        <div class="mcard-title">Guardar y abrir proyectos</div>
+        <p>Los proyectos se guardan como archivos <code>.pshow</code> (formato JSON). Incluyen: todos los cues con tiempos y canales, configuracion de zoom, duracion del show, modulos ESP32 registrados y efectos personalizados.</p>
+        <ul>
+          <li><strong>Guardar:</strong> descarga el archivo <code>NombreProyecto.pshow</code></li>
+          <li><strong>Abrir:</strong> carga un archivo <code>.pshow</code> existente</li>
+          <li><strong>Auto-guardado:</strong> cada 30 segundos en localStorage del navegador</li>
+          <li><strong>Recuperacion:</strong> al reabrir la app se ofrece restaurar el auto-guardado</li>
+        </ul>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Exportacion</div>
+        <table class="mtable">
+          <tr><th>Formato</th><th>Uso</th></tr>
+          <tr><td><code>CSV</code></td><td>Tiempo, canal, ID y descripcion de cada cue — compatible con cualquier sistema</td></tr>
+          <tr><td><code>Cobra .csv</code></td><td>Formato especifico para sistemas de disparo Cobra Firing Systems</td></tr>
+          <tr><td><code>.webm</code></td><td>Video de la simulacion 3D para mostrar al cliente antes del evento</td></tr>
+        </table>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Nuevo proyecto</div>
+        <p>Clic en <strong>Nuevo</strong> limpia todos los cues, resetea la posicion y el tiempo. Se pide confirmacion si hay cues sin guardar. El audio no se elimina — debes cargarlo de nuevo si es necesario.</p>
+      </div>
+    </div>
+
+    <!-- ── TAB 7: ATAJOS ── -->
+    <div class="manual-section" id="mtab-7">
+      <div class="msec-title">Atajos de teclado y ratón</div>
+      <div class="msec-sub">Domina PyroShow Pro con estos atajos para flujo de trabajo rapido.</div>
+
+      <div class="mcolumns">
+        <div class="mcard">
+          <div class="mcard-title">Timeline — Navegacion</div>
+          <table class="mtable">
+            <tr><td><span class="mkb">Rueda</span></td><td>Zoom horizontal</td></tr>
+            <tr><td><span class="mkb">Shift</span>+<span class="mkb">Rueda</span></td><td>Scroll vertical carriles</td></tr>
+            <tr><td><span class="mkb">Ctrl</span>+<span class="mkb">Rueda</span></td><td>Scroll horizontal (pan)</td></tr>
+            <tr><td><span class="mkb">Alt</span>+Arrastrar</td><td>Pan horizontal libre</td></tr>
+            <tr><td>Clic en Ruler</td><td>Mover playhead (scrub)</td></tr>
+          </table>
+        </div>
+        <div class="mcard">
+          <div class="mcard-title">Timeline — Cues</div>
+          <table class="mtable">
+            <tr><td>Doble clic</td><td>Agregar cue en ese punto</td></tr>
+            <tr><td>Arrastrar cue</td><td>Mover en el tiempo</td></tr>
+            <tr><td>Clic derecho</td><td>Menu contextual</td></tr>
+            <tr><td>Menu → Duplicar</td><td>Copiar cue +0.5s</td></tr>
+            <tr><td>Menu → ±0.5s</td><td>Mover con precision</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Controles de reproduccion</div>
+        <table class="mtable">
+          <tr><td><span class="mtag mtag-green">PLAY</span></td><td>Iniciar reproduccion + audio + disparo ESP32</td></tr>
+          <tr><td><span class="mtag mtag-gold">PAUSA</span></td><td>Pausar manteniendo la posicion</td></tr>
+          <tr><td><span class="mtag mtag-red">RESET</span></td><td>Volver al inicio, resetear cues disparados</td></tr>
+        </table>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Interfaz general</div>
+        <table class="mtable">
+          <tr><td>Arrastrar borde del panel</td><td>Redimensionar panel inferior / viewport 3D</td></tr>
+          <tr><td>Clic en waveform</td><td>Scrubbing directo en el audio</td></tr>
+          <tr><td>Boton ↺ en ESP32</td><td>Re-ping individual del modulo</td></tr>
+          <tr><td>Clic en <code>⚙ Efectos</code></td><td>Abrir/cerrar editor de efectos</td></tr>
+          <tr><td>Boton ▶ Preview</td><td>Probar efecto inmediatamente</td></tr>
+        </table>
+      </div>
+
+      <div class="mcard">
+        <div class="mcard-title">Modo cadena de cues</div>
+        <table class="mtable">
+          <tr><td>Clic en <span class="mkb">🔗 Cadena</span></td><td>Activar modo encadenado</td></tr>
+          <tr><td>Clic en cue 1 → cue 2</td><td>Encadenar dos cues</td></tr>
+          <tr><td>Clic derecho → Encadenar</td><td>Encadenar desde el menu</td></tr>
+          <tr><td>Clic en <span class="mkb">🔗 Cadena</span> de nuevo</td><td>Desactivar modo cadena</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end manual-body -->
+</div>
+</div>
+<!-- ===================== FIN MANUAL ===================== -->
+
+<script>
+/* =================================================================
+   ESTADO GLOBAL
+   ================================================================= */
+var S = {
+  playing:false, t:0, dur:120, zoom:8, scrollX:0, scrollY:0,
+  cues:[], nextId:0,
+  effects:[
+    {id:0,n:'Peonia Roja',      fam:'Peonia',     c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:20},
+    {id:1,n:'Crisantemo Verde', fam:'Crisantemo', c:'#27ae60',ci:[39,174,96],  cf:[0,60,20],   pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:10, velY:22},
+    {id:2,n:'Sauce Dorado',     fam:'Sauce',      c:'#d4a017',ci:[212,160,23], cf:[100,70,0],  pCount:80,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:-30,velY:20},
+    {id:3,n:'Volcan Dorado',    fam:'Volcan',     c:'#e07820',ci:[224,120,32], cf:[100,40,0],  pCount:6, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0},
+    {id:4,n:'Anillo Azul',      fam:'Anillo',     c:'#2980b9',ci:[41,128,185], cf:[0,40,100],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-30,velY:20},
+    {id:5,n:'Peonia Azul',      fam:'Peonia',     c:'#3b5bdb',ci:[59,91,219],  cf:[0,20,100],  pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:5,  velY:20},
+    {id:6,n:'Crisantemo Blanco',fam:'Crisantemo', c:'#b0b8d0',ci:[176,184,208],cf:[80,80,100], pCount:55,minLife:1.2,maxLife:1.8,minSpd:16,maxSpd:26,gravMod:1.0,fuseSeg:2.0,posX:0,  velY:22},
+    {id:7,n:'Sauce Plateado',   fam:'Sauce',      c:'#8899aa',ci:[136,153,170],cf:[40,50,60],  pCount:70,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.0,fuseSeg:2.0,posX:20, velY:20},
+    {id:8,n:'Volcan Rojo',      fam:'Volcan',     c:'#c92a2a',ci:[201,42,42],  cf:[80,0,0],    pCount:8, minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:0,  posX:0,  velY:0},
+    {id:9,n:'Anillo Dorado',    fam:'Anillo',     c:'#ca8a04',ci:[202,138,4],  cf:[100,60,0],  pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:15, velY:20},
+    {id:10,n:'Peonia Magenta',  fam:'Peonia',     c:'#d4538e',ci:[212,83,142], cf:[80,0,50],   pCount:55,minLife:1.1,maxLife:1.6,minSpd:18,maxSpd:30,gravMod:1.0,fuseSeg:2.0,posX:-10,velY:24},
+    {id:11,n:'Crisantemo Rojo', fam:'Crisantemo', c:'#c0392b',ci:[192,57,43],  cf:[80,0,0],    pCount:50,minLife:1.0,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1.0,fuseSeg:2.0,posX:20, velY:20},
+    {id:12,n:'Sauce Azul',      fam:'Sauce',      c:'#2471a3',ci:[36,113,163], cf:[0,30,80],   pCount:75,minLife:2.0,maxLife:2.0,minSpd:10,maxSpd:12,gravMod:2.2,fuseSeg:2.0,posX:30, velY:22},
+    {id:13,n:'Anillo Verde',    fam:'Anillo',    c:'#1a9e4a',ci:[26,158,74],  cf:[0,60,20],   pCount:55,minLife:2.0,maxLife:2.0,minSpd:20,maxSpd:20,gravMod:1.0,fuseSeg:2.0,posX:-20,velY:20},
+    {id:14,n:'Cometa Dorada',   fam:'Cometa',    c:'#f0c030',ci:[240,192,48], cf:[100,60,0],  pCount:30,minLife:1.8,maxLife:2.0,minSpd:15,maxSpd:22,gravMod:1.8,fuseSeg:2.5,posX:0,  velY:28},
+    {id:15,n:'Mina Plateada',   fam:'Mina',      c:'#c0c8e0',ci:[192,200,224],cf:[60,60,80],  pCount:40,minLife:1.2,maxLife:1.8,minSpd:18,maxSpd:32,gravMod:1.2,fuseSeg:0,  posX:0,  velY:0},
+    {id:16,n:'Crossette Roja',  fam:'Crossette', c:'#e03030',ci:[224,48,48],  cf:[80,0,0],    pCount:60,minLife:1.0,maxLife:1.4,minSpd:16,maxSpd:24,gravMod:1.0,fuseSeg:2.2,posX:5,  velY:22},
+    {id:17,n:'Palmera Dorada',  fam:'Palmera',   c:'#d4a820',ci:[212,168,32], cf:[90,60,0],   pCount:56,minLife:2.2,maxLife:2.2,minSpd:12,maxSpd:14,gravMod:2.4,fuseSeg:2.5,posX:-15,velY:24},
+    {id:18,n:'Sparkler Blanco', fam:'Sparkler',  c:'#e8e8f8',ci:[232,232,248],cf:[80,80,100], pCount:60,minLife:0.5,maxLife:0.8,minSpd:10,maxSpd:20,gravMod:0.8,fuseSeg:0,  posX:0,  velY:0},
+  ],
+  nextEffId:19,
+  esp32:[], nextEspId:1,
+  espOpen:false,
+  particles:[], rockets:[],
+  dragging:null, ctxId:null, editId:null,
+  chainMode:false, chainFirst:null,
+  sbDrag:false, sbDragY:0,
+  rDrag:false, rDragY:0, panelH:300,
+  audioCtx:null, audioBuffer:null, audioNode:null, audioGain:null,
+  audioStarted:0, waveform:null,
+  lastTs:null, fps:0, fpsF:0, fpsLast:0,
+  stars:null,
+  projName:'Sin titulo',
+  editorOpen:false, edSelId:0,
+  recMediaRec:null, recChunks:[], recActive:false, recStart:0,
+  beatBeats:[], beatApplied:false,
+};
+
+/* =================================================================
+   CANVASES
+   ================================================================= */
+var RC=document.getElementById('ruler-c'), TC=document.getElementById('tracks-c');
+var C3=document.getElementById('c3d'), AC=document.getElementById('audio-canvas');
+var rX=RC.getContext('2d'), tX=TC.getContext('2d'), x3=C3.getContext('2d'), aX=AC.getContext('2d');
+var TH=28, RULER=26, LABELW=68;
+
+/* =================================================================
+   INIT
+   ================================================================= */
+function init(){
+  // Info: si está en file:// mostrar aviso pero NO bloquear — img tag funciona igual
+  if(window.location.protocol==='file:'){
+    document.getElementById('file-warning').style.display='flex';
+  }
+  poblarEfectos(); poblarModalEfectos(); poblarBeatEffSel();
+  resizeAll();
+  window.addEventListener('resize', resizeAll);
+
+  document.getElementById('inp-zoom').addEventListener('input',function(){
+    S.zoom=+this.value;
+    document.getElementById('zv').textContent=S.zoom.toFixed(1);
+    document.getElementById('hud-zoom').textContent='zoom '+S.zoom.toFixed(1)+'x';
+    renderRuler(); renderTracks();
+  });
+  document.getElementById('inp-dur').addEventListener('change',function(){S.dur=+this.value;renderRuler();});
+  document.getElementById('inp-scrollx').addEventListener('input',function(){S.scrollX=+this.value;renderRuler();renderTracks();});
+
+  // Scrollbar V
+  var th=document.getElementById('sbthumb');
+  th.addEventListener('mousedown',function(e){S.sbDrag=true;S.sbDragY=e.clientY-th.getBoundingClientRect().top;e.preventDefault();});
+  window.addEventListener('mousemove',function(e){
+    if(!S.sbDrag)return;
+    var sb=document.getElementById('sbv'),r=sb.getBoundingClientRect(),tH=th.offsetHeight,trk=r.height-tH;
+    var top=Math.max(0,Math.min(e.clientY-r.top-S.sbDragY,trk));
+    S.scrollY=(trk>0?top/trk:0)*maxScrollY(); updateSB(); renderTracks();
+  });
+  window.addEventListener('mouseup',function(){S.sbDrag=false;});
+
+  // Resize handle
+  var rh=document.getElementById('resize-handle');
+  rh.addEventListener('mousedown',function(e){S.rDrag=true;S.rDragY=e.clientY;rh.classList.add('drag');e.preventDefault();});
+  window.addEventListener('mousemove',function(e){
+    if(!S.rDrag)return;
+    var avail=document.getElementById('app').offsetHeight-36-4;
+    var vpH=e.clientY-36-4;
+    vpH=Math.max(100,Math.min(vpH,avail-140));
+    S.panelH=avail-vpH;
+    document.getElementById('panel').style.height=S.panelH+'px';
+    resizeAll();
+  });
+  window.addEventListener('mouseup',function(){S.rDrag=false;document.getElementById('resize-handle').classList.remove('drag');});
+
+  // Tracks wheel
+  TC.addEventListener('wheel',function(e){
+    e.preventDefault();
+    if(e.shiftKey){S.scrollY=Math.max(0,Math.min(S.scrollY+e.deltaY*.5,maxScrollY()));updateSB();renderTracks();}
+    else if(e.ctrlKey){S.scrollX=Math.max(0,S.scrollX-e.deltaY*2/S.zoom);syncScrollSlider();renderRuler();renderTracks();}
+    else{S.zoom=Math.max(1,Math.min(80,S.zoom+(e.deltaY<0?1.5:-1.5)));document.getElementById('inp-zoom').value=S.zoom;document.getElementById('zv').textContent=S.zoom.toFixed(1);document.getElementById('hud-zoom').textContent='zoom '+S.zoom.toFixed(1)+'x';renderRuler();renderTracks();}
+  },{passive:false});
+
+  TC.addEventListener('mousedown',function(e){
+    hideCtx();
+    var c=cueAt(e.offsetX,e.offsetY);
+    if(c&&e.button===0){
+      if(S.chainMode){
+        if(!S.chainFirst){S.chainFirst=c.id;notify('Clic en el segundo cue para encadenar','info');}
+        else{encadenar(S.chainFirst,c.id);S.chainFirst=null;}
+      } else {
+        S.dragging={id:c.id,x0:e.offsetX,t0:c.t};
+      }
+    }
+  });
+  TC.addEventListener('mousemove',function(e){
+    if(!S.dragging)return;
+    var dt=(e.offsetX-S.dragging.x0)/S.zoom;
+    var c=S.cues.find(function(x){return x.id===S.dragging.id;});
+    if(c){c.t=Math.max(0,Math.min(S.dragging.t0+dt,S.dur));renderTracks();}
+  });
+  TC.addEventListener('mouseup',function(){S.dragging=null;});
+  TC.addEventListener('contextmenu',function(e){
+    e.preventDefault();
+    var c=cueAt(e.offsetX,e.offsetY);
+    if(c)showCtx(c,e.clientX,e.clientY);
+  });
+  TC.addEventListener('dblclick',function(e){
+    if(!cueAt(e.offsetX,e.offsetY)){
+      var t=px2t(e.offsetX),ch=Math.max(1,Math.floor((e.offsetY+S.scrollY)/TH)+1);
+      var eid=+document.getElementById('sel-eff').value;
+      S.cues.push({id:S.nextId++,eid:eid,t:Math.max(0,Math.min(t,S.dur)),ch:ch,fired:false,chain:null});
+      updateCueCount();renderTracks();updateSB();
+      notify('Cue @ '+t.toFixed(2)+'s CH'+ch,'success');
+    }
+  });
+
+  // Ruler scrub
+  RC.addEventListener('mousedown',function(e){
+    S.t=Math.max(0,Math.min(px2t(e.offsetX),S.dur));
+    scrubAudio();renderRuler();renderTracks();
+  });
+
+  // Audio canvas scrub + waveform click
+  AC.addEventListener('click',function(e){
+    if(!S.audioBuffer)return;
+    S.t=(e.offsetX/AC.offsetWidth)*S.dur;
+    scrubAudio();renderRuler();renderTracks();
+  });
+
+  // Drag & drop audio en viewport
+  document.getElementById('viewport').addEventListener('dragover',function(e){e.preventDefault();});
+  document.getElementById('viewport').addEventListener('drop',function(e){
+    e.preventDefault();
+    var f=e.dataTransfer.files[0];
+    if(f&&/audio/.test(f.type))procesarArchivoAudio(f);
+  });
+
+  document.addEventListener('click',function(){hideCtx();});
+
+  setInterval(function(){if(S.cues.length>0)autoSave();},30000);
+  cargarAutoSave();
+
+  requestAnimationFrame(loop);
+}
+
+/* =================================================================
+   HELPERS
+   ================================================================= */
+function eff(id){return S.effects.find(function(e){return e.id===id;})||S.effects[0];}
+function t2px(t){return(t-S.scrollX)*S.zoom;}
+function px2t(px){return S.scrollX+px/S.zoom;}
+function numTracks(){var n=8;S.cues.forEach(function(c){n=Math.max(n,c.ch);});return Math.max(n,8);}
+function maxScrollY(){return Math.max(0,numTracks()*TH-TC.height);}
+function cueAt(px,py){
+  var ch=Math.floor((py+S.scrollY)/TH);
+  for(var i=S.cues.length-1;i>=0;i--){
+    var c=S.cues[i],cx=t2px(c.t),bw=Math.max(S.zoom*1.2,20);
+    if(c.ch-1===ch&&px>=cx-3&&px<=cx-3+bw)return c;
+  }
+  return null;
+}
+function fmtT(t){var m=Math.floor(t/60),s=t%60;return(m<10?'0':'')+m+':'+(s<10?'0':'')+s.toFixed(2);}
+function syncScrollSlider(){var el=document.getElementById('inp-scrollx');el.max=Math.max(0,S.dur-TC.width/S.zoom).toFixed(1);el.value=S.scrollX.toFixed(2);}
+function poblarEfectos(){var sel=document.getElementById('sel-eff');sel.innerHTML='';S.effects.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.n;sel.appendChild(o);});}
+function poblarModalEfectos(){var sel=document.getElementById('m-eff');sel.innerHTML='';S.effects.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.n;sel.appendChild(o);});}
+function poblarBeatEffSel(){var sel=document.getElementById('beat-eff-sel');sel.innerHTML='';S.effects.forEach(function(e){var o=document.createElement('option');o.value=e.id;o.textContent=e.n;sel.appendChild(o);});}
+function updateCueCount(){document.getElementById('cue-count').textContent=S.cues.length+' cue'+(S.cues.length===1?'':'s');}
+function led(on){document.getElementById('led').className='led'+(on?' play':'');}
+function notify(msg,type){
+  var c=document.getElementById('notif'),p=document.createElement('div');
+  p.className='notif-pill'+(type?' '+type:'');p.textContent=msg;c.appendChild(p);
+  requestAnimationFrame(function(){p.classList.add('show');});
+  setTimeout(function(){p.classList.remove('show');setTimeout(function(){if(p.parentNode)c.removeChild(p);},400);},2800);
+}
+
+/* =================================================================
+   TIMELINE CONTROLS
+   ================================================================= */
+function tlPlay(){ensureAudio();S.playing=true;led(true);if(S.audioBuffer)iniciarAudio();}
+function tlPause(){S.playing=false;led(false);pararAudio(true);}
+function tlReset(){S.playing=false;led(false);S.t=0;S.cues.forEach(function(c){c.fired=false;});pararAudio(false);renderRuler();renderTracks();}
+function addCue(){
+  var eid=+document.getElementById('sel-eff').value;
+  var ch=Math.max(1,Math.min(32,+document.getElementById('inp-ch').value||1));
+  S.cues.push({id:S.nextId++,eid:eid,t:S.t,ch:ch,fired:false,chain:null});
+  updateCueCount();renderTracks();updateSB();
+  notify(eff(eid).n+' @ '+S.t.toFixed(2)+'s CH'+ch,'success');
+}
+
+/* =================================================================
+   CADENAS DE CUES (Chain — igual que FWsim CTRL+D)
+   ================================================================= */
+function toggleModoChain(){
+  S.chainMode=!S.chainMode;S.chainFirst=null;
+  document.getElementById('btn-chain').classList.toggle('on',S.chainMode);
+  notify(S.chainMode?'Modo cadena: clic en primer cue, luego en segundo':'Modo cadena desactivado',S.chainMode?'info':'');
+}
+function encadenar(id1,id2){
+  var c1=S.cues.find(function(c){return c.id===id1;}),c2=S.cues.find(function(c){return c.id===id2;});
+  if(!c1||!c2||id1===id2){notify('Selecciona dos cues diferentes','error');return;}
+  c1.chain=id2;
+  notify('Cues encadenados — disparan con un canal','success');
+  renderTracks();
+}
+function ctxChain(){
+  S.chainFirst=S.ctxId;S.chainMode=true;
+  document.getElementById('btn-chain').classList.add('on');
+  notify('Clic en el cue destino para encadenar','info');
+  hideCtx();
+}
+
+/* =================================================================
+   AUDIO
+   ================================================================= */
+function ensureAudio(){
+  if(!S.audioCtx){
+    S.audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    S.masterComp=S.audioCtx.createDynamicsCompressor();
+    S.masterComp.threshold.value=-18;S.masterComp.ratio.value=6;
+    S.masterComp.connect(S.audioCtx.destination);
+  }
+  if(S.audioCtx.state==='suspended')S.audioCtx.resume();
+}
+function cargarAudio(inp){if(inp.files[0])procesarArchivoAudio(inp.files[0]);}
+function procesarArchivoAudio(file){
+  document.getElementById('audio-file-name').textContent='Cargando '+file.name+'...';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    ensureAudio();
+    S.audioCtx.decodeAudioData(e.target.result.slice(0),function(buf){
+      S.audioBuffer=buf;S.dur=Math.ceil(buf.duration);
+      document.getElementById('inp-dur').value=S.dur;
+      document.getElementById('audio-file-name').textContent=file.name+' ('+fmtT(buf.duration)+')';
+      generarWaveform(buf);renderWaveform();
+      notify('Audio: '+file.name,'success');
+    },function(){notify('Error al decodificar audio','error');});
+  };
+  reader.readAsArrayBuffer(file);
+}
+function generarWaveform(buf){
+  var data=buf.getChannelData(0),W=1200,pts=[];
+  for(var i=0;i<W;i++){
+    var s=Math.floor(i/W*data.length),e2=Math.floor((i+1)/W*data.length),max=0;
+    for(var j=s;j<e2;j++)max=Math.max(max,Math.abs(data[j]));
+    pts.push(max);
+  }
+  S.waveform=pts;
+}
+function renderWaveform(){
+  if(!S.waveform)return;
+  var W=AC.width||400,H=AC.height||22;
+  aX.clearRect(0,0,W,H);
+  aX.fillStyle='rgba(77,110,245,0.07)';aX.fillRect(0,0,W,H);
+  aX.fillStyle='rgba(77,110,245,0.55)';
+  var pts=S.waveform;
+  for(var i=0;i<W;i++){var idx=Math.floor(i/W*pts.length),h=pts[idx]*(H-2);aX.fillRect(i,(H-h)/2,1,h);}
+  if(S.dur>0){var xp=(S.t/S.dur)*W;aX.fillStyle='rgba(232,160,32,.85)';aX.fillRect(xp-1,0,2,H);}
+  // Marcar beats detectados
+  if(S.beatBeats&&S.beatBeats.length>0){
+    aX.fillStyle='rgba(232,160,32,0.4)';
+    S.beatBeats.forEach(function(b){var xb=(b/S.dur)*W;aX.fillRect(xb,0,1,H);});
+  }
+}
+function iniciarAudio(){
+  if(!S.audioBuffer||!S.audioCtx)return;
+  pararAudio(false);
+  var node=S.audioCtx.createBufferSource();
+  node.buffer=S.audioBuffer;
+  var gain=S.audioCtx.createGain();
+  gain.gain.value=+document.getElementById('vol-input').value;
+  node.connect(gain);gain.connect(S.masterComp||S.audioCtx.destination);
+  node.start(0,S.t);
+  S.audioNode=node;S.audioGain=gain;
+  S.audioStarted=S.audioCtx.currentTime-S.t;
+}
+function pararAudio(save){
+  if(S.audioNode){try{S.audioNode.stop();}catch(e){}S.audioNode=null;}
+  if(save&&S.audioCtx)S.t=S.audioCtx.currentTime-S.audioStarted;
+}
+function scrubAudio(){if(!S.audioBuffer)return;if(S.playing)iniciarAudio();}
+function setVolumen(v){if(S.audioGain)S.audioGain.gain.value=+v;}
+
+/* =================================================================
+   BEAT DETECTION (energy-based onset — como FWsim)
+   ================================================================= */
+function abrirBeatDetect(){
+  if(!S.audioBuffer){notify('Carga un archivo de audio primero','error');return;}
+  document.getElementById('beat-modal').classList.add('open');
+  document.getElementById('beat-bar').style.width='0%';
+  document.getElementById('beat-result').style.display='none';
+  document.getElementById('beat-sub').style.display='block';
+  document.getElementById('btn-beat-run').textContent='Analizar y generar cues';
+  document.getElementById('btn-beat-run').disabled=false;
+  poblarBeatEffSel();
+}
+function cerrarBeatModal(){document.getElementById('beat-modal').classList.remove('open');}
+
+function ejecutarBeatDetect(){
+  var btn=document.getElementById('btn-beat-run');
+  btn.disabled=true;btn.textContent='Analizando...';
+  document.getElementById('beat-sub').style.display='none';
+
+  setTimeout(function(){
+    try{
+      var buf=S.audioBuffer;
+      var sr=buf.sampleRate;
+      var data=buf.getChannelData(0);
+      var ventana=Math.floor(sr*0.05); // 50ms
+      var sens=+document.getElementById('beat-sens').value;
+      var gapMin=+document.getElementById('beat-gap').value;
+
+      // Calcular energia en ventanas
+      var energias=[];
+      for(var i=0;i<data.length-ventana;i+=ventana){
+        var e2=0;
+        for(var j=0;j<ventana;j++)e2+=data[i+j]*data[i+j];
+        energias.push(e2/ventana);
+      }
+
+      // Progreso animado
+      var step=0;
+      var interval=setInterval(function(){
+        step=Math.min(step+5,90);
+        document.getElementById('beat-bar').style.width=step+'%';
+      },30);
+
+      setTimeout(function(){
+        clearInterval(interval);
+        document.getElementById('beat-bar').style.width='100%';
+
+        // Historial local para promedio local (como FWsim)
+        var histSize=43; // ~2 segundos a 50ms
+        var beats=[];
+        var ultimoBeat=-999;
+
+        for(var k=histSize;k<energias.length;k++){
+          var suma=0;
+          for(var h=k-histSize;h<k;h++)suma+=energias[h];
+          var prom=suma/histSize;
+          var t=k*(ventana/sr);
+
+          if(energias[k]>prom*sens*1.5&&(t-ultimoBeat)>=gapMin){
+            beats.push(t);
+            ultimoBeat=t;
+          }
+        }
+
+        S.beatBeats=beats;
+        var res=document.getElementById('beat-result');
+        res.style.display='block';
+        res.textContent=beats.length+' beats detectados. Se crearan '+beats.length+' cues.';
+        btn.textContent='Aplicar '+beats.length+' cues';
+        btn.disabled=false;
+        btn.onclick=function(){aplicarBeats();};
+        renderWaveform();
+      },600);
+
+    }catch(err){
+      notify('Error en beat detection','error');
+      btn.disabled=false;btn.textContent='Analizar y generar cues';
+    }
+  },50);
+}
+
+function aplicarBeats(){
+  var eid=+document.getElementById('beat-eff-sel').value;
+  var ch=Math.max(1,+document.getElementById('beat-ch').value||1);
+  var added=0;
+  S.beatBeats.forEach(function(t){
+    if(t>=0&&t<=S.dur){
+      S.cues.push({id:S.nextId++,eid:eid,t:t,ch:ch,fired:false,chain:null});
+      added++;
+    }
+  });
+  updateCueCount();renderTracks();updateSB();renderWaveform();
+  cerrarBeatModal();
+  notify(added+' cues generados desde beats','success');
+}
+
+/* =================================================================
+   SONIDO COHETE
+   ================================================================= */
+function sonarCohete(dur){
+  ensureAudio();
+  try{
+    var ac=S.audioCtx,dest=S.masterComp||ac.destination,t=ac.currentTime;
+    var osc=ac.createOscillator(),gain=ac.createGain(),flt=ac.createBiquadFilter();
+    osc.type='sawtooth';osc.frequency.setValueAtTime(280,t);osc.frequency.exponentialRampToValueAtTime(2200,t+dur*.9);
+    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(0.07,t+.05);gain.gain.linearRampToValueAtTime(0.05,t+dur*.8);gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    flt.type='highpass';flt.frequency.value=800;
+    osc.connect(flt);flt.connect(gain);gain.connect(dest);
+    osc.start(t);osc.stop(t+dur+.05);
+  }catch(e){}
+}
+
+function sintetizarExplosion(fam){
+  ensureAudio();
+  try{
+    var ac=S.audioCtx,dest=S.masterComp||ac.destination,t=ac.currentTime,sr=ac.sampleRate;
+    // BOOM
+    var bBoom=ac.createBuffer(1,sr*.5,sr),dBoom=bBoom.getChannelData(0);
+    for(var i=0;i<dBoom.length;i++)dBoom[i]=(Math.random()*2-1)*Math.exp(-i/sr*8);
+    var boom=ac.createBufferSource();boom.buffer=bBoom;
+    var gBoom=ac.createGain(),fBoom=ac.createBiquadFilter();
+    fBoom.type='lowpass';fBoom.frequency.value=fam==='Volcan'?300:fam==='Anillo'?600:400;fBoom.Q.value=2;
+    gBoom.gain.setValueAtTime(fam==='Volcan'?.6:.8,t);gBoom.gain.exponentialRampToValueAtTime(.001,t+.45);
+    boom.connect(fBoom);fBoom.connect(gBoom);gBoom.connect(dest);boom.start(t);boom.stop(t+.5);
+    // CRACK
+    var bCrack=ac.createBuffer(1,sr*.08,sr),dCrack=bCrack.getChannelData(0);
+    for(var j=0;j<dCrack.length;j++)dCrack[j]=(Math.random()*2-1)*Math.exp(-j/sr*40);
+    var crack=ac.createBufferSource();crack.buffer=bCrack;
+    var gCrack=ac.createGain();gCrack.gain.value=.5;
+    var fCrack=ac.createBiquadFilter();fCrack.type='bandpass';fCrack.frequency.value=fam==='Anillo'?3000:2000;fCrack.Q.value=.5;
+    crack.connect(fCrack);fCrack.connect(gCrack);gCrack.connect(dest);crack.start(t);crack.stop(t+.1);
+    // CHISPAS (Crisantemo/Sauce)
+    if(fam==='Crisantemo'||fam==='Sauce'){
+      var bCh=ac.createBuffer(1,sr*1.2,sr),dCh=bCh.getChannelData(0);
+      for(var k=0;k<dCh.length;k++)dCh[k]=(Math.random()*2-1)*Math.exp(-k/sr*2.5);
+      var ch2=ac.createBufferSource();ch2.buffer=bCh;
+      var gCh=ac.createGain();gCh.gain.value=.18;
+      var fCh=ac.createBiquadFilter();fCh.type='highpass';fCh.frequency.value=4000;
+      ch2.connect(fCh);fCh.connect(gCh);gCh.connect(dest);ch2.start(t+.05);ch2.stop(t+1.3);
+    }
+    // ANILLO metalico
+    if(fam==='Anillo'){
+      var oR=ac.createOscillator(),gR=ac.createGain();
+      oR.type='sine';oR.frequency.setValueAtTime(800,t);oR.frequency.exponentialRampToValueAtTime(200,t+.6);
+      gR.gain.setValueAtTime(.15,t);gR.gain.exponentialRampToValueAtTime(.001,t+.6);
+      oR.connect(gR);gR.connect(dest);oR.start(t);oR.stop(t+.65);
+    }
+    // VOLCAN traqueteo
+    if(fam==='Volcan'){
+      for(var v=0;v<6;v++){
+        var d2=v*.12+Math.random()*.06,bV=ac.createBuffer(1,sr*.06,sr),dV=bV.getChannelData(0);
+        for(var vi=0;vi<dV.length;vi++)dV[vi]=(Math.random()*2-1)*Math.exp(-vi/sr*25);
+        var sV=ac.createBufferSource();sV.buffer=bV;var gV=ac.createGain();gV.gain.value=.3;
+        sV.connect(gV);gV.connect(dest);sV.start(t+d2);sV.stop(t+d2+.08);
+      }
+    }
+  }catch(e){}
+}
+
+/* =================================================================
+   FISICA DE PARTICULAS (FireShow exact port)
+   ================================================================= */
+function sampleGaussian(m,s){if(s<=0)return m;var u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function ballRand(r){var th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),s=Math.sin(ph);return[r*s*Math.cos(th),r*s*Math.sin(th),r*Math.cos(ph)];}
+function sceneScale(W,H){return Math.min(W,H)/55;}
+function mkP(x,y,vx,vy,life,size,ci,cf,grav,emit,eInt,sLife){
+  return{x,y,vx,vy,life,initialLife:life,decay:1/life/60,size,grav,ci,cf,isEmitter:!!emit,emitInterval:eInt||0,emitTimer:0,subLife:sLife||0};
+}
+function spawnPeonia(ef,cx,cy,sc){
+  var n=50+Math.floor(Math.random()*20);
+  for(var i=0;i<n;i++){
+    var spd=sampleGaussian(3.8,.6)*sc*.06,dir=ballRand(1);
+    S.particles.push(mkP(cx,cy,dir[0]*spd,dir[1]*spd-Math.abs(dir[1])*.3,sampleGaussian(1.2,.15),2+Math.random()*2.5,ef.ci.slice(),ef.cf.slice(),1,false,0,0));
+  }
+}
+function spawnCrisantemo(ef,cx,cy,sc){
+  var n=50+Math.floor(Math.random()*20);
+  for(var i=0;i<n;i++){
+    var spd=sampleGaussian(3.5,.5)*sc*.06,dir=ballRand(1);
+    S.particles.push(mkP(cx,cy,dir[0]*spd,dir[1]*spd-Math.abs(dir[1])*.2,sampleGaussian(1.3,.18),1.8+Math.random()*2,ef.ci.slice(),ef.cf.slice(),1,true,.02,.4));
+  }
+}
+function spawnSauce(ef,cx,cy,sc){
+  var n=0,intentos=0;
+  while(n<80&&intentos<400){
+    intentos++;var dir=ballRand(1);if(dir[1]>-0.1)continue;
+    var spd=sampleGaussian(2.8,.4)*sc*.06;
+    S.particles.push(mkP(cx,cy,dir[0]*spd,dir[1]*spd,sampleGaussian(2,.1),1.5+Math.random()*1.5,ef.ci.slice(),ef.cf.slice(),2.2,true,.02,2.0));
+    n++;
+  }
+}
+function spawnVolcan(ef,cx,cy,sc){
+  var ns=8;
+  for(var i=0;i<ns;i++){
+    var ang=i/(ns-1)*Math.PI,spd=2.8*sc*.06;
+    S.particles.push(mkP(cx,cy,Math.cos(ang)*spd,-Math.abs(Math.sin(ang))*spd,sampleGaussian(2,.1),2.5+Math.random()*1.5,ef.ci.slice(),ef.cf.slice(),.8,true,.02,.8));
+  }
+}
+function spawnAnillo(ef,cx,cy,sc){
+  var ns=55,radio=18*sc*.06;
+  for(var i=0;i<ns;i++){
+    var theta=2*Math.PI*i/ns,px2=cx+radio*Math.cos(theta),py2=cy+radio*Math.sin(theta),spd=2*sc*.06;
+    S.particles.push(mkP(px2,py2,Math.cos(theta)*spd,Math.sin(theta)*spd,2,2+Math.random()*1.5,ef.ci.slice(),ef.cf.slice(),.6,false,0,0));
+  }
+}
+function spawnBurst(ef,W,H,ch){
+  var cx, cy;
+
+  // Si hay una posición definida para este canal, usarla directamente
+  if(ch && POS.puntos.length > 0){
+    var pos = POS.puntos.find(function(p){ return p.ch === ch; });
+    if(pos){
+      // Escalar de coordenadas del canvas de posiciones al canvas 3D actual
+      cx = pos.x * (W / (posCanvas ? posCanvas.width  : W));
+      cy = pos.y * (H / (posCanvas ? posCanvas.height : H));
+      cx = Math.max(W*.04, Math.min(W*.96, cx));
+      cy = Math.max(H*.04, Math.min(H*.72, cy));
+      var dur = Math.max(.3,(ef.fuseSeg||2)*.35+Math.random()*.15);
+      var groundY = H*.80;
+      S.rockets.push({
+        x: cx + (Math.random()-.5)*8,
+        y: groundY,
+        tx: cx, ty: cy,
+        t:0, dur:dur, ef:ef, trailTimer:0
+      });
+      return;
+    }
+  }
+
+  // Sin posición definida: usar posX/velY del efecto
+  cx = W*.5+(ef.posX||0)/50*W*.42;
+  cx = Math.max(W*.05, Math.min(W*.95, cx));
+  var vn = ((ef.velY||20)-5)/45;
+  cy = H*(.55-vn*.45);
+  cy = Math.max(H*.04, Math.min(H*.65, cy));
+  var dur2 = Math.max(.3,(ef.fuseSeg||2)*.35+Math.random()*.15);
+  S.rockets.push({
+    x: cx+(Math.random()-.5)*20,
+    y: cy+60+Math.random()*30,
+    tx: cx, ty: cy,
+    t:0, dur:dur2, ef:ef, trailTimer:0
+  });
+}
+function explodeBurst(ef,cx,cy,W,H){
+  var sc=sceneScale(W,H);
+  switch(ef.fam){
+    case'Peonia':     spawnPeonia(ef,cx,cy,sc);     break;
+    case'Crisantemo': spawnCrisantemo(ef,cx,cy,sc); break;
+    case'Sauce':      spawnSauce(ef,cx,cy,sc);      break;
+    case'Volcan':     spawnVolcan(ef,cx,cy,sc);     break;
+    case'Anillo':     spawnAnillo(ef,cx,cy,sc);     break;
+    case'Cometa':     spawnCometaVertical(ef,cx,cy,sc); break;
+    case'Mina':       spawnMina(ef,cx,cy,sc);       break;
+    case'Crossette':  spawnCrossette(ef,cx,cy,sc);  break;
+    case'Palmera':    spawnPalm(ef,cx,cy,sc);       break;
+    case'Sparkler':   spawnSparkler(ef,cx,cy,sc);   break;
+    default:          spawnPeonia(ef,cx,cy,sc);
+  }
+  // Humo residual — como PyroDirector environment simulation
+  agregarHumo(cx,cy);
+  sintetizarExplosion(ef.fam||'Peonia');
+}
+
+/* =================================================================
+   RENDER 3D — motor mejorado con smoke, viento, reflejo, minas
+   Inspirado en: Pyro Simulator (58 efectos), PyroDirector (HDR/viento),
+   Pyromaniax (efectos reales), Finale 3D (simulacion HD)
+   ================================================================= */
+
+// ── VIENTO global (cambia lentamente — como PyroDirector Environment)
+var VIENTO = { x: 0, y: 0, timer: 0 };
+function actualizarViento(dt){
+  VIENTO.timer += dt;
+  // Viento sinusoidal suave que cambia con el tiempo
+  VIENTO.x = Math.sin(VIENTO.timer * 0.3) * 0.04;
+  VIENTO.y = Math.cos(VIENTO.timer * 0.2) * 0.008;
+}
+
+// ── EFECTOS EXTRA (nuevos tipos)
+function spawnCometaVertical(ef,cx,cy,sc){
+  // Cometa: linea de particulas en caida diagonal
+  for(var i=0;i<30;i++){
+    var ang=-Math.PI/2+sampleGaussian(0,.15);
+    var spd=sampleGaussian(3.5,.4)*sc*.06;
+    S.particles.push(mkP(cx,cy,Math.cos(ang)*spd,Math.sin(ang)*spd,
+      sampleGaussian(1.8,.2),1.5+Math.random()*2,ef.ci.slice(),ef.cf.slice(),1.8,true,.015,1.2));
+  }
+}
+function spawnMina(ef,cx,cy,sc){
+  // Mine (candelabro): particulas hacia arriba en cono con destellos
+  var n=ef.pCount||40;
+  for(var i=0;i<n;i++){
+    var ang=-Math.PI/2+sampleGaussian(0,.45);
+    var spd=sampleGaussian(3,.5)*sc*.06;
+    S.particles.push(mkP(cx,cy,Math.cos(ang)*spd,Math.sin(ang)*spd,
+      sampleGaussian(1.4,.2),2+Math.random()*2,ef.ci.slice(),ef.cf.slice(),1.2,
+      Math.random()>.5,Math.random()>.5?.03:0,.35));
+  }
+}
+function spawnCrossette(ef,cx,cy,sc){
+  // Crossette: 4 grupos que se separan en X
+  var dirs=[[-1,-1],[1,-1],[-1,1],[1,1]];
+  dirs.forEach(function(d){
+    var bx=cx+d[0]*12*sc*.06, by=cy+d[1]*8*sc*.06;
+    for(var i=0;i<15;i++){
+      var spd=sampleGaussian(2.5,.4)*sc*.06;
+      var ang=Math.random()*Math.PI*2;
+      S.particles.push(mkP(bx,by,Math.cos(ang)*spd,Math.sin(ang)*spd,
+        sampleGaussian(1,.15),1.8+Math.random()*1.5,ef.ci.slice(),ef.cf.slice(),1.1,false,0,0));
+    }
+  });
+}
+function spawnPalm(ef,cx,cy,sc){
+  // Palm: como sauce pero con brazos separados (palmera)
+  var nBrazos=7;
+  for(var b=0;b<nBrazos;b++){
+    var ang=-Math.PI/2+((b/(nBrazos-1))-.5)*Math.PI*.9;
+    var spd=sampleGaussian(3.2,.3)*sc*.06;
+    var vx=Math.cos(ang)*spd, vy=Math.sin(ang)*spd;
+    for(var i=0;i<8;i++){
+      S.particles.push(mkP(cx,cy,
+        vx+sampleGaussian(0,.05)*sc*.06,
+        vy+sampleGaussian(0,.05)*sc*.06,
+        sampleGaussian(2,.1),2+Math.random(),
+        ef.ci.slice(),ef.cf.slice(),2.5,true,.025,1.8));
+    }
+  }
+}
+function spawnSparkler(ef,cx,cy,sc){
+  // Chispas aleatorias en tierra (ground sparkler)
+  for(var i=0;i<60;i++){
+    var ang=Math.random()*Math.PI*2;
+    var spd=(.5+Math.random()*2)*sc*.06;
+    S.particles.push(mkP(cx+(Math.random()-.5)*30*sc*.06,cy,
+      Math.cos(ang)*spd,Math.sin(ang)*spd-Math.random()*spd,
+      .4+Math.random()*.8,.8+Math.random(),
+      [255,240,100],[255,80,0],.8,false,0,0));
+  }
+}
+
+// ── REGISTRO de explotion para reflejo en suelo
+var REFLEJOS = [];
+
+// ── FONDO CIUDAD mejorado con reflejo en suelo y profundidad
+function dibujarFondoCiudad(W,H){
+  if(!S.cityCanvas||S.cityCanvas.width!==W||S.cityCanvas.height!==H){
+    var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    var cx=cv.getContext('2d');
+    // Cielo — degradado más profundo y azul
+    var grd=cx.createLinearGradient(0,0,0,H);
+    grd.addColorStop(0,'#010207');
+    grd.addColorStop(.4,'#020510');
+    grd.addColorStop(.75,'#040a18');
+    grd.addColorStop(1,'#060d1f');
+    cx.fillStyle=grd; cx.fillRect(0,0,W,H);
+
+    // Nube de Vía Láctea sutil
+    var gVL=cx.createRadialGradient(W*.45,H*.25,0,W*.45,H*.25,W*.4);
+    gVL.addColorStop(0,'rgba(80,100,180,.06)');
+    gVL.addColorStop(1,'transparent');
+    cx.fillStyle=gVL; cx.fillRect(0,0,W,H);
+
+    // Luna crescent
+    cx.save();
+    cx.beginPath(); cx.arc(W*.84,H*.11,H*.042,0,Math.PI*2);
+    cx.fillStyle='rgba(255,252,220,.90)'; cx.fill();
+    cx.beginPath(); cx.arc(W*.855,H*.10,H*.038,0,Math.PI*2);
+    cx.fillStyle='#020408'; cx.fill();
+    cx.restore();
+
+    // Estrellas con parpadeo (tamaños variados)
+    for(var s=0;s<280;s++){
+      var sx=Math.random()*W, sy=Math.random()*H*.65;
+      var sr2=Math.random()<.08 ? Math.random()*1.8+.8 : Math.random()*1.0+.2;
+      var sa=Math.random()*.7+.15;
+      cx.beginPath(); cx.arc(sx,sy,sr2,0,Math.PI*2);
+      cx.fillStyle='rgba(210,225,255,'+sa+')'; cx.fill();
+      // Halo en estrellas grandes
+      if(sr2>1.2){
+        cx.beginPath(); cx.arc(sx,sy,sr2*3,0,Math.PI*2);
+        cx.fillStyle='rgba(180,200,255,.04)'; cx.fill();
+      }
+    }
+
+    // Montañas / horizonte lejano
+    cx.fillStyle='rgba(6,10,22,.85)';
+    cx.beginPath(); cx.moveTo(0,H*.72);
+    for(var mx=0;mx<=W;mx+=W/12){
+      cx.lineTo(mx, H*.72-Math.sin(mx/W*Math.PI*3+1)*H*.06-Math.random()*H*.03);
+    }
+    cx.lineTo(W,H); cx.lineTo(0,H); cx.closePath(); cx.fill();
+
+    // Edificios — 3 capas de profundidad
+    var capas=[
+      {n:Math.floor(W/22)+2, wMin:12, wMax:20, hMin:.12, hMax:.28, color:'rgba(8,14,28,.98)', wSize:5, wGap:6},
+      {n:Math.floor(W/32)+2, wMin:18, wMax:32, hMin:.18, hMax:.38, color:'rgba(6,10,20,.98)', wSize:4, wGap:7},
+      {n:Math.floor(W/50)+1, wMin:28, wMax:55, hMin:.22, hMax:.45, color:'rgba(4,7,15,.98)', wSize:6, wGap:9},
+    ];
+    capas.forEach(function(capa,ci){
+      for(var b=0;b<capa.n;b++){
+        var bx=b*W/capa.n+(Math.random()-.5)*W/capa.n*.6;
+        var bw=capa.wMin+Math.random()*(capa.wMax-capa.wMin);
+        var bh=(capa.hMin+Math.random()*(capa.hMax-capa.hMin))*H;
+        var by=H-bh;
+        cx.fillStyle=capa.color; cx.fillRect(bx,by,bw,bh);
+        // Antena en algunos
+        if(Math.random()>.7){
+          cx.fillStyle='rgba(6,9,18,.99)';
+          cx.fillRect(bx+bw/2-1,by-H*.02,2,H*.02);
+          // Luz roja de antena
+          if(Math.random()>.5){
+            cx.beginPath(); cx.arc(bx+bw/2,by-H*.02,1.5,0,Math.PI*2);
+            cx.fillStyle='rgba(255,60,60,.7)'; cx.fill();
+          }
+        }
+        // Ventanas
+        var cols=Math.max(1,Math.floor(bw/capa.wGap));
+        var rows=Math.max(1,Math.floor(bh/10));
+        for(var row=0;row<rows;row++){
+          for(var col=0;col<cols;col++){
+            if(Math.random()>.42){
+              var wx=bx+col*capa.wGap+2, wy=by+row*10+3;
+              var warmth=Math.random();
+              var wa=.35+Math.random()*.6;
+              if(warmth>.6) cx.fillStyle='rgba(255,240,170,'+wa+')';
+              else if(warmth>.3) cx.fillStyle='rgba(200,220,255,'+wa*.7+')';
+              else cx.fillStyle='rgba(15,25,50,.5)';
+              cx.fillRect(wx,wy,capa.wSize-1,Math.floor(8-ci));
+            }
+          }
+        }
+      }
+    });
+
+    // Suelo y agua con reflejo
+    var grd3=cx.createLinearGradient(0,H*.80,0,H);
+    grd3.addColorStop(0,'rgba(4,8,18,0)');
+    grd3.addColorStop(.3,'rgba(4,8,20,.9)');
+    grd3.addColorStop(1,'rgba(2,5,12,1)');
+    cx.fillStyle=grd3; cx.fillRect(0,H*.78,W,H*.22);
+
+    // Línea de suelo / horizonte urbano
+    cx.strokeStyle='rgba(20,35,70,.4)'; cx.lineWidth=1;
+    cx.beginPath(); cx.moveTo(0,H*.80); cx.lineTo(W,H*.80); cx.stroke();
+
+    S.cityCanvas=cv;
+  }
+  x3.drawImage(S.cityCanvas,0,0);
+}
+
+// ── REFLEJO de explosión en suelo (efecto agua/suelo húmedo)
+function agregarReflejo(cx,cy,r,color,W,H){
+  var groundY=H*.80;
+  if(cy>groundY) return;
+  var dist=groundY-cy;
+  var ry=groundY+dist*.15; // reflejo más comprimido
+  REFLEJOS.push({x:cx,y:ry,r:r,color:color,life:1,W:W,H:H});
+}
+
+function draw3D(dt){
+  var W=C3.width, H=C3.height;
+
+  // Viento
+  actualizarViento(dt);
+
+  // Fondo ciudad
+  dibujarFondoCiudad(W,H);
+
+  // Fade muy suave para persistencia de luz (trail)
+  x3.globalCompositeOperation='source-over';
+  x3.fillStyle='rgba(1,2,6,0.18)'; x3.fillRect(0,0,W,H);
+
+  // ── REFLEJOS en suelo (modo lighter para que sumen)
+  x3.globalCompositeOperation='lighter';
+  for(var ri2=REFLEJOS.length-1;ri2>=0;ri2--){
+    var ref=REFLEJOS[ri2];
+    ref.life-=dt*1.8;
+    if(ref.life<=0){REFLEJOS.splice(ri2,1);continue;}
+    var rAlpha=ref.life*.25;
+    // Elipse aplastada para simular reflejo en suelo
+    x3.save();
+    x3.scale(1,.25);
+    x3.beginPath();
+    x3.arc(ref.x,ref.y*4,ref.r*(2-ref.life*.5),0,Math.PI*2);
+    x3.fillStyle='rgba('+ref.color+','+rAlpha+')'; x3.fill();
+    x3.restore();
+  }
+  x3.globalCompositeOperation='source-over';
+
+  // ── COHETES ascendentes mejorados
+  var aliveR=[];
+  for(var ri=0;ri<S.rockets.length;ri++){
+    var rk=S.rockets[ri]; rk.t+=dt;
+    var prog=Math.min(rk.t/rk.dur,1);
+    if(prog>=1){
+      explodeBurst(rk.ef,rk.tx,rk.ty,W,H);
+      // Agregar reflejo al explotar
+      agregarReflejo(rk.tx,rk.ty,40,
+        rk.ef.ci[0]+','+rk.ef.ci[1]+','+rk.ef.ci[2], W,H);
+      continue;
+    }
+    aliveR.push(rk);
+
+    // Trayectoria parabólica con viento acumulado
+    var windAccX = VIENTO.x * rk.t * 30;
+    var rx2=rk.x+(rk.tx-rk.x)*prog + windAccX;
+    var ry2=rk.y+(rk.ty-rk.y)*prog;
+    // Easing: cohete acelera al final (ease-in para el suelo, ease-out arriba)
+    var easedProg=prog*prog*(3-2*prog);
+    ry2=rk.y+(rk.ty-rk.y)*easedProg;
+
+    // Scia del cohete con viento
+    rk.trailTimer+=dt;
+    if(rk.trailTimer>.018){
+      rk.trailTimer=0;
+      S.particles.push(mkP(
+        rx2+(Math.random()-.5)*2, ry2+(Math.random()-.5)*2,
+        VIENTO.x*20+(Math.random()-.5)*.4,
+        Math.random()*1.2+.3,
+        .3+Math.random()*.2, 1.2+Math.random()*1.5,
+        [255,200,80],[40,20,5],.25,false,0,0));
+    }
+
+    // Flash de ignición al inicio
+    if(prog<.08){
+      x3.globalCompositeOperation='lighter';
+      x3.beginPath(); x3.arc(rx2,ry2,8*(1-prog/.08),0,Math.PI*2);
+      x3.fillStyle='rgba(255,200,50,.15)'; x3.fill();
+      x3.globalCompositeOperation='source-over';
+    }
+
+    // Cuerpo del cohete
+    x3.beginPath(); x3.arc(rx2,ry2,2.5,0,Math.PI*2);
+    x3.fillStyle='rgba(255,240,100,.95)'; x3.fill();
+    // Halo luminoso
+    x3.globalCompositeOperation='lighter';
+    x3.beginPath(); x3.arc(rx2,ry2,5,0,Math.PI*2);
+    x3.fillStyle='rgba(255,160,30,.18)'; x3.fill();
+    x3.globalCompositeOperation='source-over';
+  }
+  S.rockets=aliveR;
+
+  // ── PARTÍCULAS con bloom (globalCompositeOperation lighter = GL_ONE como el shader original)
+  x3.globalCompositeOperation='lighter';
+  var toAdd=[]; var alive=0;
+
+  for(var i=S.particles.length-1;i>=0;i--){
+    var p=S.particles[i];
+
+    // Física con viento
+    p.vx += VIENTO.x * dt * 60 * .4;
+    p.vy += VIENTO.y * dt * 60 * .4;
+    p.x += p.vx*dt*60;
+    p.y += p.vy*dt*60;
+    p.vy += .08*p.grav*dt*60;
+    p.life -= p.decay*dt*60;
+
+    if(p.life<=0){ S.particles.splice(i,1); continue; }
+    alive++;
+
+    var lp=p.life/p.initialLife;
+    var alpha=Math.min(p.life*2,1);
+    var pr=1-lp;
+    var r2=Math.round(p.ci[0]+(p.cf[0]-p.ci[0])*pr);
+    var g2=Math.round(p.ci[1]+(p.cf[1]-p.ci[1])*pr);
+    var b2=Math.round(p.ci[2]+(p.cf[2]-p.ci[2])*pr);
+    var sz=p.size*Math.max(.12,lp);
+
+    // Humo en partículas viejas (cuando life < 30%)
+    if(lp<.3&&p.grav>.5){
+      x3.beginPath(); x3.arc(p.x,p.y,sz*2.5,0,Math.PI*2);
+      x3.fillStyle='rgba(40,40,50,'+(lp*.08)+')'; x3.fill();
+    }
+
+    // Núcleo blanco brillante
+    x3.beginPath(); x3.arc(p.x,p.y,sz*.35,0,Math.PI*2);
+    x3.fillStyle='rgba(255,255,255,'+alpha*.65+')'; x3.fill();
+    // Cuerpo principal
+    x3.beginPath(); x3.arc(p.x,p.y,sz,0,Math.PI*2);
+    x3.fillStyle='rgba('+r2+','+g2+','+b2+','+alpha*.88+')'; x3.fill();
+    // Halo
+    if(sz>1.2&&lp>.25){
+      x3.beginPath(); x3.arc(p.x,p.y,sz*2.5,0,Math.PI*2);
+      x3.fillStyle='rgba('+r2+','+g2+','+b2+','+(alpha*.06)+')'; x3.fill();
+    }
+
+    // Sub-emisor (Crisantemo, Sauce, Mina, Palm)
+    if(p.isEmitter&&p.emitInterval>0){
+      p.emitTimer+=dt;
+      if(p.emitTimer>=p.emitInterval){
+        p.emitTimer=0;
+        toAdd.push(mkP(
+          p.x+(Math.random()-.5)*2, p.y+(Math.random()-.5)*2,
+          p.vx*.08+(Math.random()-.5)*.25,
+          p.vy*.08+(Math.random()-.5)*.25,
+          p.subLife, .8+Math.random()*.8,
+          [255,248,200],[60,55,50],.18,false,0,0));
+      }
+    }
+  }
+
+  x3.globalCompositeOperation='source-over';
+
+  // Humo residual oscuro sobre todo (modo multiply-like)
+  if(S.smokeParticles){
+    for(var si2=S.smokeParticles.length-1;si2>=0;si2--){
+      var sm=S.smokeParticles[si2];
+      sm.x+=sm.vx*dt*60+VIENTO.x*dt*20;
+      sm.y+=sm.vy*dt*60;
+      sm.r+=dt*12; sm.life-=dt*.4;
+      if(sm.life<=0){S.smokeParticles.splice(si2,1);continue;}
+      x3.beginPath(); x3.arc(sm.x,sm.y,sm.r,0,Math.PI*2);
+      x3.fillStyle='rgba(20,22,30,'+sm.life*.06+')'; x3.fill();
+    }
+  }
+
+  for(var ai=0;ai<toAdd.length;ai++) S.particles.push(toAdd[ai]);
+  document.getElementById('hud-parts').textContent=alive+' part.';
+}
+
+// Agregar humo residual al explotar
+function agregarHumo(cx2,cy2){
+  if(!S.smokeParticles) S.smokeParticles=[];
+  for(var i=0;i<8;i++){
+    S.smokeParticles.push({
+      x:cx2+(Math.random()-.5)*20, y:cy2+(Math.random()-.5)*10,
+      vx:(Math.random()-.5)*.8+VIENTO.x*15,
+      vy:-Math.random()*.5-.2,
+      r:8+Math.random()*12, life:1
+    });
+  }
+}
+
+/* =================================================================
+   RENDER RULER
+   ================================================================= */
+function renderRuler(){
+  var W=RC.width,H=RULER;
+  rX.clearRect(0,0,W,H);rX.fillStyle='#06070d';rX.fillRect(0,0,W,H);
+  var paso=10;
+  if(S.zoom>=15)paso=5;if(S.zoom>=40)paso=1;if(S.zoom<=3)paso=30;if(S.zoom<=1.5)paso=60;
+  rX.font='9px JetBrains Mono,monospace';rX.textBaseline='top';
+  for(var t=0;t<=S.dur+paso;t+=paso/5){
+    var x=t2px(t);if(x<0||x>W)continue;
+    var big=(t%paso)<.02;
+    rX.strokeStyle=big?'#3a3f5c':'#1c1e35';rX.lineWidth=1;
+    rX.beginPath();rX.moveTo(x,big?2:H-5);rX.lineTo(x,H);rX.stroke();
+    if(big){
+      rX.fillStyle='#8090b0';
+      rX.fillText(t>=60?Math.floor(t/60)+'m'+(t%60?(t%60)+'s':''):t+'s',x+2,3);
+    }
+  }
+  // Beats en ruler
+  if(S.beatBeats){
+    rX.fillStyle='rgba(232,160,32,.5)';
+    S.beatBeats.forEach(function(bt){var xb=t2px(bt);if(xb>=0&&xb<=W)rX.fillRect(xb,H-4,1,4);});
+  }
+  var xph=t2px(S.t);
+  if(xph>=0&&xph<=W){
+    rX.fillStyle='#e8a020';rX.beginPath();rX.moveTo(xph-5,0);rX.lineTo(xph+5,0);rX.lineTo(xph,10);rX.fill();
+    rX.strokeStyle='rgba(232,160,32,.45)';rX.beginPath();rX.moveTo(xph,0);rX.lineTo(xph,H);rX.stroke();
+  }
+}
+
+/* =================================================================
+   RENDER TRACKS — con waveform overlay y cadenas
+   ================================================================= */
+function renderTracks(){
+  var W=TC.width,H=TC.height,n=numTracks();
+  tX.clearRect(0,0,W,H);
+  // Tracks
+  for(var c=0;c<n;c++){
+    var y=c*TH-S.scrollY;if(y+TH<0||y>H)continue;
+    tX.fillStyle=c%2===0?'#0a0b18':'#08091400';tX.fillRect(0,y,W,TH);
+    tX.strokeStyle='#0f1022';tX.lineWidth=1;tX.beginPath();tX.moveTo(0,y+TH);tX.lineTo(W,y+TH);tX.stroke();
+  }
+  // WAVEFORM OVERLAY — forma de onda visible en la zona de carriles (como FWsim/PMFC)
+  if(S.waveform&&S.dur>0){
+    var pts=S.waveform;
+    tX.globalAlpha=0.18;
+    tX.fillStyle='rgba(77,110,245,1)';
+    for(var wi=0;wi<W;wi++){
+      var wt=px2t(wi);if(wt<0||wt>S.dur)continue;
+      var widx=Math.floor(wt/S.dur*pts.length);
+      var wh=pts[widx]*(H*.9);
+      tX.fillRect(wi,(H-wh)/2,1,wh);
+    }
+    tX.globalAlpha=1;
+  }
+  // Grid vertical (beats)
+  if(S.beatBeats&&S.beatBeats.length>0){
+    tX.strokeStyle='rgba(232,160,32,.2)';tX.lineWidth=1;
+    S.beatBeats.forEach(function(bt){
+      var xb=t2px(bt);if(xb<0||xb>W)return;
+      tX.beginPath();tX.moveTo(xb,0);tX.lineTo(xb,H);tX.stroke();
+    });
+  }
+  // Labels
+  var lc=document.getElementById('lbl-col');lc.innerHTML='';lc.style.position='relative';
+  for(var ci=0;ci<n;ci++){
+    var yd=ci*TH-S.scrollY;if(yd+TH<0||yd>lc.offsetHeight)continue;
+    var dd=document.createElement('div');
+    var hasCue=S.cues.some(function(x){return x.ch-1===ci;});
+    dd.style.cssText='position:absolute;top:'+yd+'px;height:'+TH+'px;display:flex;align-items:center;padding:0 6px;font-size:10px;color:var(--m2);width:100%;border-bottom:1px solid #0e0f20;gap:4px;';
+    if(hasCue){var dot=document.createElement('span');dot.style.cssText='width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0';dd.appendChild(dot);}
+    var lbl=document.createElement('span');lbl.textContent='CH '+(ci+1);dd.appendChild(lbl);
+    lc.appendChild(dd);
+  }
+  // CUES
+  tX.save();tX.beginPath();tX.rect(0,0,W,H);tX.clip();
+  // Primero dibujar flechas de cadena
+  tX.strokeStyle='rgba(139,92,246,.7)';tX.lineWidth=1.5;tX.setLineDash([4,3]);
+  S.cues.forEach(function(cue){
+    if(!cue.chain)return;
+    var c2=S.cues.find(function(x){return x.id===cue.chain;});if(!c2)return;
+    var x1=t2px(cue.t),y1=(cue.ch-.5)*TH-S.scrollY;
+    var x2=t2px(c2.t),y2=(c2.ch-.5)*TH-S.scrollY;
+    tX.beginPath();tX.moveTo(x1,y1);tX.lineTo(x2,y2);tX.stroke();
+    // Punta de flecha
+    var ang=Math.atan2(y2-y1,x2-x1);
+    tX.setLineDash([]);
+    tX.beginPath();tX.moveTo(x2,y2);
+    tX.lineTo(x2-8*Math.cos(ang-.4),y2-8*Math.sin(ang-.4));
+    tX.lineTo(x2-8*Math.cos(ang+.4),y2-8*Math.sin(ang+.4));
+    tX.closePath();tX.fillStyle='rgba(139,92,246,.8)';tX.fill();
+    tX.setLineDash([4,3]);
+  });
+  tX.setLineDash([]);
+  // Dibujar cues
+  S.cues.forEach(function(cue){
+    var e=eff(cue.eid),cx2=t2px(cue.t),cy2=(cue.ch-1)*TH-S.scrollY;
+    if(cy2+TH<0||cy2>H||cx2+60<0||cx2>W)return;
+    var bw=Math.max(S.zoom*1.2,20),bh=TH-5,x0=cx2-3,y0=cy2+2;
+    // Sombra
+    tX.fillStyle='rgba(0,0,0,.3)';tX.fillRect(x0+2,y0+2,bw,bh);
+    // Cuerpo
+    var g=tX.createLinearGradient(x0,y0,x0,y0+bh);
+    g.addColorStop(0,e.c+'ee');g.addColorStop(1,e.c+'77');
+    tX.fillStyle=g;
+    if(tX.roundRect){tX.beginPath();tX.roundRect(x0,y0,bw,bh,3);tX.fill();}
+    else tX.fillRect(x0,y0,bw,bh);
+    // Borde
+    tX.strokeStyle=e.c;tX.lineWidth=1.5;
+    if(tX.roundRect){tX.beginPath();tX.roundRect(x0,y0,bw,bh,3);tX.stroke();}
+    else tX.strokeRect(x0,y0,bw,bh);tX.lineWidth=1;
+    // Linea vertical (posicion de disparo)
+    tX.strokeStyle=e.c+'33';tX.setLineDash([2,4]);
+    tX.beginPath();tX.moveTo(cx2,0);tX.lineTo(cx2,H);tX.stroke();
+    tX.setLineDash([]);
+    // Texto
+    if(bw>=22){tX.fillStyle='rgba(255,255,255,.9)';tX.font='bold 9px DM Sans,sans-serif';tX.textBaseline='middle';tX.fillText(e.n.substring(0,10),x0+4,y0+bh/2);}
+    // Indicador de cadena
+    if(cue.chain){tX.fillStyle='rgba(139,92,246,.8)';tX.fillRect(x0+bw-6,y0,6,6);}
+    // Highlight fired
+    if(cue.fired){tX.fillStyle='rgba(34,197,94,.2)';if(tX.roundRect){tX.beginPath();tX.roundRect(x0,y0,bw,bh,3);tX.fill();}else tX.fillRect(x0,y0,bw,bh);}
+  });
+  tX.restore();
+  // Playhead
+  var xph=t2px(S.t);
+  if(xph>=0&&xph<=W){
+    tX.strokeStyle='rgba(0,0,0,.35)';tX.lineWidth=3;tX.beginPath();tX.moveTo(xph+1,0);tX.lineTo(xph+1,H);tX.stroke();
+    tX.strokeStyle='#e8a020';tX.lineWidth=2;tX.beginPath();tX.moveTo(xph,0);tX.lineTo(xph,H);tX.stroke();
+    tX.lineWidth=1;
+  }
+}
+
+/* =================================================================
+   MAIN LOOP
+   ================================================================= */
+function loop(ts){
+  var dt=S.lastTs?(ts-S.lastTs)/1000:.016;
+  S.lastTs=ts;dt=Math.min(dt,.1);
+  S.fpsF++;
+  if(ts-S.fpsLast>1000){S.fps=S.fpsF;S.fpsF=0;S.fpsLast=ts;document.getElementById('hud-fps').textContent=S.fps+' fps';}
+  if(S.playing){
+    var prev=S.t;
+    if(S.audioNode&&S.audioCtx){S.t=S.audioCtx.currentTime-S.audioStarted;}
+    else{S.t=Math.min(S.t+dt,S.dur);}
+    S.cues.forEach(function(c){
+      if(!c.fired&&c.t>prev&&c.t<=S.t){
+        c.fired=true;ensureAudio();
+        var ef=eff(c.eid);
+        sonarCohete(Math.max(.3,(ef.fuseSeg||2)*.35));
+        spawnBurst(ef,C3.width,C3.height);
+        var idx=c.ch-1;
+        if(idx>=0&&idx<S.esp32.length&&S.esp32[idx].enabled)espFireIdx(idx,false);
+        // Cadena: disparar el cue encadenado
+        if(c.chain){
+          var c2=S.cues.find(function(x){return x.id===c.chain;});
+          if(c2&&!c2.fired){c2.fired=true;spawnBurst(eff(c2.eid),C3.width,C3.height);}
+        }
+      }
+    });
+    document.getElementById('ttime').textContent=fmtT(S.t);
+    renderRuler();renderTracks();renderWaveform();
+    if(S.t>=S.dur){S.playing=false;led(false);pararAudio(false);}
+  }
+  draw3D(dt);
+  requestAnimationFrame(loop);
+}
+
+/* =================================================================
+   SCROLLBAR
+   ================================================================= */
+function updateSB(){
+  var n=numTracks(),tot=n*TH,vis=TC.height,max=Math.max(0,tot-vis);
+  var th=document.getElementById('sbthumb'),sb=document.getElementById('sbv');
+  if(max<=0){th.style.display='none';return;}
+  th.style.display='block';
+  var ratio=vis/tot,tH=Math.max(18,sb.offsetHeight*ratio),trk=sb.offsetHeight-tH;
+  th.style.height=tH+'px';th.style.top=(trk>0?S.scrollY/max*trk:0)+'px';
+}
+
+/* =================================================================
+   RESIZE
+   ================================================================= */
+function resizeAll(){
+  var panel=document.getElementById('panel');
+  panel.style.height=S.panelH+'px';
+  var rw=document.getElementById('ruler-row'),rc2=document.getElementById('rc');
+  var ts=document.getElementById('tracks-scroll'),vp=document.getElementById('viewport');
+  RC.width=Math.max(1,(rw.offsetWidth||400)-rc2.offsetWidth);RC.height=RULER;
+  TC.width=Math.max(1,ts.offsetWidth||400);TC.height=Math.max(1,ts.offsetHeight||200);
+  C3.width=Math.max(1,vp.offsetWidth||800);C3.height=Math.max(1,vp.offsetHeight||200);
+  AC.width=Math.max(1,document.getElementById('audio-bar').offsetWidth-220);AC.height=22;
+  S.cityCanvas=null;S.stars=null;
+  if(posCanvas){posCanvas.width=C3.width;posCanvas.height=C3.height;dibujarPosiciones();}
+  renderRuler();renderTracks();updateSB();
+  if(S.waveform)renderWaveform();syncScrollSlider();
+}
+
+/* =================================================================
+   CONTEXT MENU
+   ================================================================= */
+function showCtx(c,mx,my){
+  S.ctxId=c.id;
+  var e=eff(c.eid);
+  document.getElementById('ctx-lbl').textContent=e.n+' @ '+c.t.toFixed(2)+'s  CH'+c.ch;
+  var m=document.getElementById('ctx');m.style.display='block';m.style.left=mx+'px';m.style.top=my+'px';
+  setTimeout(function(){var r=m.getBoundingClientRect();if(r.right>window.innerWidth)m.style.left=(mx-r.width)+'px';if(r.bottom>window.innerHeight)m.style.top=(my-r.height)+'px';},0);
+}
+function hideCtx(){document.getElementById('ctx').style.display='none';}
+function ctxCue(){return S.cues.find(function(c){return c.id===S.ctxId;});}
+function ctxDel(){S.cues=S.cues.filter(function(c){return c.id!==S.ctxId;});updateCueCount();renderTracks();updateSB();hideCtx();notify('Cue eliminado');}
+function ctxDup(){var c=ctxCue();if(!c)return;S.cues.push({id:S.nextId++,eid:c.eid,t:Math.min(c.t+.5,S.dur),ch:c.ch,fired:false,chain:null});updateCueCount();renderTracks();updateSB();hideCtx();notify('Cue duplicado','success');}
+function ctxMoveLeft(){var c=ctxCue();if(!c)return;c.t=Math.max(0,c.t-.5);renderTracks();hideCtx();}
+function ctxMoveRight(){var c=ctxCue();if(!c)return;c.t=Math.min(S.dur,c.t+.5);renderTracks();hideCtx();}
+function ctxEdit(){
+  var c=ctxCue();if(!c)return;S.editId=c.id;
+  document.getElementById('m-eff').value=c.eid;document.getElementById('m-t').value=c.t.toFixed(2);document.getElementById('m-ch').value=c.ch;
+  document.getElementById('ov').classList.add('open');hideCtx();
+}
+function closeModal(){document.getElementById('ov').classList.remove('open');}
+function saveModal(){
+  var c=S.cues.find(function(x){return x.id===S.editId;});if(!c)return;
+  c.eid=+document.getElementById('m-eff').value;c.t=Math.max(0,Math.min(+document.getElementById('m-t').value,S.dur));c.ch=Math.max(1,Math.min(32,+document.getElementById('m-ch').value));
+  renderTracks();closeModal();notify('Cue actualizado','success');
+}
+
+/* =================================================================
+   ESP32
+   ================================================================= */
+/* =================================================================
+   ESP32 — HTTP REAL + DIAGNÓSTICO COMPLETO
+   ================================================================= */
+function toggleEsp(){
+  S.espOpen=!S.espOpen;
+  var ep=document.getElementById('ep'),btn=document.getElementById('btn-tesp');
+  ep.classList.toggle('open',S.espOpen);
+  btn.classList.toggle('on',S.espOpen);
+  if(S.espOpen){ espPingAll(); verificarRedWifi(); }
+  setTimeout(resizeAll,220);
+}
+
+// Verificar si el PC está en la red correcta
+function verificarRedWifi(){
+  if(S.esp32.length===0){
+    setDiagState('unknown','Agrega una IP de ESP32 para verificar');
+    return;
+  }
+  var maestroIP=S.esp32[0].ip;
+  setDiagState('checking','Verificando '+maestroIP+'...');
+  var xhr=new XMLHttpRequest();
+  xhr.timeout=2000;
+  xhr.open('GET','http://'+maestroIP+'/ping',true);
+  xhr.onload=function(){
+    if(xhr.status===200&&xhr.responseText.indexOf('OK')>=0){
+      setDiagState('ok','Red OK — '+maestroIP+' responde');
+      document.getElementById('ep-wifi-warn').classList.remove('show');
+    } else {
+      setDiagState('err','Respuesta inesperada de '+maestroIP);
+    }
+  };
+  xhr.onerror=function(){
+    setDiagState('err','Sin respuesta — ¿PC conectado a PyroShow_Master?');
+    document.getElementById('ep-wifi-warn').classList.add('show');
+  };
+  xhr.ontimeout=function(){
+    setDiagState('err','Timeout — ESP32 no responde en 2s');
+    document.getElementById('ep-wifi-warn').classList.add('show');
+  };
+  try{ xhr.send(); }
+  catch(e){ setDiagState('err','Error: '+e.message); }
+}
+
+function updateDiagBadge(){
+  var on=S.esp32.filter(function(m){return m.st==='ok';}).length;
+  var tot=S.esp32.length;
+  if(tot===0) return;
+  if(on===tot) setDiagState('ok','Todos online — '+on+'/'+tot);
+  else if(on>0) setDiagState('warn',on+'/'+tot+' online');
+  else setDiagState('err','Ninguno responde — verifica WiFi');
+  if(on===0) document.getElementById('ep-wifi-warn').classList.add('show');
+  else document.getElementById('ep-wifi-warn').classList.remove('show');
+}
+
+// Diagnóstico completo con XHR
+function diagnosticoCompleto(){
+  var btn=document.getElementById('btn-full-diag');
+  btn.classList.add('checking'); btn.textContent='Verificando...'; btn.disabled=true;
+  var detail=document.getElementById('diag-detail');
+  detail.style.display='block'; detail.innerHTML='';
+
+  var log=function(msg,color){
+    var div=document.createElement('div');
+    div.textContent=msg; div.style.color=color||'var(--m1)';
+    detail.appendChild(div);
+  };
+
+  log('── Diagnóstico '+new Date().toLocaleTimeString()+' ──','var(--m2)');
+
+  // Verificar IPs: primero las registradas, si no hay usar default
+  var ips=S.esp32.length>0 ? S.esp32.map(function(m){return m.ip;}) : ['192.168.4.1'];
+  var pendiente=ips.length;
+
+  ips.forEach(function(ip,i){
+    var t0=performance.now();
+    var xhr=new XMLHttpRequest();
+    xhr.timeout=2500;
+    xhr.open('GET','http://'+ip+'/ping',true);
+    xhr.onload=function(){
+      var lat=Math.round(performance.now()-t0);
+      if(xhr.status===200&&xhr.responseText.indexOf('OK')>=0){
+        log('✓ '+ip+' → '+xhr.responseText.trim().substring(0,25)+' ('+lat+'ms)','var(--green)');
+        var idx=S.esp32.findIndex(function(m){return m.ip===ip;});
+        if(idx>=0){S.esp32[idx].st='ok';S.esp32[idx].ms=lat;S.esp32[idx].lastErr='';}
+      } else {
+        log('✗ '+ip+' → HTTP '+xhr.status,'var(--red)');
+        var idx=S.esp32.findIndex(function(m){return m.ip===ip;});
+        if(idx>=0){S.esp32[idx].st='err';S.esp32[idx].lastErr='HTTP '+xhr.status;}
+      }
+      if(--pendiente===0) finalizarDiag();
+    };
+    xhr.onerror=function(){
+      log('✗ '+ip+' → Sin respuesta (red no alcanzable)','var(--red)');
+      var idx=S.esp32.findIndex(function(m){return m.ip===ip;});
+      if(idx>=0){S.esp32[idx].st='err';S.esp32[idx].ms=0;S.esp32[idx].lastErr='Sin conexión';}
+      if(--pendiente===0) finalizarDiag();
+    };
+    xhr.ontimeout=function(){
+      log('✗ '+ip+' → Timeout (2.5s)','var(--red)');
+      var idx=S.esp32.findIndex(function(m){return m.ip===ip;});
+      if(idx>=0){S.esp32[idx].st='err';S.esp32[idx].ms=0;S.esp32[idx].lastErr='Timeout';}
+      if(--pendiente===0) finalizarDiag();
+    };
+    try{ xhr.send(); }
+    catch(e){
+      log('✗ '+ip+' → Error: '+e.message,'var(--red)');
+      if(--pendiente===0) finalizarDiag();
+    }
+  });
+
+  function finalizarDiag(){
+    renderEspList(); updateEspSt(); updateDiagBadge();
+    var on=S.esp32.filter(function(m){return m.st==='ok';}).length;
+    if(on===0){
+      log('',''); 
+      log('¿Qué verificar?','var(--m2)');
+      log('1. PC conectado a WiFi "PyroShow_Master"','var(--m1)');
+      log('2. ESP32 encendido (LED parpadea)','var(--m1)');
+      log('3. IP correcta — abre en navegador:','var(--m1)');
+      log('   http://'+ips[0]+'/ping','var(--gold)');
+    }
+    btn.classList.remove('checking'); btn.textContent='🔍 Diagnóstico'; btn.disabled=false;
+  }
+}
+
+function espAdd(){
+  var n2=document.getElementById('en').value.trim()||'Módulo '+(S.esp32.length+1);
+  var ip=document.getElementById('eip').value.trim()||'192.168.4.1';
+  // Evitar duplicados
+  if(S.esp32.find(function(m){return m.ip===ip;})){
+    notify('Ya existe un módulo con esa IP','error'); return;
+  }
+  S.esp32.push({id:S.nextEspId++,n:n2,ip:ip,st:'off',ms:0,enabled:true,lastErr:'',failCount:0});
+  // Auto-incrementar IP sugerida
+  var parts=ip.split('.');
+  parts[3]=(+parts[3]+1)+'';
+  document.getElementById('eip').value=parts.join('.');
+  document.getElementById('en').value='Módulo '+(S.esp32.length+1);
+  renderEspList(); updateEspSt();
+  // Hacer ping inmediato al nuevo módulo
+  espPingIdx(S.esp32.length-1);
+}
+
+function renderEspList(){
+  var list=document.getElementById('ep-list'); list.innerHTML='';
+  if(S.esp32.length===0){
+    var empty=document.createElement('div');
+    empty.style.cssText='padding:14px 10px;font-size:10px;color:var(--m2);text-align:center;line-height:1.7';
+    empty.innerHTML='Sin módulos.<br>Agrega la IP del maestro ESP32.<br><span style="color:var(--m2);font-size:9px">Default: 192.168.4.1</span>';
+    list.appendChild(empty); return;
+  }
+  S.esp32.forEach(function(m,i){
+    var row=document.createElement('div'); row.className='erow';
+
+    var lc=m.st==='ok'?'ok':m.st==='err'?'err':m.st==='ld'?'ld':'';
+    var msColor=m.ms>0?(m.ms<100?'fast':m.ms<400?'slow':'err'):'err';
+    var msText=m.ms>0?m.ms+'ms':'--';
+    var fireDisabled=m.st!=='ok'?' err':'';
+    var fireTitle=m.st!=='ok'?'Sin conexión':'Disparar canal';
+
+    var main=document.createElement('div'); main.className='erow-main';
+    main.innerHTML=
+      '<span class="eled '+lc+'"></span>'+
+      '<span class="eip">'+m.ip+'</span>'+
+      '<span class="ename">'+m.n+'</span>'+
+      '<span class="ems '+msColor+'">'+msText+'</span>'+
+      '<button class="btn-reping" title="Re-ping" onclick="espPingIdx('+i+')" style="margin-right:2px">↺</button>'+
+      '<button class="btn-ef'+fireDisabled+'" title="'+fireTitle+'" onclick="espFireIdx('+i+',true)" '+(m.st!=='ok'?'disabled':'')+'>FIRE</button>';
+    row.appendChild(main);
+
+    // Detalle expandible con info de diagnóstico
+    var detail=document.createElement('div');
+    detail.className='erow-detail'+(m.lastErr?' show':'');
+    if(m.st==='err'||m.lastErr){
+      detail.innerHTML='<span style="color:var(--red)">Error: '+escapeHtml(m.lastErr||'Sin respuesta HTTP')+'</span>';
+    } else if(m.st==='ok'){
+      detail.innerHTML='<span style="color:var(--green)">Online — '+msText+' latencia</span>';
+    }
+    row.appendChild(detail);
+    list.appendChild(row);
+  });
+}
+
+function escapeHtml(s){ return String(s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+function updateEspSt(){
+  var on=S.esp32.filter(function(m){return m.st==='ok';}).length, tot=S.esp32.length;
+  var badge=document.getElementById('ep-badge');
+  badge.textContent=on+'/'+tot+' online';
+  badge.className='ep-badge '+(tot===0?'none':on===tot&&tot>0?'all-ok':'some-err');
+  var el=document.getElementById('esp-st');
+  el.textContent='ESP32: '+on+'/'+tot;
+  el.className=on>0&&on===tot?'on':on>0?'warn':'';
+  // Deshabilitar FUEGO TOTAL si no hay módulos online
+  var ft=document.getElementById('btn-fuego-total');
+  if(ft) ft.disabled=(on===0);
+}
+
+function espPingAll(){
+  S.esp32.forEach(function(m,i){ espPingIdx(i); });
+}
+
+// PING REAL — intenta XHR, acepta cualquier respuesta HTTP como "online"
+function espPingIdx(i){
+  var m=S.esp32[i]; if(!m) return;
+  m.st='ld'; m.ms=0; renderEspList();
+  var t0=performance.now();
+  var xhr=new XMLHttpRequest();
+  xhr.timeout=3000;
+  xhr.open('GET','http://'+m.ip+'/ping',true);
+  xhr.onload=function(){
+    // Acepta cualquier respuesta HTTP — el ESP32 respondió = está online
+    m.st='ok';
+    m.ms=Math.round(performance.now()-t0);
+    m.lastErr='';
+    m.failCount=0;
+    // Guardar lo que respondió el ESP32
+    m.respuesta=xhr.responseText.trim().substring(0,40)||'HTTP '+xhr.status;
+    renderEspList(); updateEspSt(); updateDiagBadge();
+  };
+  xhr.onerror=function(){
+    // XHR puede fallar por CORS aunque el ESP32 responda
+    // Intentar método alternativo con img tag (bypass CORS total)
+    pingConImg(i, t0);
+  };
+  xhr.ontimeout=function(){
+    m.st='err'; m.ms=0; m.failCount=(m.failCount||0)+1;
+    m.lastErr='Sin respuesta en 3s — verifica IP: '+m.ip;
+    renderEspList(); updateEspSt(); updateDiagBadge();
+  };
+  try{ xhr.send(); }
+  catch(e){ pingConImg(i, t0); }
+}
+
+// Método alternativo: usa <img> que ignora CORS completamente
+// Si el ESP32 responde (aunque sea con error), el onerror del img se activa
+// Si no hay ESP32, no hay respuesta en el timeout
+function pingConImg(i, t0){
+  var m=S.esp32[i]; if(!m) return;
+  var t=t0||performance.now();
+  var timedOut=false;
+  var timer=setTimeout(function(){
+    timedOut=true;
+    m.st='err'; m.ms=0; m.failCount=(m.failCount||0)+1;
+    m.lastErr='No alcanzable — verifica WiFi y IP '+m.ip;
+    renderEspList(); updateEspSt(); updateDiagBadge();
+  }, 3000);
+
+  var img=new Image();
+  // El ESP32 no sirve imágenes, pero si responde CUALQUIER cosa
+  // (incluso error 404) el onerror se llama = está ONLINE
+  img.onload=function(){
+    if(timedOut) return;
+    clearTimeout(timer);
+    m.st='ok'; m.ms=Math.round(performance.now()-t);
+    m.lastErr=''; m.failCount=0; m.respuesta='online (img)';
+    renderEspList(); updateEspSt(); updateDiagBadge();
+  };
+  img.onerror=function(){
+    if(timedOut) return;
+    clearTimeout(timer);
+    // onerror = el servidor respondió (aunque sea con error HTTP)
+    // Distinguir: si tardó poco = ESP32 respondió; si tardó mucho = timeout de red
+    var lat=Math.round(performance.now()-t);
+    if(lat < 2800){
+      m.st='ok'; m.ms=lat; m.lastErr=''; m.failCount=0;
+      m.respuesta='online ('+lat+'ms)';
+    } else {
+      m.st='err'; m.ms=0; m.failCount=(m.failCount||0)+1;
+      m.lastErr='Timeout de red';
+    }
+    renderEspList(); updateEspSt(); updateDiagBadge();
+  };
+  // Añadir timestamp para evitar caché del navegador
+  img.src='http://'+m.ip+'/ping?_t='+Date.now();
+}
+
+// FIRE REAL — usa img tag como fallback también para CORS
+function espFireIdx(i, fromUI){
+  var m=S.esp32[i];
+  if(!m){ if(fromUI) notify('Módulo no encontrado','error'); return; }
+  if(m.st!=='ok'&&fromUI){
+    notify('Módulo '+m.ip+' sin conexión — haz ping primero','error'); return;
+  }
+  m.st='ld'; renderEspList();
+  var t0=performance.now();
+
+  // Intentar XHR primero
+  var xhr=new XMLHttpRequest();
+  xhr.timeout=2000;
+  xhr.open('GET','http://'+m.ip+'/fire',true);
+  xhr.onload=function(){
+    m.st='ok'; m.ms=Math.round(performance.now()-t0); m.lastErr='';
+    renderEspList();
+    flashFireBtn(i);
+    sintetizarExplosion('Peonia'); // feedback auditivo
+  };
+  xhr.onerror=function(){
+    // Intentar con img tag (el fire igual se ejecuta en el ESP32)
+    fireConImg(i, t0);
+  };
+  xhr.ontimeout=function(){
+    m.st='err'; m.lastErr='Fire timeout';
+    renderEspList(); updateEspSt();
+    notify('Sin respuesta al disparar '+m.ip,'error');
+  };
+  try{ xhr.send(); }
+  catch(e){ fireConImg(i, t0); }
+}
+
+function fireConImg(i, t0){
+  var m=S.esp32[i]; if(!m) return;
+  var timer=setTimeout(function(){
+    m.st='err'; m.lastErr='Fire timeout';
+    renderEspList(); updateEspSt();
+  },2500);
+  var img=new Image();
+  img.onload=img.onerror=function(){
+    clearTimeout(timer);
+    var lat=Math.round(performance.now()-t0);
+    if(lat<2400){
+      m.st='ok'; m.ms=lat; m.lastErr='';
+      renderEspList(); flashFireBtn(i);
+      sintetizarExplosion('Peonia');
+    } else {
+      m.st='err'; m.lastErr='Timeout';
+      renderEspList(); updateEspSt();
+    }
+  };
+  img.src='http://'+m.ip+'/fire?_t='+Date.now();
+}
+
+function flashFireBtn(i){
+  var btns=document.querySelectorAll('.btn-ef');
+  if(btns[i]){
+    btns[i].textContent='FIRED!'; btns[i].classList.add('ok');
+    setTimeout(function(){if(btns[i]){btns[i].textContent='FIRE';btns[i].classList.remove('ok');}},700);
+  }
+}
+
+function espFireAll(){
+  var online=S.esp32.filter(function(m){return m.st==='ok';});
+  if(online.length===0){notify('Sin módulos online','error');return;}
+  var btn=document.getElementById('btn-fuego-total');
+  btn.textContent='*** DISPARANDO ***'; btn.style.background='#ff3030';
+  online.forEach(function(m,i){
+    var idx=S.esp32.indexOf(m);
+    espFireIdx(idx,false);
+  });
+  S.cues.forEach(function(c,i){
+    setTimeout(function(){c.fired=true;spawnBurst(eff(c.eid),C3.width,C3.height);renderTracks();},i*50);
+  });
+  setTimeout(function(){btn.textContent='!! FUEGO TOTAL !!';btn.style.background='';},1500);
+}
+
+// Auto-ping cada 15 segundos cuando el panel está abierto
+setInterval(function(){
+  if(S.espOpen&&S.esp32.length>0){
+    S.esp32.forEach(function(m,i){
+      if(m.st==='ok'||m.st==='off') espPingIdx(i);
+    });
+  }
+},15000);
+
+/* =================================================================
+   VIDEO EXPORT (MediaRecorder)
+   ================================================================= */
+function toggleVideo(){
+  if(S.recActive){pararVideo();}
+  else{grabarVideo();}
+}
+function grabarVideo(){
+  if(!window.MediaRecorder){notify('Tu navegador no soporta grabacion de video','error');return;}
+  try{
+    S.recChunks=[];
+    var stream=C3.captureStream(30);
+    S.recMediaRec=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9',videoBitsPerSecond:6000000});
+    S.recMediaRec.ondataavailable=function(e){if(e.data.size>0)S.recChunks.push(e.data);};
+    S.recMediaRec.onstop=function(){
+      var blob=new Blob(S.recChunks,{type:'video/webm'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pyroshow_'+S.projName+'.webm';a.click();
+      notify('Video exportado!','success');
+    };
+    S.recMediaRec.start(100);
+    S.recActive=true;S.recStart=Date.now();
+    document.getElementById('hud-rec').style.display='flex';
+    document.getElementById('btn-video').style.color='var(--red)';
+    document.getElementById('btn-video').textContent='&#9632; Detener';
+    // Actualizar contador
+    S.recInterval=setInterval(function(){
+      var secs=Math.floor((Date.now()-S.recStart)/1000);
+      var mm=Math.floor(secs/60),ss=secs%60;
+      document.getElementById('rec-time').textContent=(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    },500);
+    if(!S.playing)tlPlay();
+    notify('Grabando video — presiona Detener cuando termine','info');
+  }catch(e){notify('Error al iniciar grabacion','error');}
+}
+function pararVideo(){
+  if(S.recMediaRec&&S.recMediaRec.state!=='inactive')S.recMediaRec.stop();
+  S.recActive=false;clearInterval(S.recInterval);
+  document.getElementById('hud-rec').style.display='none';
+  document.getElementById('btn-video').style.color='var(--blue)';
+  document.getElementById('btn-video').textContent='&#9711; Video';
+  tlPause();
+}
+
+/* =================================================================
+   GUARDAR / CARGAR PROYECTO
+   ================================================================= */
+function proyectoJSON(){
+  return JSON.stringify({
+    version:3,name:S.projName,dur:S.dur,zoom:S.zoom,
+    cues:S.cues.map(function(c){return{id:c.id,eid:c.eid,t:c.t,ch:c.ch,chain:c.chain||null};}),
+    nextId:S.nextId,
+    esp32:S.esp32.map(function(m){return{n:m.n,ip:m.ip};}),
+    nextEspId:S.nextEspId,
+    effects:S.effects,nextEffId:S.nextEffId,
+  });
+}
+function guardarProyecto(){
+  var blob=new Blob([proyectoJSON()],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(S.projName||'show')+'.pshow';a.click();
+  notify('Proyecto guardado','success');
+}
+function cargarProyecto(){document.getElementById('inp-load-proj').click();}
+function leerProyecto(inp){
+  var f=inp.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      S.projName=d.name||'Proyecto';S.dur=d.dur||120;S.zoom=d.zoom||8;
+      document.getElementById('inp-dur').value=S.dur;document.getElementById('inp-zoom').value=S.zoom;document.getElementById('zv').textContent=S.zoom.toFixed(1);
+      S.cues=(d.cues||[]).map(function(c){return Object.assign({fired:false,chain:c.chain||null},c);});
+      S.nextId=d.nextId||S.cues.length;
+      S.esp32=(d.esp32||[]).map(function(m,i){return{id:i+1,n:m.n,ip:m.ip,st:'off',ms:0,enabled:true};});
+      S.nextEspId=d.nextEspId||S.esp32.length+1;
+      if(d.effects&&d.effects.length>0){S.effects=d.effects;S.nextEffId=d.nextEffId||S.effects.length;}
+      document.getElementById('proj-name').textContent=S.projName+'.pshow';
+      poblarEfectos();poblarModalEfectos();poblarBeatEffSel();
+      updateCueCount();renderEspList();updateEspSt();renderRuler();renderTracks();updateSB();
+      notify('Proyecto cargado: '+S.projName,'success');
+    }catch(err){notify('Error al cargar proyecto','error');}
+  };r.readAsText(f);
+}
+function autoSave(){try{localStorage.setItem('pyroshow_autosave',proyectoJSON());}catch(e){}}
+function cargarAutoSave(){
+  try{
+    var s=localStorage.getItem('pyroshow_autosave');if(!s)return;
+    var d=JSON.parse(s);if(!d.cues||d.cues.length===0)return;
+    if(!confirm('Auto-guardado: '+d.cues.length+' cues. Recuperar?'))return;
+    S.dur=d.dur||120;S.zoom=d.zoom||8;
+    S.cues=(d.cues||[]).map(function(c){return Object.assign({fired:false,chain:c.chain||null},c);});
+    S.nextId=d.nextId||S.cues.length;S.projName=d.name||'Recuperado';
+    if(d.effects&&d.effects.length>0){S.effects=d.effects;S.nextEffId=d.nextEffId||S.effects.length;}
+    document.getElementById('proj-name').textContent=S.projName+'.pshow';
+    document.getElementById('inp-dur').value=S.dur;document.getElementById('inp-zoom').value=S.zoom;
+    poblarEfectos();poblarModalEfectos();poblarBeatEffSel();
+    updateCueCount();renderRuler();renderTracks();updateSB();
+    notify('Auto-guardado recuperado','success');
+  }catch(e){}
+}
+function nuevoProyecto(){
+  if(S.cues.length>0&&!confirm('Descartar cambios y crear proyecto nuevo?'))return;
+  S.cues=[];S.t=0;S.playing=false;S.projName='Sin titulo';S.particles=[];S.rockets=[];S.scrollX=0;S.scrollY=0;S.beatBeats=[];
+  document.getElementById('proj-name').textContent='Sin titulo.pshow';
+  led(false);updateCueCount();renderRuler();renderTracks();updateSB();
+}
+function exportCSV(){
+  var rows=['#Event Time,#Channel,#Cue,#Description,#Family'];
+  S.cues.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(c){var e=eff(c.eid);rows.push(c.t.toFixed(3)+','+c.ch+','+c.id+','+e.n+','+e.fam);});
+  download(rows.join('\n'),'show_'+S.projName+'.csv','text/csv');notify('CSV exportado','success');
+}
+function exportarCobra(){
+  var rows=['#Trigger Channel,#Trigger Button,#Confirmation Button,#Return Channel','1,1,,1','#Event Time,#Channel,#Cue,#Description'];
+  S.cues.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(c){rows.push(c.t.toFixed(2)+','+c.ch+','+c.id+','+eff(c.eid).n);});
+  download(rows.join('\n'),'cobra_'+S.projName+'.csv','text/csv');notify('Cobra CSV exportado','success');
+}
+function download(content,filename,type){var blob=new Blob([content],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();}
+
+/* =================================================================
+   EDITOR DE EFECTOS
+   ================================================================= */
+var FAM_LIST=['Peonia','Crisantemo','Sauce','Volcan','Anillo','Cometa','Mina','Crossette','Palmera','Sparkler'];
+function toggleEditor(){
+  S.editorOpen=!S.editorOpen;
+  var dr=document.getElementById('editor-drawer'),btn=document.getElementById('btn-editor');
+  dr.classList.toggle('open',S.editorOpen);btn.classList.toggle('active',S.editorOpen);
+  if(S.editorOpen){edRenderLib();edSeleccionar(S.edSelId);}
+}
+function edRenderLib(){
+  var list=document.getElementById('ed-lib-list');list.innerHTML='';
+  S.effects.forEach(function(e){
+    var d=document.createElement('div');d.className='ed-lib-item'+(e.id===S.edSelId?' sel':'');d.onclick=function(){edSeleccionar(e.id);};
+    var dot=document.createElement('span');dot.className='ed-lib-dot';dot.style.background=e.c||'#888';d.appendChild(dot);
+    var lbl=document.createElement('span');lbl.textContent=e.n;lbl.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap';d.appendChild(lbl);
+    list.appendChild(d);
+  });
+}
+function edSeleccionar(id){
+  S.edSelId=id;var ef=S.effects.find(function(e){return e.id===id;});
+  if(!ef){document.getElementById('ed-props').innerHTML='<div style="padding:20px;font-size:12px;color:var(--m2)">Selecciona un efecto</div>';return;}
+  edRenderLib();
+  function rgb2hex(arr){return'#'+arr.map(function(v){return('0'+Math.max(0,Math.min(255,v)).toString(16)).slice(-2);}).join('');}
+  var p=document.getElementById('ed-props');
+  p.innerHTML=
+    '<div class="ed-section">General</div>'+
+    '<div class="ed-row"><label>Nombre</label><input type="text" id="ed-nombre" value="'+ef.n+'" style="grid-column:2/-1"/></div>'+
+    '<div class="ed-row"><label>Familia</label><select id="ed-fam" style="grid-column:2/-1">'+FAM_LIST.map(function(f){return'<option'+(f===ef.fam?' selected':'')+'>'+f+'</option>';}).join('')+'</select></div>'+
+    '<div class="ed-section">Particulas</div>'+
+    '<div class="ed-row"><label>Cantidad</label><input type="range" id="ed-pcount" min="5" max="500" step="5" value="'+(ef.pCount||50)+'"/><span class="rv" id="rv-pcount">'+(ef.pCount||50)+'</span></div>'+
+    '<div class="ed-row"><label>Vida min (s)</label><input type="range" id="ed-minlife" min="0.2" max="5" step="0.1" value="'+(ef.minLife||1)+'"/><span class="rv" id="rv-minlife">'+(ef.minLife||1).toFixed(1)+'s</span></div>'+
+    '<div class="ed-row"><label>Vida max (s)</label><input type="range" id="ed-maxlife" min="0.2" max="5" step="0.1" value="'+(ef.maxLife||1.5)+'"/><span class="rv" id="rv-maxlife">'+(ef.maxLife||1.5).toFixed(1)+'s</span></div>'+
+    '<div class="ed-row"><label>Vel. minima</label><input type="range" id="ed-minspd" min="1" max="60" step="1" value="'+(ef.minSpd||18)+'"/><span class="rv" id="rv-minspd">'+(ef.minSpd||18)+'</span></div>'+
+    '<div class="ed-row"><label>Vel. maxima</label><input type="range" id="ed-maxspd" min="1" max="60" step="1" value="'+(ef.maxSpd||28)+'"/><span class="rv" id="rv-maxspd">'+(ef.maxSpd||28)+'</span></div>'+
+    '<div class="ed-row"><label>Gravedad</label><input type="range" id="ed-grav" min="0" max="5" step="0.1" value="'+(ef.gravMod||1)+'"/><span class="rv" id="rv-grav">'+(ef.gravMod||1).toFixed(1)+'</span></div>'+
+    '<div class="ed-section">Colores</div>'+
+    '<div class="ed-color-row"><label>Color inicial</label><input type="color" class="ed-color-picker" id="ed-ci" value="'+rgb2hex(ef.ci)+'"/><span class="ed-color-hex" id="rv-ci">'+rgb2hex(ef.ci)+'</span></div>'+
+    '<div class="ed-color-row"><label>Color final</label><input type="color" class="ed-color-picker" id="ed-cf" value="'+rgb2hex(ef.cf)+'"/><span class="ed-color-hex" id="rv-cf">'+rgb2hex(ef.cf)+'</span></div>'+
+    '<div class="ed-section">Lanzamiento</div>'+
+    '<div class="ed-row"><label>Posicion X</label><input type="range" id="ed-posx" min="-50" max="50" step="1" value="'+(ef.posX||0)+'"/><span class="rv" id="rv-posx">'+(ef.posX||0)+'</span></div>'+
+    '<div class="ed-row"><label>Vel. Y (altura)</label><input type="range" id="ed-vely" min="5" max="50" step="1" value="'+(ef.velY||20)+'"/><span class="rv" id="rv-vely">'+(ef.velY||20)+'</span></div>'+
+    '<div class="ed-row"><label>Tiempo mecha (s)</label><input type="range" id="ed-fuse" min="0.2" max="5" step="0.1" value="'+(ef.fuseSeg||2)+'"/><span class="rv" id="rv-fuse">'+(ef.fuseSeg||2).toFixed(1)+'s</span></div>';
+  // Live sliders
+  [['ed-pcount','rv-pcount','',true],['ed-minlife','rv-minlife','s'],['ed-maxlife','rv-maxlife','s'],['ed-minspd','rv-minspd',''],['ed-maxspd','rv-maxspd',''],['ed-grav','rv-grav',''],['ed-posx','rv-posx',''],['ed-vely','rv-vely',''],['ed-fuse','rv-fuse','s']].forEach(function(sl){
+    var inp=document.getElementById(sl[0]),rv=document.getElementById(sl[1]);if(!inp||!rv)return;
+    inp.addEventListener('input',function(){rv.textContent=(sl[3]?Math.round(+this.value):parseFloat(this.value).toFixed(1))+(sl[2]||'');});
+  });
+  ['ed-ci','ed-cf'].forEach(function(id2){var inp=document.getElementById(id2);if(!inp)return;inp.addEventListener('input',function(){var rv=document.getElementById('rv-'+id2.replace('ed-',''));if(rv)rv.textContent=this.value;});});
+}
+function edNuevoEfecto(){
+  var ef={id:S.nextEffId++,n:'Nuevo '+(S.nextEffId-1),fam:'Peonia',c:'#e83030',ci:[232,48,48],cf:[80,0,0],pCount:50,minLife:1,maxLife:1.5,minSpd:18,maxSpd:28,gravMod:1,fuseSeg:2,posX:0,velY:20};
+  S.effects.push(ef);S.edSelId=ef.id;
+  poblarEfectos();poblarModalEfectos();poblarBeatEffSel();edRenderLib();edSeleccionar(ef.id);
+  notify('Nuevo efecto creado','success');
+}
+function edGuardar(){
+  var ef=S.effects.find(function(e){return e.id===S.edSelId;});if(!ef)return;
+  var g=function(id2){var el=document.getElementById(id2);return el?el.value:null;};
+  ef.n=g('ed-nombre')||ef.n;ef.fam=g('ed-fam')||ef.fam;
+  ef.pCount=parseInt(g('ed-pcount')||ef.pCount);ef.minLife=parseFloat(g('ed-minlife')||ef.minLife);ef.maxLife=parseFloat(g('ed-maxlife')||ef.maxLife);
+  ef.minSpd=parseFloat(g('ed-minspd')||ef.minSpd);ef.maxSpd=parseFloat(g('ed-maxspd')||ef.maxSpd);ef.gravMod=parseFloat(g('ed-grav')||ef.gravMod);
+  ef.posX=parseFloat(g('ed-posx')||ef.posX);ef.velY=parseFloat(g('ed-vely')||ef.velY);ef.fuseSeg=parseFloat(g('ed-fuse')||ef.fuseSeg);
+  function hex2rgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  var ci=g('ed-ci');if(ci){ef.ci=hex2rgb(ci);ef.c=ci;}
+  var cf=g('ed-cf');if(cf)ef.cf=hex2rgb(cf);
+  poblarEfectos();poblarModalEfectos();poblarBeatEffSel();edRenderLib();renderTracks();
+  notify('Efecto guardado','success');
+}
+function edEliminar(){
+  if(S.effects.length<=1){notify('Debe quedar al menos un efecto','error');return;}
+  if(!confirm('Eliminar este efecto?'))return;
+  S.effects=S.effects.filter(function(e){return e.id!==S.edSelId;});
+  S.edSelId=S.effects[0].id;poblarEfectos();poblarModalEfectos();poblarBeatEffSel();edRenderLib();edSeleccionar(S.edSelId);notify('Efecto eliminado');
+}
+function edPreview(){edGuardar();var ef=S.effects.find(function(e){return e.id===S.edSelId;});if(!ef)return;ensureAudio();spawnBurst(ef,C3.width,C3.height);sonarCohete(Math.max(.3,(ef.fuseSeg||2)*.35));notify('Preview: '+ef.n,'success');}
+
+/* =================================================================
+   EDITOR DE POSICIONES DE LANZAMIENTO
+   Sistema visual drag-and-drop en el viewport
+   ================================================================= */
+var POS = {
+  activo: false,
+  modo: 'add',          // 'add' | 'move' | 'del'
+  puntos: [],           // [{id, x, y, nombre, color, ch}]
+  nextId: 1,
+  selIdx: -1,           // índice del punto seleccionado/moviéndose
+  dragOffset: {x:0,y:0},
+  isDragging: false,
+};
+
+var posCanvas = null;
+var pCtx = null;
+
+function togglePosiciones(){
+  POS.activo = !POS.activo;
+  var overlay = document.getElementById('pos-overlay');
+  var btn     = document.getElementById('btn-posiciones');
+  var hudPos  = document.getElementById('hud-pos');
+
+  overlay.classList.toggle('active', POS.activo);
+  btn.classList.toggle('active', POS.activo);
+  hudPos.style.display = POS.activo ? 'block' : 'none';
+
+  if(POS.activo){
+    // Inicializar canvas de posiciones
+    posCanvas = document.getElementById('pos-canvas');
+    pCtx      = posCanvas.getContext('2d');
+    posCanvas.width  = C3.width;
+    posCanvas.height = C3.height;
+    posCanvas.style.pointerEvents = 'none'; // el overlay maneja los eventos
+    setPosMode('add');
+    dibujarPosiciones();
+    notify('Clic en el viewport para agregar puntos de lanzamiento','info');
+  } else {
+    // Aplicar posiciones a los efectos de la biblioteca
+    aplicarPosicionesAEfectos();
+  }
+}
+
+function setPosMode(m){
+  POS.modo = m;
+  POS.selIdx = -1;
+  ['add','move','del'].forEach(function(mode){
+    var el = document.getElementById('btn-pos-'+mode);
+    if(el) el.classList.toggle('active', mode===m);
+  });
+  var overlay = document.getElementById('pos-overlay');
+  overlay.style.cursor = m==='add'?'crosshair': m==='del'?'no-drop':'grab';
+}
+
+// ── Eventos del overlay
+document.addEventListener('DOMContentLoaded', function(){
+  var overlay = document.getElementById('pos-overlay');
+
+  overlay.addEventListener('mousedown', function(e){
+    if(!POS.activo) return;
+    var rect = overlay.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+
+    if(POS.modo === 'add'){
+      // Agregar punto donde se hizo clic
+      var colores = ['#38bdf8','#e8a020','#22c55e','#e03030','#8b5cf6','#f0c030','#ec4899','#06b6d4'];
+      var col = colores[(POS.puntos.length) % colores.length];
+      POS.puntos.push({
+        id: POS.nextId++,
+        x: mx, y: my,
+        nombre: 'Pos '+POS.puntos.length,
+        color: col,
+        ch: POS.puntos.length + 1,
+      });
+      notify('Punto '+POS.puntos.length+' agregado','success');
+      actualizarHudPos();
+      dibujarPosiciones();
+
+    } else if(POS.modo === 'del'){
+      var idx = puntoEnPosicion(mx, my);
+      if(idx >= 0){
+        POS.puntos.splice(idx, 1);
+        // Renumerar
+        POS.puntos.forEach(function(p,i){ p.ch=i+1; p.nombre='Pos '+(i+1); });
+        actualizarHudPos();
+        dibujarPosiciones();
+        notify('Punto eliminado');
+      }
+
+    } else if(POS.modo === 'move'){
+      var idx2 = puntoEnPosicion(mx, my);
+      if(idx2 >= 0){
+        POS.selIdx = idx2;
+        POS.isDragging = true;
+        POS.dragOffset.x = mx - POS.puntos[idx2].x;
+        POS.dragOffset.y = my - POS.puntos[idx2].y;
+        overlay.style.cursor = 'grabbing';
+      }
+    }
+  });
+
+  overlay.addEventListener('mousemove', function(e){
+    if(!POS.activo || !POS.isDragging || POS.selIdx < 0) return;
+    var rect = overlay.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    POS.puntos[POS.selIdx].x = mx - POS.dragOffset.x;
+    POS.puntos[POS.selIdx].y = my - POS.dragOffset.y;
+    // Mantener dentro del viewport
+    POS.puntos[POS.selIdx].x = Math.max(20, Math.min(posCanvas.width-20,  POS.puntos[POS.selIdx].x));
+    POS.puntos[POS.selIdx].y = Math.max(20, Math.min(posCanvas.height-20, POS.puntos[POS.selIdx].y));
+    dibujarPosiciones();
+  });
+
+  overlay.addEventListener('mouseup', function(){
+    if(POS.isDragging){
+      POS.isDragging = false;
+      POS.selIdx = -1;
+      overlay.style.cursor = 'grab';
+    }
+  });
+
+  // Hover: mostrar info del punto
+  overlay.addEventListener('mousemove', function(e){
+    if(!POS.activo) return;
+    var rect = overlay.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    var idx = puntoEnPosicion(mx, my);
+    var info = document.getElementById('pos-sel-info');
+    if(idx >= 0 && !POS.isDragging){
+      var p = POS.puntos[idx];
+      info.textContent = p.nombre + ' — CH ' + p.ch + ' — X:' + Math.round(p.x) + ' Y:' + Math.round(p.y);
+      info.classList.add('show');
+    } else if(!POS.isDragging){
+      info.classList.remove('show');
+    }
+  });
+});
+
+function puntoEnPosicion(mx, my){
+  var RADIO = 16;
+  for(var i = POS.puntos.length-1; i >= 0; i--){
+    var p = POS.puntos[i];
+    var dx = mx - p.x, dy = my - p.y;
+    if(Math.sqrt(dx*dx+dy*dy) <= RADIO) return i;
+  }
+  return -1;
+}
+
+function actualizarHudPos(){
+  var el = document.getElementById('hud-pos');
+  if(el) el.textContent = POS.puntos.length + ' posicion' + (POS.puntos.length===1?'':'es');
+}
+
+// ── Dibujar posiciones en el canvas overlay
+function dibujarPosiciones(){
+  if(!pCtx || !posCanvas) return;
+  pCtx.clearRect(0, 0, posCanvas.width, posCanvas.height);
+  if(!POS.activo) return;
+
+  // Línea de suelo (referencia visual)
+  var groundY = posCanvas.height * 0.80;
+  pCtx.strokeStyle = 'rgba(56,189,248,0.2)';
+  pCtx.lineWidth = 1;
+  pCtx.setLineDash([6,4]);
+  pCtx.beginPath(); pCtx.moveTo(0, groundY); pCtx.lineTo(posCanvas.width, groundY);
+  pCtx.stroke();
+  pCtx.fillStyle = 'rgba(56,189,248,0.25)';
+  pCtx.font = '9px JetBrains Mono,monospace';
+  pCtx.textBaseline = 'bottom';
+  pCtx.fillText('SUELO / POSICION DE LANZAMIENTO', 8, groundY - 2);
+  pCtx.setLineDash([]);
+
+  POS.puntos.forEach(function(p, i){
+    var isSelected = (i === POS.selIdx);
+
+    // Línea vertical desde el punto hasta el suelo
+    pCtx.strokeStyle = p.color + '55';
+    pCtx.lineWidth   = 1;
+    pCtx.setLineDash([3, 4]);
+    pCtx.beginPath();
+    pCtx.moveTo(p.x, p.y);
+    pCtx.lineTo(p.x, groundY);
+    pCtx.stroke();
+    pCtx.setLineDash([]);
+
+    // Punto en el suelo (base de lanzamiento)
+    pCtx.beginPath();
+    pCtx.arc(p.x, groundY, 5, 0, Math.PI*2);
+    pCtx.fillStyle = p.color;
+    pCtx.fill();
+
+    // Flecha de dirección (cohete sube)
+    pCtx.strokeStyle = p.color + 'aa';
+    pCtx.lineWidth   = 1.5;
+    pCtx.beginPath();
+    pCtx.moveTo(p.x, groundY);
+    pCtx.lineTo(p.x, p.y + 12);
+    pCtx.stroke();
+
+    // Punto de explosión
+    var grd = pCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, isSelected ? 18 : 14);
+    grd.addColorStop(0, p.color + 'cc');
+    grd.addColorStop(1, p.color + '00');
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, isSelected ? 18 : 14, 0, Math.PI*2);
+    pCtx.fillStyle = grd;
+    pCtx.fill();
+
+    // Círculo principal
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, isSelected ? 12 : 9, 0, Math.PI*2);
+    pCtx.fillStyle = p.color + (isSelected ? 'ee' : 'cc');
+    pCtx.fill();
+    pCtx.strokeStyle = '#ffffff44';
+    pCtx.lineWidth   = 1.5;
+    pCtx.stroke();
+
+    // Número del canal
+    pCtx.fillStyle   = '#0a0c14';
+    pCtx.font        = 'bold 9px DM Sans,sans-serif';
+    pCtx.textAlign   = 'center';
+    pCtx.textBaseline= 'middle';
+    pCtx.fillText(p.ch, p.x, p.y);
+
+    // Etiqueta nombre
+    pCtx.fillStyle   = p.color;
+    pCtx.font        = '10px DM Sans,sans-serif';
+    pCtx.textAlign   = 'center';
+    pCtx.textBaseline= 'bottom';
+    pCtx.fillText(p.nombre, p.x, p.y - 13);
+    pCtx.textAlign   = 'left';
+  });
+}
+
+function limpiarPosiciones(){
+  if(POS.puntos.length > 0 && !confirm('¿Eliminar todos los puntos de lanzamiento?')) return;
+  POS.puntos = [];
+  POS.nextId = 1;
+  actualizarHudPos();
+  dibujarPosiciones();
+}
+
+// Distribuir N puntos equidistantes en la línea de suelo
+function distribuirPosiciones(){
+  var n = POS.puntos.length;
+  if(n < 2){ notify('Necesitas al menos 2 puntos para distribuir','error'); return; }
+  var W2 = posCanvas.width;
+  var groundY = posCanvas.height * 0.80;
+  var margen = W2 * 0.08;
+  var espacioY = posCanvas.height * 0.35; // altura promedio de explosión
+  POS.puntos.forEach(function(p, i){
+    p.x = margen + i/(n-1) * (W2 - 2*margen);
+    p.y = groundY - espacioY + (Math.random()-.5)*espacioY*.3;
+  });
+  dibujarPosiciones();
+  notify('Posiciones distribuidas equidistantes','success');
+}
+
+// Aplicar las posiciones definidas a los cues de la timeline
+function aplicarPosicionesAEfectos(){
+  if(POS.puntos.length === 0) return;
+  var W2 = C3.width, H2 = C3.height;
+  var groundY = H2 * 0.80;
+
+  // Convertir coordenadas pixel a los rangos que usa spawnBurst
+  // posX: -50..50 según la posición horizontal
+  // velY: 5..50 según la altura de explosión
+  POS.puntos.forEach(function(p){
+    var posXnorm = (p.x / W2 - 0.5) / 0.42 * 50; // invertir la fórmula de spawnBurst
+    posXnorm = Math.max(-50, Math.min(50, posXnorm));
+    var alturaRel = (groundY - p.y) / (groundY - H2*0.04); // 0..1
+    var velYval   = 5 + alturaRel * 45;
+    velYval = Math.max(5, Math.min(50, velYval));
+
+    // Asignar a los cues del canal correspondiente
+    S.cues.forEach(function(c){
+      if(c.ch === p.ch){
+        var ef = eff(c.eid);
+        if(ef){ ef.posX = Math.round(posXnorm); ef.velY = Math.round(velYval); }
+      }
+    });
+  });
+  notify('Posiciones aplicadas a '+POS.puntos.length+' canales','success');
+  renderTracks();
+}
+function abrirVideoDemo(){
+  var overlay=document.getElementById('video-overlay');
+  overlay.classList.add('open');
+  // Intentar cargar el video automáticamente desde la ruta conocida
+  // (Solo funciona si la app se abre desde servidor local con el video en la misma carpeta)
+  var player=document.getElementById('video-player');
+  var noFile=document.getElementById('video-no-file');
+  // Intentar ruta relativa (si el video está junto a la app)
+  var rutasIntento=[
+    '../PyroShow Pro.mp4',
+    'PyroShow Pro.mp4',
+    '../video/PyroShow Pro.mp4',
+  ];
+  var intentado=0;
+  function intentarRuta(idx){
+    if(idx>=rutasIntento.length){
+      // Ninguna ruta funcionó — mostrar selector
+      player.style.display='none';
+      noFile.style.display='flex';
+      return;
+    }
+    player.src=rutasIntento[idx];
+    player.onloadedmetadata=function(){
+      noFile.style.display='none';
+      player.style.display='block';
+    };
+    player.onerror=function(){
+      intentarRuta(idx+1);
+    };
+    player.load();
+  }
+  // Si ya tiene src cargado no reintentar
+  if(!player.src||player.error) intentarRuta(0);
+  else if(player.readyState>=1){ noFile.style.display='none'; player.style.display='block'; }
+}
+
+function cerrarVideoDemo(){
+  var overlay=document.getElementById('video-overlay');
+  overlay.classList.remove('open');
+  var player=document.getElementById('video-player');
+  player.pause();
+}
+
+function cargarVideoDemo(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var file=inp.files[0];
+  var url=URL.createObjectURL(file);
+  var player=document.getElementById('video-player');
+  var noFile=document.getElementById('video-no-file');
+  player.src=url;
+  player.style.display='block';
+  noFile.style.display='none';
+  player.load();
+  player.play();
+  // Guardar referencia para no perderla
+  S._videoBlob=url;
+}
+
+// Cerrar video con Escape (ya manejado en el listener global)
+function abrirManual(){
+  document.getElementById('manual-overlay').classList.add('open');
+}
+function cerrarManual(){
+  document.getElementById('manual-overlay').classList.remove('open');
+}
+function manualTab(n){
+  document.querySelectorAll('.manual-tab').forEach(function(t,i){
+    t.classList.toggle('active',i===n);
+  });
+  document.querySelectorAll('.manual-section').forEach(function(s,i){
+    s.classList.toggle('active',i===n);
+  });
+}
+// Cerrar con Escape
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    cerrarManual();
+    cerrarVideoDemo();
+    closeModal();
+    cerrarBeatModal();
+  }
+});
+document.getElementById('manual-overlay').addEventListener('click',function(e){
+  if(e.target===this) cerrarManual();
+});
+document.getElementById('video-overlay').addEventListener('click',function(e){
+  if(e.target===this) cerrarVideoDemo();
+});
+
+/* =================================================================
+   START
+   ================================================================= */
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+/* animations.css */
+@keyframes floatY {
+  0%,100%{ transform:translateY(0); }
+  50%    { transform:translateY(-6px); }
+}
+
+/* Stagger para los hero elements */
+.hero-badge      { animation-delay: 0.1s; }
+.hero-title      { animation-delay: 0.18s; }
+.hero-sub        { animation-delay: 0.26s; }
+.hero-actions    { animation-delay: 0.34s; }
+.hero-trust      { animation-delay: 0.40s; }
+.hero-preview    { animation-delay: 0.48s; }
+
+/* Feature cards hover glow */
+.feat-gold:hover { box-shadow: 0 0 24px rgba(232,160,32,0.10); }
+.feat-blue:hover { box-shadow: 0 0 24px rgba(77,110,245,0.10); }
+.feat-red:hover  { box-shadow: 0 0 24px rgba(224,48,48,0.10); }
+.feat-green:hover{ box-shadow: 0 0 24px rgba(34,197,94,0.10); }
+
+/* App frame levita */
+.app-frame {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+/* Cue blink cuando se dispara */
+@keyframes cueFire {
+  0%  { filter: brightness(1); }
+  30% { filter: brightness(2.5); }
+  100%{ filter: brightness(1); }
+}
+.cue.firing { animation: cueFire 0.4s ease-out; }
