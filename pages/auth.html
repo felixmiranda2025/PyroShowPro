@@ -187,48 +187,56 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 </div>
 
 <script>
-/* ─── USUARIOS (localStorage simulando backend) ─── */
-var PLAN_LIMITS = {
-  free:    { canales:1,    nombre:'Gratis',    label:'1 canal' },
-  hobby:   { canales:10,   nombre:'Hobbyist',  label:'10 canales' },
-  pro:     { canales:9999, nombre:'Pro',        label:'Ilimitado' },
-  enterprise:{ canales:9999,nombre:'Enterprise',label:'Ilimitado' },
+/* ─── USUARIOS en localStorage ─── */
+var PLAN_INFO = {
+  free:       { canales:1,    nombre:'Gratis' },
+  hobby:      { canales:10,   nombre:'Hobbyist' },
+  pro:        { canales:9999, nombre:'Pro' },
+  enterprise: { canales:9999, nombre:'Enterprise' },
 };
 
-function getUsers(){ try{return JSON.parse(localStorage.getItem('pyro_users')||'{}');}catch(e){return{};} }
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem('pyro_users')||'{}'); }
+  catch(e){ return {}; }
+}
 function saveUsers(u){ localStorage.setItem('pyro_users',JSON.stringify(u)); }
-function getSesion(){ try{return JSON.parse(sessionStorage.getItem('pyro_session')||'null');}catch(e){return null;} }
 function guardarSesion(u){ sessionStorage.setItem('pyro_session',JSON.stringify(u)); }
 
-/* ─── Crear usuarios de demo si no existen ─── */
+/* ─── Crear usuarios demo ─── */
 (function(){
   var u=getUsers();
-  if(!u['admin@pyroshow.com']) u['admin@pyroshow.com']={nombre:'Admin',pass:'admin123',plan:'pro',role:'admin',creado:new Date().toISOString()};
-  if(!u['demo@demo.com'])      u['demo@demo.com']={nombre:'Usuario Demo',pass:'demo123',plan:'free',role:'user',creado:new Date().toISOString()};
+  if(!u['admin@pyroshow.com']){
+    u['admin@pyroshow.com']={nombre:'Administrador',pass:'admin123',plan:'pro',role:'admin',creado:new Date().toISOString()};
+  }
+  if(!u['demo@demo.com']){
+    u['demo@demo.com']={nombre:'Usuario Demo',pass:'demo123',plan:'free',role:'user',creado:new Date().toISOString()};
+  }
   saveUsers(u);
 })();
 
-/* ─── Si ya hay sesión, redirigir ─── */
+/* ─── Redirigir si ya hay sesión ─── */
 (function(){
-  var s=getSesion();
-  if(s&&s.email) window.location.href='app.html';
+  try{
+    var s=JSON.parse(sessionStorage.getItem('pyro_session')||'null');
+    if(s&&s.email) window.location.href='app.html';
+  }catch(e){}
 })();
 
 /* ─── Tabs ─── */
 function showTab(t){
-  document.getElementById('form-login').style.display   = t==='login'   ?'block':'none';
-  document.getElementById('form-register').style.display= t==='register'?'block':'none';
-  document.getElementById('tab-login').classList.toggle('active',   t==='login');
+  document.getElementById('form-login').style.display    = t==='login'    ? 'block':'none';
+  document.getElementById('form-register').style.display = t==='register' ? 'block':'none';
+  document.getElementById('tab-login').classList.toggle('active',    t==='login');
   document.getElementById('tab-register').classList.toggle('active', t==='register');
-  clearErrors();
+  ocultarErrores();
 }
 
-/* ─── Plan selector en registro ─── */
-var planSelReg = 'free';
-var planHints = {
-  free:  '<strong>Plan Gratis:</strong> 1 canal de disparo, simulación 3D completa, sin exportación CSV ni ESP32.',
-  hobby: '<strong>Plan Hobbyist ($49):</strong> Hasta 10 canales, exportación CSV, control ESP32 WiFi. Se generará un enlace de pago.',
-  pro:   '<strong>Plan Pro ($149):</strong> Canales ilimitados, código fuente, soporte prioritario, grabación de video. Se generará un enlace de pago.',
+/* ─── Plan selector registro ─── */
+var planSelReg='free';
+var planHints={
+  free:  '<strong>Plan Gratis:</strong> 1 canal de disparo, simulación 3D completa.',
+  hobby: '<strong>Plan Hobbyist ($49):</strong> Hasta 10 canales, exportación, ESP32.',
+  pro:   '<strong>Plan Pro ($149):</strong> Canales ilimitados, código fuente, soporte.',
 };
 function selPlanReg(p){
   planSelReg=p;
@@ -236,80 +244,113 @@ function selPlanReg(p){
     document.getElementById('plan-'+id).classList.toggle('active',id===p);
   });
   var h=document.getElementById('plan-limits-hint');
-  h.innerHTML=planHints[p]||''; h.classList.add('show');
+  h.innerHTML=planHints[p]||'';
+  h.style.display='block';
+}
+
+/* ─── Mostrar / ocultar mensajes ─── */
+function mostrarError(prefijo, msg){
+  var el=document.getElementById(prefijo+'-error');
+  if(!el) return;
+  el.textContent=msg;
+  el.style.display='block';
+}
+function mostrarExito(id, html){
+  var el=document.getElementById(id);
+  if(!el) return;
+  el.innerHTML=html;
+  el.style.display='block';
+}
+function ocultarErrores(){
+  ['login-error','reg-error','reg-success'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){ el.style.display='none'; el.textContent=''; }
+  });
 }
 
 /* ─── LOGIN ─── */
 function doLogin(){
-  var email=document.getElementById('login-email').value.trim().toLowerCase();
-  var pass =document.getElementById('login-pass').value;
-  var btn  =document.getElementById('btn-login');
-  clearErrors();
-  if(!email||!pass){ showError('login','Completa todos los campos'); return; }
-  btn.classList.add('loading'); btn.textContent='Verificando...';
+  var email = document.getElementById('login-email').value.trim().toLowerCase();
+  var pass  = document.getElementById('login-pass').value;
+  var btn   = document.getElementById('btn-login');
+  ocultarErrores();
+
+  if(!email || !pass){
+    mostrarError('login','Por favor completa el correo y la contraseña.');
+    return;
+  }
+
+  // Estado cargando
+  btn.disabled=true;
+  btn.textContent='Verificando...';
+
   setTimeout(function(){
-    var users=getUsers();
-    var u=users[email];
-    if(!u||u.pass!==pass){
-      showError('login','Correo o contraseña incorrectos');
-      btn.classList.remove('loading'); btn.innerHTML='🔑 Entrar a PyroShow Pro';
+    var users = getUsers();
+    var u     = users[email];
+
+    if(!u){
+      mostrarError('login','No existe una cuenta con ese correo. ¿Quieres registrarte?');
+      btn.disabled=false; btn.innerHTML='🔑 Entrar a PyroShow Pro';
       return;
     }
-    guardarSesion({email:email,nombre:u.nombre,plan:u.plan,role:u.role||'user'});
-    btn.innerHTML='✓ Acceso concedido';
+    if(u.pass !== pass){
+      mostrarError('login','Contraseña incorrecta. Inténtalo de nuevo.');
+      btn.disabled=false; btn.innerHTML='🔑 Entrar a PyroShow Pro';
+      return;
+    }
+
+    // Login exitoso
+    guardarSesion({email:email, nombre:u.nombre, plan:u.plan||'free', role:u.role||'user'});
+    btn.innerHTML='✓ Bienvenido, '+u.nombre.split(' ')[0]+'!';
     btn.style.background='var(--green)';
-    setTimeout(function(){ window.location.href='app.html'; },600);
-  },700);
+    btn.style.color='#fff';
+
+    setTimeout(function(){ window.location.href='app.html'; }, 700);
+
+  }, 600);
 }
 
 /* ─── REGISTRO ─── */
 function doRegister(){
-  var nombre= document.getElementById('reg-name').value.trim();
-  var email = document.getElementById('reg-email').value.trim().toLowerCase();
-  var pass  = document.getElementById('reg-pass').value;
-  var btn   = document.getElementById('btn-register');
-  clearErrors();
-  if(!nombre||!email||!pass){ showError('reg','Completa todos los campos'); return; }
-  if(pass.length<8){ showError('reg','La contraseña debe tener al menos 8 caracteres'); return; }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showError('reg','Correo no válido'); return; }
+  var nombre = document.getElementById('reg-name').value.trim();
+  var email  = document.getElementById('reg-email').value.trim().toLowerCase();
+  var pass   = document.getElementById('reg-pass').value;
+  var btn    = document.getElementById('btn-register');
+  ocultarErrores();
+
+  if(!nombre||!email||!pass){ mostrarError('reg','Completa todos los campos.'); return; }
+  if(pass.length<8){ mostrarError('reg','La contraseña debe tener al menos 8 caracteres.'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ mostrarError('reg','Correo electrónico no válido.'); return; }
+
   var users=getUsers();
-  if(users[email]){ showError('reg','Este correo ya tiene una cuenta. Inicia sesión.'); return; }
-  btn.classList.add('loading'); btn.textContent='Creando cuenta...';
+  if(users[email]){ mostrarError('reg','Ya existe una cuenta con ese correo. Inicia sesión.'); return; }
+
+  btn.disabled=true; btn.textContent='Creando cuenta...';
+
   setTimeout(function(){
-    users[email]={nombre:nombre,pass:pass,plan:planSelReg,role:'user',creado:new Date().toISOString()};
+    users[email]={nombre:nombre, pass:pass, plan:planSelReg, role:'user', creado:new Date().toISOString()};
     saveUsers(users);
+
     if(planSelReg==='free'){
-      guardarSesion({email:email,nombre:nombre,plan:'free',role:'user'});
+      guardarSesion({email:email, nombre:nombre, plan:'free', role:'user'});
       btn.innerHTML='✓ Cuenta creada';
       btn.style.background='var(--green)';
-      setTimeout(function(){ window.location.href='app.html'; },700);
+      setTimeout(function(){ window.location.href='app.html'; }, 700);
     } else {
-      btn.classList.remove('loading');
+      btn.disabled=false;
       btn.innerHTML='🚀 Crear cuenta';
-      document.getElementById('reg-success').textContent=
-        '✓ Cuenta creada. Para activar el plan '+PLAN_LIMITS[planSelReg].nombre+', completa el pago:';
-      document.getElementById('reg-success').classList.add('show');
-      document.getElementById('reg-success').innerHTML+=
-        ' <a href="checkout.html?plan='+planSelReg+'&email='+encodeURIComponent(email)+'" '+
-        'style="color:var(--gold);font-weight:600">Ir a pagar →</a>';
-      guardarSesion({email:email,nombre:nombre,plan:'free',role:'user'});
+      guardarSesion({email:email, nombre:nombre, plan:'free', role:'user'});
+      mostrarExito('reg-success',
+        '✓ Cuenta creada correctamente. Para activar el plan <strong>'+
+        PLAN_INFO[planSelReg].nombre+'</strong>, completa el pago: '+
+        '<a href="checkout.html?plan='+planSelReg+'" style="color:var(--gold);font-weight:600">Ir a pagar →</a>'
+      );
     }
-  },800);
+  }, 700);
 }
 
-/* ─── Helpers ─── */
-function showError(prefix, msg){
-  var el=document.getElementById(prefix+'-error');
-  el.textContent=msg; el.classList.add('show');
-}
-function clearErrors(){
-  ['login-error','reg-error','reg-success'].forEach(function(id){
-    var el=document.getElementById(id);
-    el.classList.remove('show'); el.textContent='';
-  });
-}
 function showForgot(){
-  alert('Para restablecer tu contraseña contacta:\nhola@pyroshowpro.com');
+  alert('Para restablecer tu contraseña escríbenos a:\nhola@pyroshowpro.com');
 }
 </script>
 </body>
