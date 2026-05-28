@@ -1,230 +1,323 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Descargar PyroShow Pro</title>
-  <link rel="stylesheet" href="../css/variables.css"/>
-  <link rel="stylesheet" href="../css/base.css"/>
-  <link rel="stylesheet" href="../css/nav.css"/>
-  <link rel="stylesheet" href="../css/footer.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    .dl-hero{padding:120px 0 60px;text-align:center;border-bottom:1px solid var(--border)}
-    .dl-hero h1{font-size:40px;margin-bottom:12px}
-    .dl-hero p{color:var(--muted);max-width:500px;margin:0 auto 36px;font-size:15px}
-    .dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:60px 0}
-    .dl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;display:flex;flex-direction:column;gap:14px}
-    .dl-card.recommended{border-color:var(--gold)}
-    .dl-os-icon{font-size:32px;margin-bottom:4px}
-    .dl-os-name{font-size:17px;font-weight:500;font-family:var(--font-display)}
-    .dl-os-sub{font-size:12px;color:var(--muted)}
-    .dl-btn{display:block;text-align:center;background:var(--gold);color:#0a0800;font-weight:500;padding:12px;border-radius:var(--radius-md);font-size:14px;transition:background 0.15s;margin-top:auto}
-    .dl-btn:hover{background:var(--gold2)}
-    .dl-btn.outline{background:transparent;color:var(--text);border:1px solid var(--border2)}
-    .dl-btn.outline:hover{border-color:var(--muted)}
-    .dl-specs{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .dl-spec{display:flex;gap:8px;font-size:12px;color:var(--muted)}
-    .dl-spec::before{content:'•';color:var(--muted2)}
-    .dl-web-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin:0 0 60px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-    .dl-web-info h3{font-size:20px;margin-bottom:8px}
-    .dl-web-info p{font-size:14px;color:var(--muted)}
-    .changelog{margin:0 0 60px}
-    .changelog h2{font-size:24px;margin-bottom:24px}
-    .version-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:22px;margin-bottom:12px}
-    .version-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-    .version-tag{background:var(--gold-dim);color:var(--gold);font-size:12px;font-weight:500;padding:3px 10px;border-radius:var(--radius-sm);font-family:var(--font-display)}
-    .version-date{font-size:12px;color:var(--muted2)}
-    .version-tag.latest{background:var(--green-dim);color:var(--green)}
-    .version-changes{display:flex;flex-direction:column;gap:6px}
-    .version-change{font-size:13px;color:var(--muted);display:flex;gap:8px}
-    .version-change.new::before{content:'[NUEVO]';color:var(--green);font-size:10px;font-weight:600;white-space:nowrap}
-    .version-change.fix::before{content:'[FIX]';color:var(--gold);font-size:10px;font-weight:600}
-    .version-change.change::before{content:'[CAMBIO]';color:var(--blue);font-size:10px;font-weight:600}
-    @media(max-width:720px){.dl-grid{grid-template-columns:1fr}.dl-web-section{flex-direction:column}}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Descargar PyroShow Pro — Software Pirotécnico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060e;--s1:#0a0c1a;--s2:#0e1020;--s3:#131628;
+  --b1:#1a1e35;--b2:#222640;
+  --gold:#e8a020;--gold2:#f5c842;--golddim:rgba(232,160,32,.10);
+  --green:#22c55e;--greendim:rgba(34,197,94,.10);
+  --blue:#4d6ef5;--bluedim:rgba(77,110,245,.10);
+  --text:#eef0f8;--m1:#8890b0;--m2:#52566e;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(5,6,14,.92);border-bottom:1px solid var(--b1);backdrop-filter:blur(12px);z-index:100;display:flex;align-items:center;padding:0 40px;gap:32px}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:16px}
+.nav-logo-icon{width:28px;height:28px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-logo strong{color:var(--gold)}
+.nav-links{display:flex;gap:24px;list-style:none;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--m1);transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--gold);color:#08060a;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:500;margin-left:8px;transition:background .15s}
+.nav-cta:hover{background:var(--gold2)}
+
+/* MAIN */
+main{padding-top:60px}
+.container{max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* HERO DESCARGA */
+.dl-hero{padding:70px 0 50px;text-align:center;position:relative;overflow:hidden}
+.dl-hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(232,160,32,.07) 0%,transparent 70%);pointer-events:none}
+.dl-hero h1{font-family:'Syne',sans-serif;font-size:42px;font-weight:700;margin-bottom:12px}
+.dl-hero h1 span{color:var(--gold)}
+.dl-hero p{color:var(--m1);max-width:540px;margin:0 auto 14px;font-size:15px}
+.version-badge{display:inline-flex;align-items:center;gap:7px;background:var(--greendim);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--green);margin-bottom:28px}
+.version-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* WEB APP DESTACADA */
+.webapp-card{background:linear-gradient(135deg,var(--s2) 0%,var(--s3) 100%);border:1px solid var(--b2);border-radius:16px;padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:28px;margin:0 0 48px;position:relative;overflow:hidden}
+.webapp-card::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:radial-gradient(ellipse,rgba(232,160,32,.08),transparent 70%);pointer-events:none}
+.webapp-info{flex:1}
+.webapp-label{display:inline-flex;align-items:center;gap:6px;background:var(--golddim);border:1px solid rgba(232,160,32,.25);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--gold);font-weight:500;margin-bottom:12px;letter-spacing:.5px}
+.webapp-info h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px}
+.webapp-info p{color:var(--m1);font-size:14px;max-width:440px;line-height:1.65}
+.webapp-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn-primary{background:var(--gold);color:#08060a;padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-secondary{background:var(--s1);color:var(--text);padding:11px 20px;border-radius:8px;font-size:14px;border:1px solid var(--b2);transition:all .15s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn-secondary:hover{border-color:var(--b3);background:var(--s2)}
+.webapp-img{width:200px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35}
+
+/* INSTALADORES */
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-title span{font-size:12px;color:var(--m2);font-family:'DM Sans',sans-serif;font-weight:400;background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:2px 8px}
+.os-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
+.os-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s;cursor:pointer;position:relative;overflow:hidden}
+.os-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.02),transparent);pointer-events:none}
+.os-card:hover{border-color:var(--b2);transform:translateY(-2px)}
+.os-card.featured{border-color:rgba(232,160,32,.35)}
+.os-card.featured::after{content:'Recomendado';position:absolute;top:12px;right:12px;background:var(--golddim);color:var(--gold);font-size:9px;font-weight:500;padding:2px 8px;border-radius:3px;border:1px solid rgba(232,160,32,.25);letter-spacing:.5px}
+.os-icon{font-size:34px;margin-bottom:4px}
+.os-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:600}
+.os-ver{font-size:11px;color:var(--m2);font-family:'JetBrains Mono',monospace}
+.os-specs{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.os-spec{font-size:12px;color:var(--m1);display:flex;align-items:center;gap:5px}
+.os-spec::before{content:'·';color:var(--m2)}
+.os-dl-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--s2);color:var(--text);border:1px solid var(--b2);border-radius:7px;padding:10px;font-size:13px;font-weight:500;margin-top:auto;transition:all .15s}
+.os-dl-btn:hover{background:var(--s3);border-color:var(--b3)}
+.os-card.featured .os-dl-btn{background:var(--gold);color:#08060a;border-color:transparent}
+.os-card.featured .os-dl-btn:hover{background:var(--gold2)}
+
+/* INSTRUCCIONES INSTALACION */
+.install-steps{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:28px 32px;margin-bottom:48px}
+.install-steps h3{font-family:'Syne',sans-serif;font-size:16px;margin-bottom:20px;color:var(--text)}
+.steps-list{display:flex;flex-direction:column;gap:14px}
+.step-item{display:flex;align-items:flex-start;gap:14px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--golddim);border:1px solid rgba(232,160,32,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0;margin-top:1px}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.step-desc{font-size:12px;color:var(--m1);line-height:1.55}
+.step-code{font-family:'JetBrains Mono',monospace;background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:4px 8px;font-size:11px;color:var(--gold);margin-top:4px;display:inline-block}
+
+/* CHANGELOG */
+.changelog-section{margin-bottom:60px}
+.version-block{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:22px 24px;margin-bottom:10px}
+.version-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.vtag{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px}
+.vtag.latest{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.vtag.old{background:var(--s2);color:var(--m1);border:1px solid var(--b1)}
+.vdate{font-size:11px;color:var(--m2);font-family:'JetBrains Mono',monospace}
+.vchanges{display:flex;flex-direction:column;gap:6px}
+.vchange{font-size:13px;color:var(--m1);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.vc-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.vc-new{background:var(--green)}
+.vc-fix{background:var(--blue)}
+.vc-imp{background:var(--gold)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--b1);padding:32px 0;text-align:center}
+footer p{font-size:12px;color:var(--m2)}
+footer a{color:var(--m1);margin:0 10px}
+footer a:hover{color:var(--text)}
+@media(max-width:700px){
+  .os-grid{grid-template-columns:1fr}
+  .webapp-card{flex-direction:column}
+  .webapp-img{display:none}
+  nav{padding:0 20px}
+  .nav-links{display:none}
+}
+</style>
 </head>
 <body>
-  <nav class="nav" id="nav">
-    <div class="nav-inner">
-      <a href="../index.html" class="nav-logo">
-        <span class="nav-logo-icon">&#127878;</span>
-        <span>PyroShow <strong>Pro</strong></span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="../index.html#features">Caracteristicas</a></li>
-        <li><a href="../index.html#pricing">Precios</a></li>
-        <li><a href="esp32.html">ESP32</a></li>
-        <li><a href="docs.html">Docs</a></li>
-      </ul>
-      <div class="nav-actions">
-        <a href="checkout.html?plan=pro" class="btn-cta">Comprar Pro</a>
-      </div>
-    </div>
-  </nav>
+<nav>
+  <a href="../index.html" class="nav-logo">
+    <div class="nav-logo-icon">🎆</div>
+    PyroShow <strong>Pro</strong>
+  </a>
+  <ul class="nav-links">
+    <li><a href="../index.html#features">Características</a></li>
+    <li><a href="../index.html#pricing">Precios</a></li>
+    <li><a href="esp32.html">ESP32</a></li>
+    <li><a href="download.html" style="color:var(--gold)">Descargar</a></li>
+  </ul>
+  <a href="checkout.html" class="btn-primary nav-cta" style="margin-left:auto;padding:8px 16px;font-size:13px">Comprar $149</a>
+</nav>
 
+<main>
+<div class="container">
   <div class="dl-hero">
-    <div class="container">
-      <div class="section-label">Descarga</div>
-      <h1>PyroShow Pro v2.0.1</h1>
-      <p>Descarga la version de escritorio para tu sistema operativo, o accede a la version web directamente desde el navegador.</p>
-      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid rgba(34,197,94,0.25);color:var(--green);border-radius:20px;padding:5px 14px;font-size:12px">
-        <span style="width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block"></span>
-        Version estable — 15 de mayo 2025
+    <div class="version-badge"><div class="version-dot"></div>Versión 2.0 — Disponible ahora</div>
+    <h1>Descarga <span>PyroShow Pro</span></h1>
+    <p>Software profesional para diseño de espectáculos pirotécnicos con simulación 3D, timeline musical y control ESP32 WiFi.</p>
+  </div>
+
+  <!-- WEBAPP — la opción recomendada -->
+  <div class="webapp-card">
+    <div class="webapp-info">
+      <div class="webapp-label">⭐ RECOMENDADO — Sin instalación</div>
+      <h2>Versión Web App</h2>
+      <p>Funciona directamente en el navegador. Abre el archivo <code style="background:var(--s3);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px">app.html</code> con el servidor local o usa Python para iniciarlo en segundos.</p>
+      <div class="webapp-actions">
+        <a href="app.html" class="btn-primary">▶ Abrir PyroShow Pro</a>
+        <a href="#download-zip" class="btn-secondary">⬇ Descargar ZIP</a>
+      </div>
+    </div>
+    <div class="webapp-img">🌐</div>
+  </div>
+
+  <!-- INSTALADORES -->
+  <div class="section-title">
+    Instaladores por sistema operativo
+    <span>v2.0.0</span>
+  </div>
+  <div class="os-grid" id="download-zip">
+
+    <div class="os-card featured">
+      <div class="os-icon">🪟</div>
+      <div class="os-name">Windows</div>
+      <div class="os-ver">Windows 10 / 11 · x64</div>
+      <div class="os-specs">
+        <div class="os-spec">Requiere Python 3.8+ (opcional para servidor local)</div>
+        <div class="os-spec">Incluye servidor local y bat de inicio</div>
+        <div class="os-spec">Tamaño: ~85 KB</div>
+      </div>
+      <a href="../PyroShowPro.zip" class="os-dl-btn" download>
+        ⬇ Descargar para Windows
+      </a>
+    </div>
+
+    <div class="os-card">
+      <div class="os-icon">🍎</div>
+      <div class="os-name">macOS</div>
+      <div class="os-ver">macOS 12+ · Intel / Apple Silicon</div>
+      <div class="os-specs">
+        <div class="os-spec">Misma versión web — funciona en Safari/Chrome</div>
+        <div class="os-spec">Iniciar con: python3 servidor.py</div>
+        <div class="os-spec">Tamaño: ~85 KB</div>
+      </div>
+      <a href="../PyroShowPro.zip" class="os-dl-btn" download>
+        ⬇ Descargar para macOS
+      </a>
+    </div>
+
+    <div class="os-card">
+      <div class="os-icon">🐧</div>
+      <div class="os-name">Linux</div>
+      <div class="os-ver">Ubuntu 20.04+ · Debian · Arch</div>
+      <div class="os-specs">
+        <div class="os-spec">Funciona en cualquier distribución con Python</div>
+        <div class="os-spec">Iniciar con: python3 servidor.py</div>
+        <div class="os-spec">Tamaño: ~85 KB</div>
+      </div>
+      <a href="../PyroShowPro.zip" class="os-dl-btn" download>
+        ⬇ Descargar para Linux
+      </a>
+    </div>
+
+  </div>
+
+  <!-- PASOS DE INSTALACION -->
+  <div class="install-steps">
+    <h3>🚀 Cómo instalar y ejecutar</h3>
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Descargar y extraer el ZIP</div>
+          <div class="step-desc">Descarga el archivo ZIP y extráelo en cualquier carpeta. Ejemplo: <code class="step-code">C:\PyroShowPro\</code></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Opción A — Doble clic (Windows)</div>
+          <div class="step-desc">Ejecuta <code class="step-code">INICIAR_SERVIDOR.bat</code> — abre el servidor y el navegador automáticamente.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Opción B — Línea de comandos</div>
+          <div class="step-desc">Abre la terminal en la carpeta del ZIP y ejecuta:</div>
+          <code class="step-code">python servidor.py</code>
+          <div class="step-desc" style="margin-top:6px">Luego abre el navegador en: <code class="step-code">http://localhost:8080/pages/app.html</code></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Opción C — Abrir directamente</div>
+          <div class="step-desc">Abre <code class="step-code">pages/app.html</code> directamente en el navegador (sin servidor). La app funciona completamente, pero la conexión al ESP32 requiere el servidor local.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Para usar con ESP32 WiFi</div>
+          <div class="step-desc">Conecta tu PC a la red WiFi <code class="step-code">PyroShow_Master</code> que crea el ESP32. Abre el Panel de Disparo en la app y haz Ping All para verificar.</div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- CHANGELOG -->
+  <div class="changelog-section">
+    <div class="section-title">Historial de versiones</div>
+
+    <div class="version-block">
+      <div class="version-hdr">
+        <span class="vtag latest">v2.0.0</span>
+        <span class="vdate">Mayo 2025 — Versión actual</span>
+      </div>
+      <div class="vchanges">
+        <div class="vchange"><div class="vc-dot vc-new"></div>Sistema ESP32 maestro/esclavo WiFi — hasta 72 canales sin cables</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Beat detection automático con análisis de energía por ventana de 50ms</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>10 tipos de efectos nuevos: Cometa, Mina, Crossette, Palmera, Sparkler</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Editor de posiciones de lanzamiento drag-and-drop</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Ángulo de disparo configurable (10°–170°) con visualizador en tiempo real</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Voice cues sincronizados con el show — anuncia "FUEGO" con anticipación</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Patrones de disparo automático: cascada, abanico, ola, final explosivo</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>4 ángulos de cámara con fondos únicos por modo</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Fondo personalizado — carga capturas de Google Maps</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Inventario de productos con alerta de stock insuficiente</div>
+        <div class="vchange"><div class="vc-dot vc-imp"></div>Simulación 3D mejorada: viento, humo, reflejos en suelo, cohete inclinado</div>
+        <div class="vchange"><div class="vc-dot vc-fix"></div>Undo/Redo (Ctrl+Z / Ctrl+Y) — historial de 50 acciones</div>
+      </div>
+    </div>
+
+    <div class="version-block">
+      <div class="version-hdr">
+        <span class="vtag old">v1.5.0</span>
+        <span class="vdate">Febrero 2025</span>
+      </div>
+      <div class="vchanges">
+        <div class="vchange"><div class="vc-dot vc-new"></div>Cadenas de cues — encadenar efectos con un solo canal ESP32</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Waveform visible dentro de la timeline (como PMFC/FWsim)</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Grabación de video .webm del viewport en tiempo real</div>
+        <div class="vchange"><div class="vc-dot vc-imp"></div>Fondo ciudad nocturna procedural con edificios en 3 capas</div>
+        <div class="vchange"><div class="vc-dot vc-fix"></div>Física gaussiana portada del FireShow C++ original</div>
+      </div>
+    </div>
+
+    <div class="version-block">
+      <div class="version-hdr">
+        <span class="vtag old">v1.0.0</span>
+        <span class="vdate">Octubre 2024 — Lanzamiento inicial</span>
+      </div>
+      <div class="vchanges">
+        <div class="vchange"><div class="vc-dot vc-new"></div>Timeline con canales, zoom y sincronización de audio</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Simulación 3D con física de partículas y bloom</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Editor de efectos visual con preview en tiempo real</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Exportación CSV y Cobra Firing Systems</div>
+        <div class="vchange"><div class="vc-dot vc-new"></div>Guardar/cargar proyectos .pshow</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<footer>
   <div class="container">
-
-    <!-- Descarga de escritorio -->
-    <div class="dl-grid">
-      <div class="dl-card recommended">
-        <div class="dl-os-icon">&#129695;</div>
-        <div class="dl-os-name">Windows</div>
-        <div class="dl-os-sub">Windows 10 / 11 (64 bits)</div>
-        <div class="dl-specs">
-          <div class="dl-spec">Instalador .exe — 48 MB</div>
-          <div class="dl-spec">OpenGL 3.3 requerido</div>
-          <div class="dl-spec">4 GB RAM minimo</div>
-        </div>
-        <a href="#" class="dl-btn" onclick="return fakeDl('Windows')">
-          &#11015; Descargar .exe
-        </a>
-      </div>
-
-      <div class="dl-card">
-        <div class="dl-os-icon">&#127822;</div>
-        <div class="dl-os-name">Linux</div>
-        <div class="dl-os-sub">Ubuntu 20.04+ / Debian</div>
-        <div class="dl-specs">
-          <div class="dl-spec">AppImage — 42 MB</div>
-          <div class="dl-spec">Mesa OpenGL 3.3+</div>
-          <div class="dl-spec">libGL, libGLFW3 necesarios</div>
-        </div>
-        <a href="#" class="dl-btn outline" onclick="return fakeDl('Linux')">
-          &#11015; Descargar .AppImage
-        </a>
-      </div>
-
-      <div class="dl-card">
-        <div class="dl-os-icon">&#127822;</div>
-        <div class="dl-os-name">macOS</div>
-        <div class="dl-os-sub">macOS 12+ (Intel y Apple Silicon)</div>
-        <div class="dl-specs">
-          <div class="dl-spec">Disco .dmg — 45 MB</div>
-          <div class="dl-spec">Metal/OpenGL via MoltenVK</div>
-          <div class="dl-spec">Proxximamente (beta)</div>
-        </div>
-        <a href="#" class="dl-btn outline" onclick="return fakeDl('macOS')">
-          &#11015; Descargar .dmg (beta)
-        </a>
-      </div>
+    <p>© 2025 PyroShow Pro — Software pirotécnico profesional</p>
+    <div style="margin-top:10px">
+      <a href="../index.html">Inicio</a>
+      <a href="app.html">App</a>
+      <a href="esp32.html">ESP32</a>
+      <a href="checkout.html">Comprar</a>
     </div>
-
-    <!-- Version Web -->
-    <div class="dl-web-section">
-      <div class="dl-web-info">
-        <h3>Version Web — Sin instalacion</h3>
-        <p>Accede a PyroShow Pro directamente desde tu navegador. Compatible con Chrome, Firefox y Edge. Funciona en cualquier sistema operativo. La version web tiene las mismas funciones excepto la simulacion 3D OpenGL (usa una version 2D simplificada).</p>
-      </div>
-      <a href="app.html" class="btn-primary btn-large" style="flex-shrink:0">
-        Abrir version web &#8594;
-      </a>
-    </div>
-
-    <!-- Firmware ESP32 -->
-    <div class="dl-web-section">
-      <div class="dl-web-info">
-        <h3>Firmware ESP32 — Arduino</h3>
-        <p>Codigo fuente Arduino para los modulos de disparo ESP32. Incluye servidor HTTP, control GPIO y configuracion de red WiFi estatica. Lee la <a href="esp32.html" style="color:var(--gold)">guia completa</a> antes de flashear.</p>
-      </div>
-      <a href="#" class="btn-outline btn-large" style="flex-shrink:0" onclick="return fakeDl('Firmware')">
-        &#11015; Descargar Firmware .zip
-      </a>
-    </div>
-
-    <!-- Changelog -->
-    <div class="changelog">
-      <h2>Historial de versiones</h2>
-
-      <div class="version-block">
-        <div class="version-header">
-          <span class="version-tag latest">v2.0.1</span>
-          <span class="version-date">15 mayo 2025</span>
-        </div>
-        <div class="version-changes">
-          <div class="version-change fix">Corregido crash al usar Volcan con velocidadMin == velocidadMax</div>
-          <div class="version-change fix">Arreglado orden de renderizado de barra de agregar en la timeline</div>
-          <div class="version-change fix">Corregido calculo de tabla ESP32 cuando hay mas de 8 canales</div>
-        </div>
-      </div>
-
-      <div class="version-block">
-        <div class="version-header">
-          <span class="version-tag">v2.0.0</span>
-          <span class="version-date">1 mayo 2025</span>
-        </div>
-        <div class="version-changes">
-          <div class="version-change new">Panel de disparo ESP32 WiFi integrado (hasta 20 modulos)</div>
-          <div class="version-change new">Disparo automatico sincronizado con la timeline</div>
-          <div class="version-change new">Scrollbar vertical en la timeline para mas de 8 canales</div>
-          <div class="version-change new">Cues arrastrables en el timeline (mover tiempo con drag)</div>
-          <div class="version-change new">Menu contextual (clic derecho) para editar y borrar cues</div>
-          <div class="version-change change">Interfaz completamente rediseñada — tema nocturno profesional</div>
-          <div class="version-change change">Panel de disparo separado del editor de efectos</div>
-        </div>
-      </div>
-
-      <div class="version-block">
-        <div class="version-header">
-          <span class="version-tag">v1.2.0</span>
-          <span class="version-date">10 febrero 2025</span>
-        </div>
-        <div class="version-changes">
-          <div class="version-change new">Efecto Crisantemo con sub-emisores de chispas</div>
-          <div class="version-change new">Exportacion CSV compatible con Cobra Firing Systems</div>
-          <div class="version-change new">Soporte para archivos de audio WAV y MP3</div>
-          <div class="version-change fix">Correcciones de memoria en el sistema de particulas</div>
-        </div>
-      </div>
-    </div>
-
   </div>
+</footer>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <div class="footer-logo">&#127878; PyroShow Pro</div>
-        <p class="footer-tagline">Software pirotecnico profesional.</p>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-title">Descargas</div>
-        <a href="#">Windows</a>
-        <a href="#">Linux</a>
-        <a href="#">macOS</a>
-        <a href="#">Firmware ESP32</a>
-      </div>
-      <div class="footer-col">
-        <div class="footer-col-title">Recursos</div>
-        <a href="docs.html">Documentacion</a>
-        <a href="esp32.html">Guia ESP32</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="container">
-        <span>2025 PyroShow Pro.</span>
-      </div>
-    </div>
-  </footer>
-
-  <script src="../js/nav.js"></script>
-  <script>
-    function fakeDl(platform) {
-      alert('En la version de produccion aqui se descargaria el instalador para ' + platform + '. Conecta tu servidor de archivos aqui.');
-      return false;
-    }
-  </script>
 </body>
 </html>
