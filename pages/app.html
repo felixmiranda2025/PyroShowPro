@@ -514,6 +514,7 @@ canvas{display:block}
     <div class="hud-pill live" id="hud-parts">0 part.</div>
     <div class="hud-pill" id="hud-fps">-- fps</div>
     <div class="hud-pill" id="hud-zoom">zoom 8.0x</div>
+    <div class="hud-pill" id="hud-plan" style="display:none;color:var(--gold)"></div>
     <div class="hud-pill" id="hud-pos" style="display:none;color:#38bdf8">0 posiciones</div>
     <div class="hud-pill rec" id="hud-rec" style="display:none">&#9679; REC <span id="rec-time">0:00</span> <button onclick="pararVideo()" style="margin-left:6px;background:rgba(255,255,255,.2);border:none;color:#fff;padding:1px 5px;border-radius:3px;font-size:9px;cursor:pointer">Detener</button></div>
   </div>
@@ -1231,6 +1232,17 @@ canvas{display:block}
 <!-- ===================== FIN MANUAL ===================== -->
 
 <script>
+/* ─── GUARDIA DE AUTENTICACIÓN — se ejecuta ANTES que todo ─── */
+(function(){
+  var s=null;
+  try{ s=JSON.parse(sessionStorage.getItem('pyro_session')||'null'); }catch(e){}
+  if(!s||!s.email){
+    window.location.replace('auth.html');
+    document.addEventListener('DOMContentLoaded',function(){ document.body.innerHTML=''; });
+    throw new Error('AUTH_REQUIRED'); // detiene el resto del script
+  }
+})();
+
 var PLANES = {
   free:       { canales:1,    nombre:'Gratis',     label:'1 canal' },
   hobby:      { canales:10,   nombre:'Hobbyist',   label:'10 canales' },
@@ -4054,70 +4066,66 @@ init();ES = {
   enterprise: { canales:9999, nombre:'Enterprise',  label:'Ilimitado' },
 };
 
-var SESSION = null;
+/* =================================================================
+   AUTENTICACIÓN Y LICENCIAS
+   ================================================================= */
+var SESSION = (function(){
+  try{ return JSON.parse(sessionStorage.getItem('pyro_session')||'null'); }
+  catch(e){ return null; }
+})();
 
 function initAuth(){
-  try{ SESSION=JSON.parse(sessionStorage.getItem('pyro_session')||'null'); }
-  catch(e){ SESSION=null; }
-  if(!SESSION || !SESSION.email){
-    // Redirigir al login
-    window.location.href='auth.html';
-    return false;
-  }
-  // Mostrar info del usuario en la UI
-  var plan=PLANES[SESSION.plan]||PLANES.free;
-  // Badge de plan en topbar
+  if(!SESSION||!SESSION.email){ return true; } // guardia ya redirigió
+  var plan = PLANES[SESSION.plan]||PLANES.free;
+  S.maxCanales = (SESSION.role==='admin') ? 9999 : plan.canales;
+
+  // Badge topbar
   var badge=document.getElementById('user-plan-badge');
   if(badge){
-    badge.textContent=SESSION.nombre.split(' ')[0]+' · '+plan.nombre;
-    badge.title='Plan: '+plan.nombre+' — '+plan.label;
-    badge.style.display='flex';
-    // Color por plan
     var colores={free:'var(--m2)',hobby:'var(--blue)',pro:'var(--gold)',enterprise:'var(--purple)'};
-    badge.style.color=colores[SESSION.plan]||'var(--m2)';
-    badge.style.borderColor=(colores[SESSION.plan]||'var(--m2)').replace('var(','rgba(').replace(')',',0.35)');
+    var col=SESSION.role==='admin'?'var(--red)':(colores[SESSION.plan]||'var(--m2)');
+    badge.textContent=SESSION.nombre.split(' ')[0]+' · '+(SESSION.role==='admin'?'Admin':plan.nombre);
+    badge.style.cssText='display:flex;font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid '+col+';color:'+col;
   }
-  // Límite de canales
-  var maxCH = SESSION.role==='admin' ? 9999 : plan.canales;
-  S.maxCanales = maxCH;
 
-  // Si es admin mostrar enlace al panel
+  // HUD plan
+  var hud=document.getElementById('hud-plan');
+  if(hud){
+    hud.textContent=S.maxCanales>=9999?'∞ CH':S.maxCanales+' CH max';
+    hud.style.display='block';
+  }
+
+  // Botón admin
   if(SESSION.role==='admin'){
-    var adminBtn=document.getElementById('btn-admin-panel');
-    if(adminBtn) adminBtn.style.display='flex';
+    var ab=document.getElementById('btn-admin-panel');
+    if(ab) ab.style.display='flex';
   }
-
   return true;
 }
 
-// Verificar si se puede agregar un cue en el canal dado
 function puedeAgregarCanal(ch){
-  if(!S.maxCanales) return true;
-  if(ch<=S.maxCanales) return true;
-  // Mostrar aviso de límite
+  if(!S.maxCanales||ch<=S.maxCanales) return true;
   var plan=PLANES[SESSION.plan]||PLANES.free;
-  notify('Plan '+plan.nombre+' permite hasta '+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'. Actualiza tu plan para más canales.','error');
-  // Mostrar modal de upgrade
+  notify('Plan '+plan.nombre+': máximo '+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'. Actualiza tu plan.','error');
   mostrarUpgradeModal(ch);
   return false;
 }
 
-// Modal de upgrade
 function mostrarUpgradeModal(ch){
-  var overlay=document.getElementById('upgrade-overlay');
-  if(!overlay) return;
+  var ov=document.getElementById('upgrade-overlay'); if(!ov)return;
   var plan=PLANES[SESSION.plan]||PLANES.free;
   document.getElementById('upgrade-msg').innerHTML=
-    'Intentas usar <strong>CH '+ch+'</strong> pero tu plan <strong>'+plan.nombre+'</strong> permite máximo <strong>'+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'</strong>.';
-  overlay.classList.add('open');
+    'Intentas usar <strong>CH '+ch+'</strong> pero tu plan <strong>'+plan.nombre+
+    '</strong> permite máximo <strong>'+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'</strong>.';
+  ov.classList.add('open');
 }
+function cerrarUpgradeModal(){ var ov=document.getElementById('upgrade-overlay');if(ov)ov.classList.remove('open'); }
+function cerrarSesionApp(){ sessionStorage.removeItem('pyro_session'); window.location.replace('auth.html'); }
 
-function cerrarUpgradeModal(){ document.getElementById('upgrade-overlay').classList.remove('open'); }
-
-function cerrarSesionApp(){
-  sessionStorage.removeItem('pyro_session');
-  window.location.href='auth.html';
-}
+/* =================================================================
+   START
+   ================================================================= */
+init();
 </script>
 </body>
 </html>
