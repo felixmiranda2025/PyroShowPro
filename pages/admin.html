@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PyroShow Pro — Panel de administración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060e;--s1:#0a0c1a;--s2:#0e1020;--s3:#131628;
+  --b1:#1a1e35;--b2:#222640;--b3:#2e3358;
+  --gold:#e8a020;--gold2:#f5c842;--golddim:rgba(232,160,32,.10);
+  --green:#22c55e;--greendim:rgba(34,197,94,.10);
+  --red:#e03838;--reddim:rgba(224,56,56,.10);
+  --blue:#4d6ef5;--bluedim:rgba(77,110,245,.10);
+  --purple:#8b5cf6;
+  --text:#eef0f8;--m1:#8890b0;--m2:#52566e;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{height:56px;background:rgba(5,6,14,.95);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:15px}
+.nav-logo-icon{width:28px;height:28px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.nav-logo strong{color:var(--gold)}
+.nav-badge{background:var(--reddim);border:1px solid rgba(224,56,56,.3);color:var(--red);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.5px}
+.nav-user{margin-left:auto;font-size:12px;color:var(--m1);display:flex;align-items:center;gap:10px}
+.nav-user span{background:var(--s2);border:1px solid var(--b2);border-radius:5px;padding:4px 10px}
+.btn-nav{padding:5px 12px;border-radius:6px;font-size:12px;border:1px solid var(--b2);color:var(--m1);cursor:pointer;background:none;transition:all .14s}
+.btn-nav:hover{color:var(--text);border-color:var(--b3)}
+.btn-nav.danger{border-color:rgba(224,56,56,.4);color:var(--red)}
+
+/* LAYOUT */
+.admin-wrap{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--b1);padding:20px 0;background:rgba(10,12,26,.5)}
+.sidebar-section{font-size:9px;color:var(--m2);text-transform:uppercase;letter-spacing:1.2px;padding:0 16px;margin-bottom:6px;margin-top:16px}
+.sidebar-section:first-child{margin-top:0}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;color:var(--m1);cursor:pointer;transition:all .14s;border-left:2px solid transparent}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sidebar-item.active{color:var(--text);border-left-color:var(--gold);background:rgba(232,160,32,.06)}
+.sidebar-item .si-icon{font-size:14px;width:16px;text-align:center}
+.main-content{flex:1;padding:28px 32px;overflow-y:auto}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px 20px}
+.stat-label{font-size:11px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700}
+.stat-sub{font-size:11px;color:var(--m1);margin-top:4px}
+.stat-card.gold .stat-val{color:var(--gold)}
+.stat-card.green .stat-val{color:var(--green)}
+.stat-card.blue .stat-val{color:var(--blue)}
+.stat-card.purple .stat-val{color:var(--purple)}
+
+/* TABLA USUARIOS */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:600}
+.section-actions{display:flex;gap:8px}
+.btn-action{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .14s}
+.btn-green{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-green:hover{background:rgba(34,197,94,.18)}
+.btn-blue{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.3)}
+.btn-red{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.3)}
+.btn-gold{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+
+/* Search bar */
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.search-input:focus{border-color:rgba(232,160,32,.4)}
+.filter-sel{background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 10px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+
+/* Tabla */
+.users-table{width:100%;border-collapse:collapse;font-size:13px}
+.users-table th{background:var(--s2);color:var(--m1);padding:10px 14px;text-align:left;border-bottom:1px solid var(--b1);font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:500;white-space:nowrap}
+.users-table td{padding:12px 14px;border-bottom:1px solid rgba(26,30,53,.6);vertical-align:middle}
+.users-table tr:last-child td{border-bottom:none}
+.users-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.user-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;text-transform:uppercase}
+.user-info{display:flex;align-items:center;gap:10px}
+.user-name{font-weight:500;font-size:13px}
+.user-email{font-size:11px;color:var(--m2)}
+.plan-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.4px}
+.plan-free{background:rgba(82,86,110,.2);color:var(--m1);border:1px solid var(--b2)}
+.plan-hobby{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.25)}
+.plan-pro{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.25)}
+.plan-enterprise{background:var(--purpledim);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+.plan-admin{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.25)}
+.canales-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m1);background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.status-active{background:var(--green);box-shadow:0 0 4px var(--green)}
+.status-inactive{background:var(--m2)}
+.row-actions{display:flex;gap:5px}
+.row-btn{padding:4px 8px;border-radius:4px;font-size:10px;border:1px solid var(--b2);color:var(--m1);cursor:pointer;background:none;transition:all .12s;white-space:nowrap}
+.row-btn:hover{color:var(--text);border-color:var(--b3)}
+.row-btn.danger{border-color:rgba(224,56,56,.3);color:var(--red)}
+.row-btn.danger:hover{background:var(--reddim)}
+.row-btn.promote{border-color:rgba(232,160,32,.3);color:var(--gold)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--s1);border:1px solid var(--b2);border-radius:14px;padding:28px;width:440px;max-width:95vw}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:18px}
+.modal-form-group{margin-bottom:14px}
+.modal-form-group label{display:block;font-size:11px;color:var(--m1);margin-bottom:5px}
+.modal-form-group input,.modal-form-group select{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+.modal-form-group input:focus,.modal-form-group select:focus{border-color:rgba(232,160,32,.5)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:8px 16px;border-radius:7px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none;cursor:pointer}
+.btn-save{padding:8px 20px;border-radius:7px;background:var(--gold);color:#08060a;font-size:13px;font-weight:600;border:none;cursor:pointer}
+.btn-save:hover{background:var(--gold2)}
+
+/* Empty state */
+.empty-state{text-align:center;padding:50px 20px;color:var(--m2)}
+.empty-state .es-icon{font-size:40px;margin-bottom:12px;opacity:.4}
+
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .sidebar{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="app.html" class="nav-logo">
+    <div class="nav-logo-icon">🎆</div>
+    PyroShow <strong>Pro</strong>
+  </a>
+  <span class="nav-badge">ADMIN</span>
+  <div class="nav-user">
+    <span id="nav-admin-name">Admin</span>
+    <button class="btn-nav" onclick="window.location.href='app.html'">🚀 Ir a la App</button>
+    <button class="btn-nav danger" onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</nav>
+
+<div class="admin-wrap">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">Principal</div>
+    <div class="sidebar-item active" onclick="showSection('users')">
+      <span class="si-icon">👥</span> Usuarios
+    </div>
+    <div class="sidebar-item" onclick="showSection('stats')">
+      <span class="si-icon">📊</span> Estadísticas
+    </div>
+    <div class="sidebar-section">Configuración</div>
+    <div class="sidebar-item" onclick="showSection('plans')">
+      <span class="si-icon">💎</span> Planes y límites
+    </div>
+    <div class="sidebar-item" onclick="showSection('logs')">
+      <span class="si-icon">📋</span> Registro de accesos
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-overview">
+      <div class="stat-card gold">
+        <div class="stat-label">Total usuarios</div>
+        <div class="stat-val" id="stat-total">0</div>
+        <div class="stat-sub">registrados</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Plan Pro</div>
+        <div class="stat-val" id="stat-pro">0</div>
+        <div class="stat-sub">usuarios activos</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Hobbyist</div>
+        <div class="stat-val" id="stat-hobby">0</div>
+        <div class="stat-sub">usuarios</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Plan Gratis</div>
+        <div class="stat-val" id="stat-free">0</div>
+        <div class="stat-sub">usuarios</div>
+      </div>
+    </div>
+
+    <!-- SECCION USUARIOS -->
+    <div id="section-users">
+      <div class="section-hdr">
+        <div class="section-title">👥 Gestión de usuarios</div>
+        <div class="section-actions">
+          <button class="btn-action btn-green" onclick="abrirModalNuevo()">+ Nuevo usuario</button>
+          <button class="btn-action btn-gold" onclick="exportarUsuarios()">⬇ Exportar CSV</button>
+        </div>
+      </div>
+
+      <div class="search-row">
+        <input class="search-input" id="search-input" placeholder="🔍 Buscar por nombre o correo..." oninput="renderTabla()"/>
+        <select class="filter-sel" id="filter-plan" onchange="renderTabla()">
+          <option value="">Todos los planes</option>
+          <option value="free">Gratis</option>
+          <option value="hobby">Hobbyist</option>
+          <option value="pro">Pro</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </div>
+
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden">
+        <table class="users-table" id="users-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Plan</th>
+              <th>Canales</th>
+              <th>Estado</th>
+              <th>Registrado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCION PLANES -->
+    <div id="section-plans" style="display:none">
+      <div class="section-title" style="margin-bottom:20px">💎 Configuración de planes</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:20px">
+          <div style="font-size:11px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Gratis</div>
+          <div style="font-size:11px;color:var(--m1);line-height:1.8">
+            ✓ Canales: <strong style="color:var(--green)">1</strong><br>
+            ✓ Simulación 3D<br>
+            ✓ Timeline básica<br>
+            ✗ Exportación CSV<br>
+            ✗ Control ESP32<br>
+            ✗ Grabación video<br>
+            ✗ Beat detection
+          </div>
+        </div>
+        <div style="background:var(--s1);border:1px solid rgba(77,110,245,.3);border-radius:12px;padding:20px">
+          <div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Hobbyist $49</div>
+          <div style="font-size:11px;color:var(--m1);line-height:1.8">
+            ✓ Canales: <strong style="color:var(--blue)">10</strong><br>
+            ✓ Simulación 3D<br>
+            ✓ Timeline completa<br>
+            ✓ Exportación CSV<br>
+            ✓ Control ESP32<br>
+            ✓ Grabación video<br>
+            ✓ Beat detection
+          </div>
+        </div>
+        <div style="background:var(--s1);border:1px solid rgba(232,160,32,.3);border-radius:12px;padding:20px">
+          <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Pro $149</div>
+          <div style="font-size:11px;color:var(--m1);line-height:1.8">
+            ✓ Canales: <strong style="color:var(--gold)">Ilimitados</strong><br>
+            ✓ Todo lo de Hobbyist<br>
+            ✓ Voice cues<br>
+            ✓ Código fuente C++<br>
+            ✓ Firmware ESP32<br>
+            ✓ Soporte prioritario<br>
+            ✓ Uso comercial
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCION LOGS -->
+    <div id="section-logs" style="display:none">
+      <div class="section-title" style="margin-bottom:16px">📋 Registro de accesos</div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:0;overflow:hidden">
+        <table class="users-table" id="logs-table">
+          <thead><tr><th>Usuario</th><th>Acción</th><th>Fecha/Hora</th><th>Plan</th></tr></thead>
+          <tbody id="logs-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL NUEVO/EDITAR USUARIO -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Nuevo usuario</div>
+    <div class="modal-form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="m-nombre" placeholder="Nombre del usuario"/>
+    </div>
+    <div class="modal-form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="m-email" placeholder="correo@empresa.com"/>
+    </div>
+    <div class="modal-form-group">
+      <label>Contraseña</label>
+      <input type="text" id="m-pass" placeholder="Contraseña temporal"/>
+    </div>
+    <div class="modal-form-group">
+      <label>Plan de licencia</label>
+      <select id="m-plan">
+        <option value="free">Gratis — 1 canal</option>
+        <option value="hobby">Hobbyist — 10 canales ($49)</option>
+        <option value="pro">Pro — Ilimitado ($149)</option>
+        <option value="enterprise">Enterprise — Ilimitado ($349)</option>
+      </select>
+    </div>
+    <div class="modal-form-group">
+      <label>Rol</label>
+      <select id="m-role">
+        <option value="user">Usuario</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarUsuario()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN BORRAR -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-title">⚠️ Eliminar usuario</div>
+    <p style="font-size:13px;color:var(--m1);margin-bottom:20px">¿Estás seguro? Esta acción no se puede deshacer. El usuario perderá acceso inmediatamente.</p>
+    <div style="background:var(--reddim);border:1px solid rgba(224,56,56,.25);border-radius:7px;padding:10px;font-size:12px;color:var(--red);margin-bottom:20px" id="del-user-info"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" style="background:var(--red);color:#fff" onclick="confirmarBorrar()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PLAN_INFO = {
+  free:       {label:'Gratis',      canales:1,    cls:'plan-free'},
+  hobby:      {label:'Hobbyist',    canales:10,   cls:'plan-hobby'},
+  pro:        {label:'Pro',         canales:9999, cls:'plan-pro'},
+  enterprise: {label:'Enterprise',  canales:9999, cls:'plan-enterprise'},
+  admin:      {label:'Admin',       canales:9999, cls:'plan-admin'},
+};
+
+var LOGS = JSON.parse(localStorage.getItem('pyro_logs')||'[]');
+var editEmail = null;
+var delEmail  = null;
+
+// ─── Verificar sesión de admin ───
+var sesion = JSON.parse(sessionStorage.getItem('pyro_session')||'null');
+if(!sesion){ window.location.href='auth.html'; }
+if(sesion.role!=='admin'){
+  alert('Acceso denegado. Solo administradores pueden ver esta página.');
+  window.location.href='app.html';
+}
+document.getElementById('nav-admin-name').textContent = sesion.nombre;
+
+// ─── Helpers ───
+function getUsers(){ try{return JSON.parse(localStorage.getItem('pyro_users')||'{}');}catch(e){return{};} }
+function saveUsers(u){ localStorage.setItem('pyro_users',JSON.stringify(u)); }
+function saveLogs(){ localStorage.setItem('pyro_logs',JSON.stringify(LOGS.slice(-200))); }
+
+function avatarColor(email){
+  var cols=['#e03838','#4d6ef5','#22c55e','#e8a020','#8b5cf6','#06b6d4','#ec4899'];
+  var i=0; for(var c of email) i+=c.charCodeAt(0);
+  return cols[i%cols.length];
+}
+
+// ─── Estadísticas ───
+function actualizarStats(){
+  var u=getUsers();
+  var keys=Object.keys(u);
+  document.getElementById('stat-total').textContent=keys.length;
+  document.getElementById('stat-pro').textContent=keys.filter(function(k){return u[k].plan==='pro'||u[k].plan==='enterprise';}).length;
+  document.getElementById('stat-hobby').textContent=keys.filter(function(k){return u[k].plan==='hobby';}).length;
+  document.getElementById('stat-free').textContent=keys.filter(function(k){return u[k].plan==='free';}).length;
+}
+
+// ─── Tabla ───
+function renderTabla(){
+  var q=document.getElementById('search-input').value.toLowerCase();
+  var pf=document.getElementById('filter-plan').value;
+  var u=getUsers();
+  var tbody=document.getElementById('users-tbody');
+  tbody.innerHTML='';
+  var items=Object.entries(u).filter(function(e){
+    var match=!q||(e[0].toLowerCase().includes(q)||e[1].nombre.toLowerCase().includes(q));
+    var planMatch=!pf||e[1].plan===pf;
+    return match&&planMatch;
+  });
+  if(!items.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--m2)">Sin usuarios que coincidan</td></tr>';
+    return;
+  }
+  items.forEach(function(e){
+    var email=e[0], ud=e[1];
+    var plan=PLAN_INFO[ud.plan]||PLAN_INFO.free;
+    var isAdmin=ud.role==='admin';
+    var canales=isAdmin?'∞':plan.canales>=9999?'∞':plan.canales;
+    var initials=(ud.nombre||'?').split(' ').map(function(p){return p[0];}).join('').substring(0,2).toUpperCase();
+    var col=avatarColor(email);
+    var fecha=ud.creado?new Date(ud.creado).toLocaleDateString('es-ES'):'—';
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td><div class="user-info">'+
+        '<div class="user-avatar" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'44">'+initials+'</div>'+
+        '<div><div class="user-name">'+escH(ud.nombre)+'</div><div class="user-email">'+escH(email)+'</div></div>'+
+      '</div></td>'+
+      '<td><span class="plan-tag '+(isAdmin?'plan-admin':plan.cls)+'">'+
+        (isAdmin?'👑 Admin':plan.label)+
+      '</span></td>'+
+      '<td><span class="canales-badge">'+canales+' CH</span></td>'+
+      '<td><span class="status-dot status-active"></span><span style="font-size:12px;color:var(--m1)">Activo</span></td>'+
+      '<td style="font-size:12px;color:var(--m2)">'+fecha+'</td>'+
+      '<td><div class="row-actions">'+
+        '<button class="row-btn promote" onclick="editarUsuario(\''+escH(email)+'\')">✏ Editar</button>'+
+        '<button class="row-btn" onclick="cambiarPlan(\''+escH(email)+'\')">💎 Plan</button>'+
+        (email!==sesion.email?'<button class="row-btn danger" onclick="pedirBorrar(\''+escH(email)+'\')">✕ Borrar</button>':'')+
+      '</div></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function escH(s){ return String(s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+
+// ─── Logs ───
+function agregarLog(email,accion,plan){
+  LOGS.push({email:email,accion:accion,plan:plan,ts:new Date().toISOString()});
+  saveLogs();
+}
+function renderLogs(){
+  var tbody=document.getElementById('logs-tbody'); tbody.innerHTML='';
+  LOGS.slice().reverse().slice(0,50).forEach(function(l){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-size:12px">'+escH(l.email)+'</td>'+
+      '<td style="font-size:12px;color:var(--m1)">'+escH(l.accion)+'</td>'+
+      '<td style="font-size:11px;color:var(--m2);font-family:JetBrains Mono,monospace">'+new Date(l.ts).toLocaleString('es-ES')+'</td>'+
+      '<td><span class="plan-tag '+((PLAN_INFO[l.plan]||PLAN_INFO.free).cls)+'">'+((PLAN_INFO[l.plan]||PLAN_INFO.free).label)+'</span></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// ─── Modales ───
+function abrirModalNuevo(){
+  editEmail=null;
+  document.getElementById('modal-title').textContent='Nuevo usuario';
+  document.getElementById('m-nombre').value='';
+  document.getElementById('m-email').value='';
+  document.getElementById('m-pass').value='';
+  document.getElementById('m-plan').value='free';
+  document.getElementById('m-role').value='user';
+  document.getElementById('user-modal').classList.add('open');
+}
+function editarUsuario(email){
+  var u=getUsers(); var ud=u[email]; if(!ud) return;
+  editEmail=email;
+  document.getElementById('modal-title').textContent='Editar usuario';
+  document.getElementById('m-nombre').value=ud.nombre;
+  document.getElementById('m-email').value=email;
+  document.getElementById('m-email').disabled=true;
+  document.getElementById('m-pass').value=ud.pass;
+  document.getElementById('m-plan').value=ud.plan||'free';
+  document.getElementById('m-role').value=ud.role||'user';
+  document.getElementById('user-modal').classList.add('open');
+}
+function cambiarPlan(email){
+  var u=getUsers(); var ud=u[email]; if(!ud) return;
+  var nuevoPlan=prompt('Plan para '+ud.nombre+':\nfree | hobby | pro | enterprise',ud.plan||'free');
+  if(!nuevoPlan||!PLAN_INFO[nuevoPlan]){alert('Plan no válido');return;}
+  ud.plan=nuevoPlan; u[email]=ud; saveUsers(u);
+  agregarLog(email,'Cambio de plan → '+nuevoPlan,nuevoPlan);
+  renderTabla(); actualizarStats();
+  alert('Plan actualizado a '+PLAN_INFO[nuevoPlan].label);
+}
+function guardarUsuario(){
+  var nombre=document.getElementById('m-nombre').value.trim();
+  var email =document.getElementById('m-email').value.trim().toLowerCase();
+  var pass  =document.getElementById('m-pass').value;
+  var plan  =document.getElementById('m-plan').value;
+  var role  =document.getElementById('m-role').value;
+  if(!nombre||!email||!pass){alert('Completa todos los campos');return;}
+  var u=getUsers();
+  if(!editEmail&&u[email]){alert('Ya existe un usuario con ese correo');return;}
+  var target=editEmail||email;
+  u[target]={nombre:nombre,pass:pass,plan:plan,role:role,creado:u[target]?.creado||new Date().toISOString()};
+  saveUsers(u);
+  agregarLog(email,editEmail?'Editado por admin':'Creado por admin',plan);
+  document.getElementById('m-email').disabled=false;
+  cerrarModal(); renderTabla(); actualizarStats();
+}
+function pedirBorrar(email){
+  delEmail=email;
+  var u=getUsers(); var ud=u[email];
+  document.getElementById('del-user-info').textContent=ud.nombre+' ('+email+') — Plan: '+(PLAN_INFO[ud.plan]||PLAN_INFO.free).label;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function confirmarBorrar(){
+  if(!delEmail) return;
+  var u=getUsers(); delete u[delEmail]; saveUsers(u);
+  agregarLog(delEmail,'Eliminado por admin','—');
+  cerrarModal(); renderTabla(); actualizarStats();
+}
+function cerrarModal(){
+  document.querySelectorAll('.modal-overlay').forEach(function(m){m.classList.remove('open');});
+  document.getElementById('m-email').disabled=false;
+  delEmail=null;
+}
+
+// ─── Secciones ───
+function showSection(s){
+  ['users','plans','logs'].forEach(function(sec){
+    var el=document.getElementById('section-'+sec);
+    if(el) el.style.display=(sec===s?'block':'none');
+  });
+  document.querySelectorAll('.sidebar-item').forEach(function(item,i){
+    item.classList.remove('active');
+  });
+  document.querySelectorAll('.sidebar-item').forEach(function(item){
+    if(item.getAttribute('onclick')&&item.getAttribute('onclick').includes(s))
+      item.classList.add('active');
+  });
+  if(s==='logs') renderLogs();
+}
+
+function exportarUsuarios(){
+  var u=getUsers();
+  var rows=['Nombre,Email,Plan,Canales,Rol,Registrado'];
+  Object.entries(u).forEach(function(e){
+    var ud=e[1], p=PLAN_INFO[ud.plan]||PLAN_INFO.free;
+    rows.push([ud.nombre,e[0],p.label,p.canales>=9999?'Ilimitado':p.canales,ud.role||'user',ud.creado||''].join(','));
+  });
+  var blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='usuarios_pyroshow.csv'; a.click();
+}
+
+function cerrarSesion(){
+  sessionStorage.removeItem('pyro_session');
+  window.location.href='auth.html';
+}
+
+// ─── Init ───
+actualizarStats();
+renderTabla();
+// Log de acceso admin
+agregarLog(sesion.email,'Acceso al panel admin',sesion.plan);
+</script>
+</body>
+</html>

@@ -448,6 +448,37 @@ canvas{display:block}
   <button class="tbtn" onclick="abrirVideoDemo()" title="Video demostración" style="color:var(--m2)">&#9654; Demo</button>
   <button class="tbtn" onclick="abrirManual()" title="Manual de instrucciones" style="color:var(--green);border-color:rgba(34,197,94,.35)">&#63; Ayuda</button>
   <button class="tbtn gold" onclick="open('checkout.html?plan=pro','_blank')" title="Comprar licencia completa">&#11088; Pro $149</button>
+  <div class="tsep"></div>
+  <!-- Usuario y sesión -->
+  <div class="tmenu-group" style="flex-shrink:0">
+    <span class="tmenu-lbl">Cuenta</span>
+    <div class="tmenu-items">
+      <span id="user-plan-badge" style="display:none;font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid;color:var(--m2)"></span>
+      <button class="tbtn" id="btn-admin-panel" onclick="window.open('admin.html','_blank')" style="display:none;color:var(--red);border-color:rgba(224,56,56,.3)" title="Panel de administración">&#9881; Admin</button>
+      <button class="tbtn" onclick="cerrarSesionApp()" title="Cerrar sesión" style="color:var(--m2)">&#10148; Salir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UPGRADE DE PLAN -->
+<div id="upgrade-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9500;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">🔒</div>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px">Límite de plan alcanzado</div>
+    <div id="upgrade-msg" style="font-size:13px;color:var(--m1);line-height:1.65;margin-bottom:20px"></div>
+    <div style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="font-size:11px;color:var(--m2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.8px">Planes disponibles</div>
+      <div style="font-size:12px;color:var(--m1);line-height:2">
+        <span style="color:var(--blue)">◆ Hobbyist $49</span> — hasta 10 canales<br>
+        <span style="color:var(--gold)">◆ Pro $149</span> — canales ilimitados + código fuente<br>
+        <span style="color:var(--purple)">◆ Enterprise $349</span> — todo incluido + soporte
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="cerrarUpgradeModal()" style="padding:9px 18px;border-radius:7px;border:1px solid var(--b2);color:var(--m1);background:none;cursor:pointer;font-size:13px">Cancelar</button>
+      <button onclick="window.open('checkout.html?plan=pro','_blank')" style="padding:9px 20px;border-radius:7px;background:var(--gold);color:#08060a;border:none;cursor:pointer;font-size:13px;font-weight:700">&#11088; Actualizar plan</button>
+    </div>
+  </div>
 </div>
 
 <!-- VIEWPORT 3D -->
@@ -1200,6 +1231,13 @@ canvas{display:block}
 <!-- ===================== FIN MANUAL ===================== -->
 
 <script>
+var PLANES = {
+  free:       { canales:1,    nombre:'Gratis',     label:'1 canal' },
+  hobby:      { canales:10,   nombre:'Hobbyist',   label:'10 canales' },
+  pro:        { canales:9999, nombre:'Pro',         label:'Ilimitado' },
+  enterprise: { canales:9999, nombre:'Enterprise',  label:'Ilimitado' },
+};
+
 /* =================================================================
    ESTADO GLOBAL
    ================================================================= */
@@ -1260,7 +1298,10 @@ var TH=28, RULER=26, LABELW=68;
    INIT
    ================================================================= */
 function init(){
-  // Info: si está en file:// mostrar aviso pero NO bloquear — img tag funciona igual
+  // Verificar sesión — redirigir a login si no hay
+  if(!initAuth()) return;
+
+  // Info: si está en file:// mostrar aviso
   if(window.location.protocol==='file:'){
     document.getElementById('file-warning').style.display='flex';
   }
@@ -1337,7 +1378,9 @@ function init(){
   TC.addEventListener('dblclick',function(e){
     if(!cueAt(e.offsetX,e.offsetY)){
       var t=px2t(e.offsetX),ch=Math.max(1,Math.floor((e.offsetY+S.scrollY)/TH)+1);
+      if(!puedeAgregarCanal(ch)) return;
       var eid=+document.getElementById('sel-eff').value;
+      guardarEstado('Agregar cue doble clic');
       S.cues.push({id:S.nextId++,eid:eid,t:Math.max(0,Math.min(t,S.dur)),ch:ch,fired:false,chain:null});
       updateCueCount();renderTracks();updateSB();
       notify('Cue @ '+t.toFixed(2)+'s CH'+ch,'success');
@@ -1419,6 +1462,8 @@ function tlReset(){
 function addCue(){
   var eid=+document.getElementById('sel-eff').value;
   var ch=Math.max(1,Math.min(32,+document.getElementById('inp-ch').value||1));
+  if(!puedeAgregarCanal(ch)) return;
+  guardarEstado('Agregar cue');
   S.cues.push({id:S.nextId++,eid:eid,t:S.t,ch:ch,fired:false,chain:null});
   updateCueCount();renderTracks();updateSB();
   notify(eff(eid).n+' @ '+S.t.toFixed(2)+'s CH'+ch,'success');
@@ -4000,9 +4045,79 @@ document.getElementById('video-overlay').addEventListener('click',function(e){
 });
 
 /* =================================================================
-   START
+   START — llamar al final después de definir todo
    ================================================================= */
-init();
+init();ES = {
+  free:       { canales:1,    nombre:'Gratis',     label:'1 canal' },
+  hobby:      { canales:10,   nombre:'Hobbyist',   label:'10 canales' },
+  pro:        { canales:9999, nombre:'Pro',         label:'Ilimitado' },
+  enterprise: { canales:9999, nombre:'Enterprise',  label:'Ilimitado' },
+};
+
+var SESSION = null;
+
+function initAuth(){
+  try{ SESSION=JSON.parse(sessionStorage.getItem('pyro_session')||'null'); }
+  catch(e){ SESSION=null; }
+  if(!SESSION || !SESSION.email){
+    // Redirigir al login
+    window.location.href='auth.html';
+    return false;
+  }
+  // Mostrar info del usuario en la UI
+  var plan=PLANES[SESSION.plan]||PLANES.free;
+  // Badge de plan en topbar
+  var badge=document.getElementById('user-plan-badge');
+  if(badge){
+    badge.textContent=SESSION.nombre.split(' ')[0]+' · '+plan.nombre;
+    badge.title='Plan: '+plan.nombre+' — '+plan.label;
+    badge.style.display='flex';
+    // Color por plan
+    var colores={free:'var(--m2)',hobby:'var(--blue)',pro:'var(--gold)',enterprise:'var(--purple)'};
+    badge.style.color=colores[SESSION.plan]||'var(--m2)';
+    badge.style.borderColor=(colores[SESSION.plan]||'var(--m2)').replace('var(','rgba(').replace(')',',0.35)');
+  }
+  // Límite de canales
+  var maxCH = SESSION.role==='admin' ? 9999 : plan.canales;
+  S.maxCanales = maxCH;
+
+  // Si es admin mostrar enlace al panel
+  if(SESSION.role==='admin'){
+    var adminBtn=document.getElementById('btn-admin-panel');
+    if(adminBtn) adminBtn.style.display='flex';
+  }
+
+  return true;
+}
+
+// Verificar si se puede agregar un cue en el canal dado
+function puedeAgregarCanal(ch){
+  if(!S.maxCanales) return true;
+  if(ch<=S.maxCanales) return true;
+  // Mostrar aviso de límite
+  var plan=PLANES[SESSION.plan]||PLANES.free;
+  notify('Plan '+plan.nombre+' permite hasta '+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'. Actualiza tu plan para más canales.','error');
+  // Mostrar modal de upgrade
+  mostrarUpgradeModal(ch);
+  return false;
+}
+
+// Modal de upgrade
+function mostrarUpgradeModal(ch){
+  var overlay=document.getElementById('upgrade-overlay');
+  if(!overlay) return;
+  var plan=PLANES[SESSION.plan]||PLANES.free;
+  document.getElementById('upgrade-msg').innerHTML=
+    'Intentas usar <strong>CH '+ch+'</strong> pero tu plan <strong>'+plan.nombre+'</strong> permite máximo <strong>'+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'</strong>.';
+  overlay.classList.add('open');
+}
+
+function cerrarUpgradeModal(){ document.getElementById('upgrade-overlay').classList.remove('open'); }
+
+function cerrarSesionApp(){
+  sessionStorage.removeItem('pyro_session');
+  window.location.href='auth.html';
+}
 </script>
 </body>
 </html>

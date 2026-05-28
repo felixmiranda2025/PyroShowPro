@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PyroShow Pro — Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060e;--s1:#0a0c1a;--s2:#0e1020;--s3:#131628;
+  --b1:#1a1e35;--b2:#222640;--b3:#2e3358;
+  --gold:#e8a020;--gold2:#f5c842;--golddim:rgba(232,160,32,.10);
+  --green:#22c55e;--greendim:rgba(34,197,94,.10);
+  --red:#e03838;--reddim:rgba(224,56,56,.10);
+  --blue:#4d6ef5;--bluedim:rgba(77,110,245,.10);
+  --purple:#8b5cf6;--purpledim:rgba(139,92,246,.10);
+  --text:#eef0f8;--m1:#8890b0;--m2:#52566e;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center}
+
+/* Fondo animado */
+.bg-particles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.25;animation:float 8s ease-in-out infinite}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(232,160,32,.4),transparent);top:-100px;left:-100px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(77,110,245,.35),transparent);bottom:-80px;right:-80px;animation-delay:3s}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,rgba(139,92,246,.3),transparent);top:40%;left:60%;animation-delay:5s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+
+/* Grid de fondo */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+/* CARD PRINCIPAL */
+.auth-card{position:relative;z-index:10;width:100%;max-width:420px;background:rgba(10,12,26,.88);border:1px solid var(--b2);border-radius:20px;padding:40px;backdrop-filter:blur(20px);box-shadow:0 32px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05)}
+
+/* Logo */
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center}
+.logo-icon{width:42px;height:42px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.logo-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.logo-text strong{color:var(--gold)}
+
+/* Tabs */
+.auth-tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;margin-bottom:28px}
+.auth-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--m1);transition:all .15s}
+.auth-tab.active{background:var(--s3);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+/* Form */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;color:var(--m1);margin-bottom:6px;letter-spacing:.3px}
+.form-group input{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:8px;padding:11px 14px;font-size:14px;font-family:'DM Sans',sans-serif;transition:border-color .15s;outline:none}
+.form-group input:focus{border-color:rgba(232,160,32,.5)}
+.form-group input.error{border-color:rgba(224,56,56,.5);background:rgba(224,56,56,.05)}
+
+/* Plan selector en registro */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.plan-item{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.plan-item:hover{border-color:var(--b3)}
+.plan-item.active{border-color:rgba(232,160,32,.5);background:var(--golddim)}
+.plan-item .pi-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.plan-item .pi-price{font-size:16px;font-weight:700;color:var(--gold);font-family:'Syne',sans-serif}
+.plan-item .pi-sub{font-size:9px;color:var(--m2);margin-top:2px;line-height:1.4}
+.plan-item.free .pi-price{color:var(--green)}
+.plan-check{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:9px;color:#08060a;font-weight:700}
+.plan-item.active .plan-check{display:flex}
+
+/* Submit */
+.btn-submit{width:100%;background:var(--gold);color:#08060a;font-size:15px;font-weight:700;padding:13px;border-radius:9px;border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
+.btn-submit:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit.loading{opacity:.7;cursor:not-allowed}
+
+/* Error msg */
+.auth-error{background:var(--reddim);border:1px solid rgba(224,56,56,.3);border-radius:6px;padding:9px 12px;font-size:12px;color:var(--red);margin-bottom:16px;display:none}
+.auth-error.show{display:block}
+.auth-success{background:var(--greendim);border:1px solid rgba(34,197,94,.3);border-radius:6px;padding:9px 12px;font-size:12px;color:var(--green);margin-bottom:16px;display:none}
+.auth-success.show{display:block}
+
+/* Footer */
+.auth-footer{margin-top:20px;text-align:center;font-size:12px;color:var(--m2)}
+.auth-footer a{color:var(--m1);text-decoration:none;transition:color .15s}
+.auth-footer a:hover{color:var(--text)}
+
+/* Plan limits hint */
+.plan-limits{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:10px 12px;margin-bottom:16px;font-size:11px;color:var(--m1);line-height:1.7;display:none}
+.plan-limits.show{display:block}
+.plan-limits strong{color:var(--text)}
+
+@media(max-width:480px){
+  .auth-card{margin:16px;padding:28px 22px;border-radius:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-particles">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div class="auth-card">
+
+  <div class="auth-logo">
+    <div class="logo-icon">🎆</div>
+    <div class="logo-text">PyroShow <strong>Pro</strong></div>
+  </div>
+
+  <div class="auth-tabs">
+    <div class="auth-tab active" id="tab-login" onclick="showTab('login')">Iniciar sesión</div>
+    <div class="auth-tab" id="tab-register" onclick="showTab('register')">Crear cuenta</div>
+  </div>
+
+  <!-- ─── LOGIN ─── -->
+  <div id="form-login">
+    <div class="auth-error" id="login-error"></div>
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="correo@empresa.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn-submit" id="btn-login" onclick="doLogin()">
+      🔑 Entrar a PyroShow Pro
+    </button>
+    <div class="auth-footer" style="margin-top:14px">
+      <a href="#" onclick="showForgot()">¿Olvidaste tu contraseña?</a>
+    </div>
+  </div>
+
+  <!-- ─── REGISTRO ─── -->
+  <div id="form-register" style="display:none">
+    <div class="auth-error" id="reg-error"></div>
+    <div class="auth-success" id="reg-success"></div>
+    <div class="form-group">
+      <label>Nombre completo</label>
+      <input type="text" id="reg-name" placeholder="Tu nombre"/>
+    </div>
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input type="email" id="reg-email" placeholder="correo@empresa.com"/>
+    </div>
+    <div class="form-group">
+      <label>Contraseña (mín. 8 caracteres)</label>
+      <input type="password" id="reg-pass" placeholder="••••••••"/>
+    </div>
+
+    <label style="font-size:11px;color:var(--m1);display:block;margin-bottom:8px;letter-spacing:.3px">Plan de licencia</label>
+    <div class="plan-grid">
+      <div class="plan-item free active" id="plan-free" onclick="selPlanReg('free')">
+        <div class="plan-check">✓</div>
+        <div class="pi-name">Gratis</div>
+        <div class="pi-price">$0</div>
+        <div class="pi-sub">1 canal<br>Demo ilimitado</div>
+      </div>
+      <div class="plan-item" id="plan-hobby" onclick="selPlanReg('hobby')">
+        <div class="plan-check">✓</div>
+        <div class="pi-name">Hobbyist</div>
+        <div class="pi-price">$49</div>
+        <div class="pi-sub">10 canales<br>Licencia única</div>
+      </div>
+      <div class="plan-item" id="plan-pro" onclick="selPlanReg('pro')">
+        <div class="plan-check">✓</div>
+        <div class="pi-name">Pro</div>
+        <div class="pi-price">$149</div>
+        <div class="pi-sub">Ilimitado<br>Código fuente</div>
+      </div>
+    </div>
+
+    <div class="plan-limits show" id="plan-limits-hint">
+      <strong>Plan Gratis:</strong> 1 canal de disparo, simulación 3D completa, sin exportación CSV ni ESP32.
+    </div>
+
+    <button class="btn-submit" id="btn-register" onclick="doRegister()">
+      🚀 Crear cuenta
+    </button>
+  </div>
+
+  <div class="auth-footer">
+    Al continuar aceptas los <a href="#">Términos de uso</a> y la <a href="#">Política de privacidad</a>
+  </div>
+
+</div>
+
+<script>
+/* ─── USUARIOS (localStorage simulando backend) ─── */
+var PLAN_LIMITS = {
+  free:    { canales:1,    nombre:'Gratis',    label:'1 canal' },
+  hobby:   { canales:10,   nombre:'Hobbyist',  label:'10 canales' },
+  pro:     { canales:9999, nombre:'Pro',        label:'Ilimitado' },
+  enterprise:{ canales:9999,nombre:'Enterprise',label:'Ilimitado' },
+};
+
+function getUsers(){ try{return JSON.parse(localStorage.getItem('pyro_users')||'{}');}catch(e){return{};} }
+function saveUsers(u){ localStorage.setItem('pyro_users',JSON.stringify(u)); }
+function getSesion(){ try{return JSON.parse(sessionStorage.getItem('pyro_session')||'null');}catch(e){return null;} }
+function guardarSesion(u){ sessionStorage.setItem('pyro_session',JSON.stringify(u)); }
+
+/* ─── Crear usuarios de demo si no existen ─── */
+(function(){
+  var u=getUsers();
+  if(!u['admin@pyroshow.com']) u['admin@pyroshow.com']={nombre:'Admin',pass:'admin123',plan:'pro',role:'admin',creado:new Date().toISOString()};
+  if(!u['demo@demo.com'])      u['demo@demo.com']={nombre:'Usuario Demo',pass:'demo123',plan:'free',role:'user',creado:new Date().toISOString()};
+  saveUsers(u);
+})();
+
+/* ─── Si ya hay sesión, redirigir ─── */
+(function(){
+  var s=getSesion();
+  if(s&&s.email) window.location.href='app.html';
+})();
+
+/* ─── Tabs ─── */
+function showTab(t){
+  document.getElementById('form-login').style.display   = t==='login'   ?'block':'none';
+  document.getElementById('form-register').style.display= t==='register'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('active',   t==='login');
+  document.getElementById('tab-register').classList.toggle('active', t==='register');
+  clearErrors();
+}
+
+/* ─── Plan selector en registro ─── */
+var planSelReg = 'free';
+var planHints = {
+  free:  '<strong>Plan Gratis:</strong> 1 canal de disparo, simulación 3D completa, sin exportación CSV ni ESP32.',
+  hobby: '<strong>Plan Hobbyist ($49):</strong> Hasta 10 canales, exportación CSV, control ESP32 WiFi. Se generará un enlace de pago.',
+  pro:   '<strong>Plan Pro ($149):</strong> Canales ilimitados, código fuente, soporte prioritario, grabación de video. Se generará un enlace de pago.',
+};
+function selPlanReg(p){
+  planSelReg=p;
+  ['free','hobby','pro'].forEach(function(id){
+    document.getElementById('plan-'+id).classList.toggle('active',id===p);
+  });
+  var h=document.getElementById('plan-limits-hint');
+  h.innerHTML=planHints[p]||''; h.classList.add('show');
+}
+
+/* ─── LOGIN ─── */
+function doLogin(){
+  var email=document.getElementById('login-email').value.trim().toLowerCase();
+  var pass =document.getElementById('login-pass').value;
+  var btn  =document.getElementById('btn-login');
+  clearErrors();
+  if(!email||!pass){ showError('login','Completa todos los campos'); return; }
+  btn.classList.add('loading'); btn.textContent='Verificando...';
+  setTimeout(function(){
+    var users=getUsers();
+    var u=users[email];
+    if(!u||u.pass!==pass){
+      showError('login','Correo o contraseña incorrectos');
+      btn.classList.remove('loading'); btn.innerHTML='🔑 Entrar a PyroShow Pro';
+      return;
+    }
+    guardarSesion({email:email,nombre:u.nombre,plan:u.plan,role:u.role||'user'});
+    btn.innerHTML='✓ Acceso concedido';
+    btn.style.background='var(--green)';
+    setTimeout(function(){ window.location.href='app.html'; },600);
+  },700);
+}
+
+/* ─── REGISTRO ─── */
+function doRegister(){
+  var nombre= document.getElementById('reg-name').value.trim();
+  var email = document.getElementById('reg-email').value.trim().toLowerCase();
+  var pass  = document.getElementById('reg-pass').value;
+  var btn   = document.getElementById('btn-register');
+  clearErrors();
+  if(!nombre||!email||!pass){ showError('reg','Completa todos los campos'); return; }
+  if(pass.length<8){ showError('reg','La contraseña debe tener al menos 8 caracteres'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showError('reg','Correo no válido'); return; }
+  var users=getUsers();
+  if(users[email]){ showError('reg','Este correo ya tiene una cuenta. Inicia sesión.'); return; }
+  btn.classList.add('loading'); btn.textContent='Creando cuenta...';
+  setTimeout(function(){
+    users[email]={nombre:nombre,pass:pass,plan:planSelReg,role:'user',creado:new Date().toISOString()};
+    saveUsers(users);
+    if(planSelReg==='free'){
+      guardarSesion({email:email,nombre:nombre,plan:'free',role:'user'});
+      btn.innerHTML='✓ Cuenta creada';
+      btn.style.background='var(--green)';
+      setTimeout(function(){ window.location.href='app.html'; },700);
+    } else {
+      btn.classList.remove('loading');
+      btn.innerHTML='🚀 Crear cuenta';
+      document.getElementById('reg-success').textContent=
+        '✓ Cuenta creada. Para activar el plan '+PLAN_LIMITS[planSelReg].nombre+', completa el pago:';
+      document.getElementById('reg-success').classList.add('show');
+      document.getElementById('reg-success').innerHTML+=
+        ' <a href="checkout.html?plan='+planSelReg+'&email='+encodeURIComponent(email)+'" '+
+        'style="color:var(--gold);font-weight:600">Ir a pagar →</a>';
+      guardarSesion({email:email,nombre:nombre,plan:'free',role:'user'});
+    }
+  },800);
+}
+
+/* ─── Helpers ─── */
+function showError(prefix, msg){
+  var el=document.getElementById(prefix+'-error');
+  el.textContent=msg; el.classList.add('show');
+}
+function clearErrors(){
+  ['login-error','reg-error','reg-success'].forEach(function(id){
+    var el=document.getElementById(id);
+    el.classList.remove('show'); el.textContent='';
+  });
+}
+function showForgot(){
+  alert('Para restablecer tu contraseña contacta:\nhola@pyroshowpro.com');
+}
+</script>
+</body>
+</html>
