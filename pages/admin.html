@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PyroShow Pro — Panel de administración</title>
+<title>PyroShow Pro — Panel Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
 <style>
@@ -15,533 +15,776 @@
   --green:#22c55e;--greendim:rgba(34,197,94,.10);
   --red:#e03838;--reddim:rgba(224,56,56,.10);
   --blue:#4d6ef5;--bluedim:rgba(77,110,245,.10);
-  --purple:#8b5cf6;
+  --purple:#8b5cf6;--purpledim:rgba(139,92,246,.10);
   --text:#eef0f8;--m1:#8890b0;--m2:#52566e;
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,select{font-family:'DM Sans',sans-serif}
 
 /* NAV */
-nav{height:56px;background:rgba(5,6,14,.95);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
-.nav-logo{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:15px}
-.nav-logo-icon{width:28px;height:28px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center}
-.nav-logo strong{color:var(--gold)}
-.nav-badge{background:var(--reddim);border:1px solid rgba(224,56,56,.3);color:var(--red);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.5px}
-.nav-user{margin-left:auto;font-size:12px;color:var(--m1);display:flex;align-items:center;gap:10px}
-.nav-user span{background:var(--s2);border:1px solid var(--b2);border-radius:5px;padding:4px 10px}
-.btn-nav{padding:5px 12px;border-radius:6px;font-size:12px;border:1px solid var(--b2);color:var(--m1);cursor:pointer;background:none;transition:all .14s}
-.btn-nav:hover{color:var(--text);border-color:var(--b3)}
-.btn-nav.danger{border-color:rgba(224,56,56,.4);color:var(--red)}
+nav{height:54px;background:rgba(5,6,14,.96);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.nl{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:15px}
+.nl-icon{width:28px;height:28px;background:var(--golddim);border:1px solid rgba(232,160,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.nl strong{color:var(--gold)}
+.admin-badge{background:rgba(224,56,56,.15);border:1px solid rgba(224,56,56,.3);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.5px}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-r span{font-size:12px;color:var(--m1);background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:4px 10px}
+.nbtn{padding:5px 12px;border-radius:6px;font-size:12px;border:1px solid var(--b2);color:var(--m1);background:none;transition:all .14s}
+.nbtn:hover{color:var(--text);border-color:var(--b3)}
+.nbtn.app{border-color:rgba(232,160,32,.4);color:var(--gold)}
+.nbtn.out{border-color:rgba(224,56,56,.3);color:var(--red)}
 
 /* LAYOUT */
-.admin-wrap{display:flex;min-height:calc(100vh - 56px)}
-.sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--b1);padding:20px 0;background:rgba(10,12,26,.5)}
-.sidebar-section{font-size:9px;color:var(--m2);text-transform:uppercase;letter-spacing:1.2px;padding:0 16px;margin-bottom:6px;margin-top:16px}
-.sidebar-section:first-child{margin-top:0}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;color:var(--m1);cursor:pointer;transition:all .14s;border-left:2px solid transparent}
-.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
-.sidebar-item.active{color:var(--text);border-left-color:var(--gold);background:rgba(232,160,32,.06)}
-.sidebar-item .si-icon{font-size:14px;width:16px;text-align:center}
-.main-content{flex:1;padding:28px 32px;overflow-y:auto}
+.wrap{display:flex;min-height:calc(100vh - 54px)}
+
+/* SIDEBAR */
+.sb{width:210px;flex-shrink:0;border-right:1px solid var(--b1);padding:16px 0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.sb-sect{font-size:9px;color:var(--m2);text-transform:uppercase;letter-spacing:1.2px;padding:12px 16px 5px;margin-top:4px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:13px;color:var(--m1);cursor:pointer;transition:all .14s;border-left:2px solid transparent}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sb-item.on{color:var(--text);border-left-color:var(--gold);background:rgba(232,160,32,.06)}
+.sb-icon{width:15px;text-align:center;font-size:14px}
+
+/* MAIN */
+.main{flex:1;padding:26px 30px;min-width:0}
 
 /* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px 20px}
-.stat-label{font-size:11px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700}
-.stat-sub{font-size:11px;color:var(--m1);margin-top:4px}
-.stat-card.gold .stat-val{color:var(--gold)}
-.stat-card.green .stat-val{color:var(--green)}
-.stat-card.blue .stat-val{color:var(--blue)}
-.stat-card.purple .stat-val{color:var(--purple)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 18px}
+.sc-lbl{font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.sc-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.sc-sub{font-size:11px;color:var(--m1);margin-top:3px}
+.sc.gold .sc-val{color:var(--gold)}
+.sc.green .sc-val{color:var(--green)}
+.sc.blue .sc-val{color:var(--blue)}
+.sc.purple .sc-val{color:var(--purple)}
 
-/* TABLA USUARIOS */
-.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.section-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:600}
-.section-actions{display:flex;gap:8px}
-.btn-action{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .14s}
-.btn-green{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.3)}
-.btn-green:hover{background:rgba(34,197,94,.18)}
-.btn-blue{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.3)}
-.btn-red{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.3)}
-.btn-gold{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+/* SECTION */
+.sec{display:none}.sec.on{display:block}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.sec-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:600}
+.sec-acts{display:flex;gap:8px}
 
-/* Search bar */
-.search-row{display:flex;gap:10px;margin-bottom:16px}
-.search-input{flex:1;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
-.search-input:focus{border-color:rgba(232,160,32,.4)}
-.filter-sel{background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 10px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+/* SEARCH */
+.search-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.si{flex:1;min-width:180px;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 12px;font-size:13px;outline:none;transition:border-color .15s}
+.si:focus{border-color:rgba(232,160,32,.45)}
+.sf{background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:8px 10px;font-size:12px;outline:none}
 
-/* Tabla */
-.users-table{width:100%;border-collapse:collapse;font-size:13px}
-.users-table th{background:var(--s2);color:var(--m1);padding:10px 14px;text-align:left;border-bottom:1px solid var(--b1);font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:500;white-space:nowrap}
-.users-table td{padding:12px 14px;border-bottom:1px solid rgba(26,30,53,.6);vertical-align:middle}
-.users-table tr:last-child td{border-bottom:none}
-.users-table tbody tr:hover td{background:rgba(255,255,255,.02)}
-.user-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;text-transform:uppercase}
-.user-info{display:flex;align-items:center;gap:10px}
-.user-name{font-weight:500;font-size:13px}
-.user-email{font-size:11px;color:var(--m2)}
-.plan-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.4px}
-.plan-free{background:rgba(82,86,110,.2);color:var(--m1);border:1px solid var(--b2)}
-.plan-hobby{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.25)}
-.plan-pro{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.25)}
-.plan-enterprise{background:var(--purpledim);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
-.plan-admin{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.25)}
-.canales-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m1);background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px}
-.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
-.status-active{background:var(--green);box-shadow:0 0 4px var(--green)}
-.status-inactive{background:var(--m2)}
-.row-actions{display:flex;gap:5px}
-.row-btn{padding:4px 8px;border-radius:4px;font-size:10px;border:1px solid var(--b2);color:var(--m1);cursor:pointer;background:none;transition:all .12s;white-space:nowrap}
-.row-btn:hover{color:var(--text);border-color:var(--b3)}
-.row-btn.danger{border-color:rgba(224,56,56,.3);color:var(--red)}
-.row-btn.danger:hover{background:var(--reddim)}
-.row-btn.promote{border-color:rgba(232,160,32,.3);color:var(--gold)}
+/* TABLA */
+.tcard{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
+.utbl{width:100%;border-collapse:collapse;font-size:13px}
+.utbl th{background:var(--s2);color:var(--m2);padding:10px 14px;text-align:left;border-bottom:1px solid var(--b1);font-size:10px;text-transform:uppercase;letter-spacing:.6px;font-weight:500;white-space:nowrap}
+.utbl th.sort{cursor:pointer;user-select:none}
+.utbl th.sort:hover{color:var(--m1)}
+.utbl td{padding:11px 14px;border-bottom:1px solid rgba(26,30,53,.5);vertical-align:middle}
+.utbl tr:last-child td{border-bottom:none}
+.utbl tbody tr:hover td{background:rgba(255,255,255,.018)}
+.uinfo{display:flex;align-items:center;gap:10px}
+.uav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.uname{font-weight:500;font-size:13px}
+.uemail{font-size:11px;color:var(--m2)}
+
+/* BADGES */
+.ptag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.4px;white-space:nowrap}
+.p-free{background:rgba(82,86,110,.15);color:var(--m1);border:1px solid var(--b2)}
+.p-hobby{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.25)}
+.p-pro{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.25)}
+.p-enterprise{background:var(--purpledim);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
+.p-admin{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.25)}
+.stag{display:inline-flex;align-items:center;gap:5px;font-size:11px}
+.sdot{width:7px;height:7px;border-radius:50%}
+.s-on{background:var(--green);box-shadow:0 0 5px var(--green)}
+.s-off{background:var(--m2)}
+.chdot{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;color:var(--m1)}
+
+/* ROW BTNS */
+.rbts{display:flex;gap:4px;flex-wrap:nowrap}
+.rb{padding:4px 8px;border-radius:4px;font-size:10px;border:1px solid var(--b2);color:var(--m1);background:none;transition:all .12s;white-space:nowrap}
+.rb:hover{color:var(--text);border-color:var(--b3);background:var(--s2)}
+.rb.edit{border-color:rgba(77,110,245,.3);color:var(--blue)}
+.rb.plan{border-color:rgba(232,160,32,.3);color:var(--gold)}
+.rb.pass{border-color:rgba(34,197,94,.3);color:var(--green)}
+.rb.tog{border-color:rgba(139,92,246,.3);color:var(--purple)}
+.rb.del{border-color:rgba(224,56,56,.3);color:var(--red)}
+.rb.del:hover{background:var(--reddim)}
+
+/* ACTION BTNS */
+.abtn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .14s}
+.a-green{background:var(--greendim);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.a-green:hover{background:rgba(34,197,94,.18)}
+.a-gold{background:var(--golddim);color:var(--gold);border:1px solid rgba(232,160,32,.3)}
+.a-gold:hover{background:rgba(232,160,32,.18)}
+.a-blue{background:var(--bluedim);color:var(--blue);border:1px solid rgba(77,110,245,.3)}
+.a-red{background:var(--reddim);color:var(--red);border:1px solid rgba(224,56,56,.3)}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal-box{background:var(--s1);border:1px solid var(--b2);border-radius:14px;padding:28px;width:440px;max-width:95vw}
-.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:18px}
-.modal-form-group{margin-bottom:14px}
-.modal-form-group label{display:block;font-size:11px;color:var(--m1);margin-bottom:5px}
-.modal-form-group input,.modal-form-group select{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
-.modal-form-group input:focus,.modal-form-group select:focus{border-color:rgba(232,160,32,.5)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
-.btn-cancel{padding:8px 16px;border-radius:7px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none;cursor:pointer}
-.btn-save{padding:8px 20px;border-radius:7px;background:var(--gold);color:#08060a;font-size:13px;font-weight:600;border:none;cursor:pointer}
-.btn-save:hover{background:var(--gold2)}
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.mov.open{display:flex}
+.mbox{background:var(--s1);border:1px solid var(--b2);border-radius:14px;padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.mbox::-webkit-scrollbar{width:4px}
+.mbox::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.mtitle{font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.mfg{margin-bottom:14px}
+.mfg label{display:block;font-size:11px;color:var(--m1);margin-bottom:5px}
+.mfg input,.mfg select{width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:7px;padding:10px 12px;font-size:13px;outline:none;transition:border-color .15s}
+.mfg input:focus,.mfg select:focus{border-color:rgba(232,160,32,.5)}
+.mfg .hint{font-size:10px;color:var(--m2);margin-top:4px}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--b1)}
+.mcancel{padding:8px 16px;border-radius:7px;border:1px solid var(--b2);color:var(--m1);font-size:13px;background:none;cursor:pointer}
+.mcancel:hover{color:var(--text)}
+.msave{padding:8px 20px;border-radius:7px;background:var(--gold);color:#08060a;font-size:13px;font-weight:600;border:none;cursor:pointer}
+.msave:hover{background:var(--gold2)}
+.msave.danger{background:var(--red);color:#fff}
+.msave.danger:hover{background:#ff3030}
+.msave.green{background:var(--green)}
 
-/* Empty state */
-.empty-state{text-align:center;padding:50px 20px;color:var(--m2)}
-.empty-state .es-icon{font-size:40px;margin-bottom:12px;opacity:.4}
+/* PLAN SELECTOR EN MODAL */
+.plan-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px}
+.popt{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px;cursor:pointer;transition:all .14s;position:relative}
+.popt:hover{border-color:var(--b3)}
+.popt.sel{border-color:rgba(232,160,32,.5);background:var(--golddim)}
+.popt .pn{font-size:12px;font-weight:600;margin-bottom:3px}
+.popt .pp{font-size:16px;font-weight:700;color:var(--gold);font-family:'Syne',sans-serif}
+.popt .pc{font-size:10px;color:var(--m2);margin-top:2px}
+.popt .pck{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:9px;color:#08060a;font-weight:700}
+.popt.sel .pck{display:flex}
 
-@media(max-width:900px){
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .sidebar{display:none}
-}
+/* LOGS */
+.log-row{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--b1);font-size:12px}
+.log-row:last-child{border-bottom:none}
+.log-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--m2);min-width:130px;flex-shrink:0}
+.log-email{color:var(--m1);min-width:160px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis}
+.log-action{color:var(--text);flex:1}
+.log-badge{flex-shrink:0}
+
+/* INLINE ALERT */
+.ialert{border-radius:7px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:none;line-height:1.5}
+.ialert.err{background:var(--reddim);border:1px solid rgba(224,56,56,.3);color:var(--red)}
+.ialert.ok{background:var(--greendim);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.ialert.show{display:block}
+
+/* EMPTY */
+.empty{padding:40px;text-align:center;color:var(--m2);font-size:13px}
+.empty div{font-size:32px;margin-bottom:10px;opacity:.3}
+
+@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.sb{display:none}}
+@media(max-width:600px){.stats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="app.html" class="nav-logo">
-    <div class="nav-logo-icon">🎆</div>
-    PyroShow <strong>Pro</strong>
-  </a>
-  <span class="nav-badge">ADMIN</span>
-  <div class="nav-user">
-    <span id="nav-admin-name">Admin</span>
-    <button class="btn-nav" onclick="window.location.href='app.html'">🚀 Ir a la App</button>
-    <button class="btn-nav danger" onclick="cerrarSesion()">Cerrar sesión</button>
+  <a href="app.html" class="nl"><div class="nl-icon">🎆</div>PyroShow <strong>Pro</strong></a>
+  <span class="admin-badge">ADMIN</span>
+  <div class="nav-r">
+    <span id="nav-name">Admin</span>
+    <button class="nbtn app" onclick="window.location.href='app.html'">🚀 Ir a la App</button>
+    <button class="nbtn out" onclick="salir()">Salir</button>
   </div>
 </nav>
 
-<div class="admin-wrap">
+<div class="wrap">
   <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-section">Principal</div>
-    <div class="sidebar-item active" onclick="showSection('users')">
-      <span class="si-icon">👥</span> Usuarios
-    </div>
-    <div class="sidebar-item" onclick="showSection('stats')">
-      <span class="si-icon">📊</span> Estadísticas
-    </div>
-    <div class="sidebar-section">Configuración</div>
-    <div class="sidebar-item" onclick="showSection('plans')">
-      <span class="si-icon">💎</span> Planes y límites
-    </div>
-    <div class="sidebar-item" onclick="showSection('logs')">
-      <span class="si-icon">📋</span> Registro de accesos
-    </div>
+  <div class="sb">
+    <div class="sb-sect">Principal</div>
+    <div class="sb-item on" id="si-users" onclick="ver('users')"><span class="sb-icon">👥</span>Usuarios</div>
+    <div class="sb-item" id="si-plans" onclick="ver('plans')"><span class="sb-icon">💎</span>Planes y límites</div>
+    <div class="sb-sect">Sistema</div>
+    <div class="sb-item" id="si-logs" onclick="ver('logs')"><span class="sb-icon">📋</span>Registro accesos</div>
+    <div class="sb-item" id="si-me" onclick="ver('me')"><span class="sb-icon">👤</span>Mi cuenta</div>
   </div>
 
-  <!-- MAIN -->
-  <div class="main-content">
+  <div class="main">
 
-    <!-- STATS -->
-    <div class="stats-grid" id="stats-overview">
-      <div class="stat-card gold">
-        <div class="stat-label">Total usuarios</div>
-        <div class="stat-val" id="stat-total">0</div>
-        <div class="stat-sub">registrados</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-label">Plan Pro</div>
-        <div class="stat-val" id="stat-pro">0</div>
-        <div class="stat-sub">usuarios activos</div>
-      </div>
-      <div class="stat-card blue">
-        <div class="stat-label">Hobbyist</div>
-        <div class="stat-val" id="stat-hobby">0</div>
-        <div class="stat-sub">usuarios</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-label">Plan Gratis</div>
-        <div class="stat-val" id="stat-free">0</div>
-        <div class="stat-sub">usuarios</div>
-      </div>
+    <!-- ESTADÍSTICAS -->
+    <div class="stats" id="stats-row">
+      <div class="sc gold"><div class="sc-lbl">Total usuarios</div><div class="sc-val" id="st-total">0</div><div class="sc-sub">registrados</div></div>
+      <div class="sc green"><div class="sc-lbl">Pro / Enterprise</div><div class="sc-val" id="st-pro">0</div><div class="sc-sub">licencias activas</div></div>
+      <div class="sc blue"><div class="sc-lbl">Hobbyist</div><div class="sc-val" id="st-hobby">0</div><div class="sc-sub">usuarios</div></div>
+      <div class="sc purple"><div class="sc-lbl">Plan Gratis</div><div class="sc-val" id="st-free">0</div><div class="sc-sub">usuarios</div></div>
     </div>
 
-    <!-- SECCION USUARIOS -->
-    <div id="section-users">
-      <div class="section-hdr">
-        <div class="section-title">👥 Gestión de usuarios</div>
-        <div class="section-actions">
-          <button class="btn-action btn-green" onclick="abrirModalNuevo()">+ Nuevo usuario</button>
-          <button class="btn-action btn-gold" onclick="exportarUsuarios()">⬇ Exportar CSV</button>
+    <!-- ── SECCIÓN USUARIOS ── -->
+    <div class="sec on" id="sec-users">
+      <div class="sec-hdr">
+        <div class="sec-title">👥 Gestión de usuarios</div>
+        <div class="sec-acts">
+          <button class="abtn a-green" onclick="abrirNuevo()">+ Nuevo usuario</button>
+          <button class="abtn a-gold" onclick="exportar()">⬇ CSV</button>
         </div>
       </div>
-
       <div class="search-row">
-        <input class="search-input" id="search-input" placeholder="🔍 Buscar por nombre o correo..." oninput="renderTabla()"/>
-        <select class="filter-sel" id="filter-plan" onchange="renderTabla()">
+        <input class="si" id="q" placeholder="🔍 Buscar por nombre o correo..." oninput="renderTabla()"/>
+        <select class="sf" id="fplan" onchange="renderTabla()">
           <option value="">Todos los planes</option>
           <option value="free">Gratis</option>
           <option value="hobby">Hobbyist</option>
           <option value="pro">Pro</option>
           <option value="enterprise">Enterprise</option>
         </select>
+        <select class="sf" id="festado" onchange="renderTabla()">
+          <option value="">Todos</option>
+          <option value="1">Activos</option>
+          <option value="0">Inactivos</option>
+        </select>
       </div>
-
-      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden">
-        <table class="users-table" id="users-table">
+      <div class="tcard">
+        <table class="utbl">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th class="sort" onclick="sortBy('nombre')">Usuario ↕</th>
               <th>Plan</th>
               <th>Canales</th>
-              <th>Estado</th>
-              <th>Registrado</th>
+              <th class="sort" onclick="sortBy('estado')">Estado ↕</th>
+              <th class="sort" onclick="sortBy('creado')">Registro ↕</th>
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody id="users-tbody"></tbody>
+          <tbody id="tbody"></tbody>
         </table>
       </div>
+      <div id="tabla-info" style="font-size:11px;color:var(--m2);margin-top:8px"></div>
     </div>
 
-    <!-- SECCION PLANES -->
-    <div id="section-plans" style="display:none">
-      <div class="section-title" style="margin-bottom:20px">💎 Configuración de planes</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+    <!-- ── SECCIÓN PLANES ── -->
+    <div class="sec" id="sec-plans">
+      <div class="sec-title" style="margin-bottom:18px">💎 Configuración de planes y límites</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
         <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:20px">
-          <div style="font-size:11px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Gratis</div>
-          <div style="font-size:11px;color:var(--m1);line-height:1.8">
-            ✓ Canales: <strong style="color:var(--green)">1</strong><br>
-            ✓ Simulación 3D<br>
-            ✓ Timeline básica<br>
-            ✗ Exportación CSV<br>
-            ✗ Control ESP32<br>
-            ✗ Grabación video<br>
-            ✗ Beat detection
+          <div class="ptag p-free" style="margin-bottom:12px">Plan Gratis</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:14px">$0</div>
+          <div style="font-size:12px;color:var(--m1);line-height:2">
+            <div>✓ <strong style="color:var(--text)">1 canal</strong> de disparo</div>
+            <div>✓ Simulación 3D completa</div>
+            <div>✓ Timeline musical</div>
+            <div style="color:var(--m2)">✗ Exportación CSV</div>
+            <div style="color:var(--m2)">✗ Control ESP32</div>
+            <div style="color:var(--m2)">✗ Grabación video</div>
           </div>
         </div>
         <div style="background:var(--s1);border:1px solid rgba(77,110,245,.3);border-radius:12px;padding:20px">
-          <div style="font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Hobbyist $49</div>
-          <div style="font-size:11px;color:var(--m1);line-height:1.8">
-            ✓ Canales: <strong style="color:var(--blue)">10</strong><br>
-            ✓ Simulación 3D<br>
-            ✓ Timeline completa<br>
-            ✓ Exportación CSV<br>
-            ✓ Control ESP32<br>
-            ✓ Grabación video<br>
-            ✓ Beat detection
+          <div class="ptag p-hobby" style="margin-bottom:12px">Hobbyist</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--blue);margin-bottom:14px">$49</div>
+          <div style="font-size:12px;color:var(--m1);line-height:2">
+            <div>✓ <strong style="color:var(--text)">10 canales</strong> de disparo</div>
+            <div>✓ Todo lo del plan Gratis</div>
+            <div>✓ Exportación CSV / Cobra</div>
+            <div>✓ Control ESP32 WiFi</div>
+            <div>✓ Grabación video .webm</div>
+            <div style="color:var(--m2)">✗ Código fuente</div>
           </div>
         </div>
         <div style="background:var(--s1);border:1px solid rgba(232,160,32,.3);border-radius:12px;padding:20px">
-          <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Plan Pro $149</div>
-          <div style="font-size:11px;color:var(--m1);line-height:1.8">
-            ✓ Canales: <strong style="color:var(--gold)">Ilimitados</strong><br>
-            ✓ Todo lo de Hobbyist<br>
-            ✓ Voice cues<br>
-            ✓ Código fuente C++<br>
-            ✓ Firmware ESP32<br>
-            ✓ Soporte prioritario<br>
-            ✓ Uso comercial
+          <div class="ptag p-pro" style="margin-bottom:12px">Pro</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:14px">$149</div>
+          <div style="font-size:12px;color:var(--m1);line-height:2">
+            <div>✓ <strong style="color:var(--text)">Canales ilimitados</strong></div>
+            <div>✓ Todo lo del plan Hobbyist</div>
+            <div>✓ Voice cues sincronizados</div>
+            <div>✓ Código fuente completo</div>
+            <div>✓ Firmware ESP32 C++</div>
+            <div>✓ Soporte prioritario</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:16px 20px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px">Canales por plan (editable)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div>
+            <label style="font-size:11px;color:var(--m2);display:block;margin-bottom:4px">Gratis (CH máx)</label>
+            <input type="number" id="lim-free" value="1" min="1" style="width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:6px;padding:7px 10px;font-size:13px;outline:none"/>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--m2);display:block;margin-bottom:4px">Hobbyist (CH máx)</label>
+            <input type="number" id="lim-hobby" value="10" min="1" style="width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:6px;padding:7px 10px;font-size:13px;outline:none"/>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--m2);display:block;margin-bottom:4px">Pro (CH máx)</label>
+            <input type="number" id="lim-pro" value="9999" min="1" style="width:100%;background:var(--s2);border:1px solid var(--b2);color:var(--text);border-radius:6px;padding:7px 10px;font-size:13px;outline:none"/>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button onclick="guardarLimites()" style="width:100%;background:var(--gold);color:#08060a;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:600;cursor:pointer">Guardar límites</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SECCION LOGS -->
-    <div id="section-logs" style="display:none">
-      <div class="section-title" style="margin-bottom:16px">📋 Registro de accesos</div>
-      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:0;overflow:hidden">
-        <table class="users-table" id="logs-table">
-          <thead><tr><th>Usuario</th><th>Acción</th><th>Fecha/Hora</th><th>Plan</th></tr></thead>
-          <tbody id="logs-tbody"></tbody>
-        </table>
+    <!-- ── SECCIÓN LOGS ── -->
+    <div class="sec" id="sec-logs">
+      <div class="sec-hdr">
+        <div class="sec-title">📋 Registro de accesos</div>
+        <button class="abtn a-red" onclick="limpiarLogs()">Limpiar registro</button>
+      </div>
+      <div class="tcard" id="logs-list" style="max-height:500px;overflow-y:auto"></div>
+    </div>
+
+    <!-- ── MI CUENTA ── -->
+    <div class="sec" id="sec-me">
+      <div class="sec-title" style="margin-bottom:18px">👤 Mi cuenta de administrador</div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:24px;max-width:440px">
+        <div class="ialert" id="me-alert"></div>
+        <div class="mfg"><label>Nombre</label><input type="text" id="me-nombre"/></div>
+        <div class="mfg"><label>Correo (no se puede cambiar)</label><input type="text" id="me-email" disabled style="opacity:.5"/></div>
+        <div class="mfg"><label>Nueva contraseña</label><input type="password" id="me-pass" placeholder="Dejar vacío para no cambiar"/></div>
+        <div class="mfg"><label>Confirmar contraseña</label><input type="password" id="me-pass2" placeholder="Repetir nueva contraseña"/></div>
+        <button onclick="guardarMiCuenta()" style="background:var(--gold);color:#08060a;border:none;border-radius:7px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px">Guardar cambios</button>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- MODAL NUEVO/EDITAR USUARIO -->
-<div class="modal-overlay" id="user-modal">
-  <div class="modal-box">
-    <div class="modal-title" id="modal-title">Nuevo usuario</div>
-    <div class="modal-form-group">
-      <label>Nombre completo</label>
+<!-- MODAL CREAR / EDITAR USUARIO -->
+<div class="mov" id="m-user">
+  <div class="mbox">
+    <div class="mtitle" id="m-user-title">👤 Nuevo usuario</div>
+    <div class="ialert" id="m-alert"></div>
+    <div class="mfg">
+      <label>Nombre completo *</label>
       <input type="text" id="m-nombre" placeholder="Nombre del usuario"/>
     </div>
-    <div class="modal-form-group">
-      <label>Correo electrónico</label>
+    <div class="mfg">
+      <label>Correo electrónico *</label>
       <input type="email" id="m-email" placeholder="correo@empresa.com"/>
+      <div class="hint">Será el usuario para iniciar sesión</div>
     </div>
-    <div class="modal-form-group">
-      <label>Contraseña</label>
-      <input type="text" id="m-pass" placeholder="Contraseña temporal"/>
+    <div class="mfg">
+      <label id="m-pass-lbl">Contraseña *</label>
+      <input type="text" id="m-pass" placeholder="Contraseña de acceso"/>
+      <div class="hint" id="m-pass-hint"></div>
     </div>
-    <div class="modal-form-group">
+    <div class="mfg">
       <label>Plan de licencia</label>
-      <select id="m-plan">
-        <option value="free">Gratis — 1 canal</option>
-        <option value="hobby">Hobbyist — 10 canales ($49)</option>
-        <option value="pro">Pro — Ilimitado ($149)</option>
-        <option value="enterprise">Enterprise — Ilimitado ($349)</option>
-      </select>
+      <div class="plan-opts">
+        <div class="popt sel" id="po-free" onclick="selPlan('free')">
+          <div class="pck">✓</div><div class="pn">Gratis</div>
+          <div class="pp">$0</div><div class="pc">1 canal</div>
+        </div>
+        <div class="popt" id="po-hobby" onclick="selPlan('hobby')">
+          <div class="pck">✓</div><div class="pn">Hobbyist</div>
+          <div class="pp">$49</div><div class="pc">10 canales</div>
+        </div>
+        <div class="popt" id="po-pro" onclick="selPlan('pro')">
+          <div class="pck">✓</div><div class="pn">Pro</div>
+          <div class="pp">$149</div><div class="pc">Ilimitado</div>
+        </div>
+        <div class="popt" id="po-enterprise" onclick="selPlan('enterprise')">
+          <div class="pck">✓</div><div class="pn">Enterprise</div>
+          <div class="pp">$349</div><div class="pc">Ilimitado + soporte</div>
+        </div>
+      </div>
     </div>
-    <div class="modal-form-group">
+    <div class="mfg">
       <label>Rol</label>
       <select id="m-role">
         <option value="user">Usuario</option>
         <option value="admin">Administrador</option>
       </select>
     </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn-save" onclick="guardarUsuario()">Guardar</button>
+    <div class="mfg">
+      <label>Estado</label>
+      <select id="m-activo">
+        <option value="1">Activo</option>
+        <option value="0">Inactivo (no puede entrar)</option>
+      </select>
+    </div>
+    <div class="mfoot">
+      <button class="mcancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="msave" onclick="guardarUsuario()">Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL CONFIRMACIÓN BORRAR -->
-<div class="modal-overlay" id="delete-modal">
-  <div class="modal-box" style="max-width:360px">
-    <div class="modal-title">⚠️ Eliminar usuario</div>
-    <p style="font-size:13px;color:var(--m1);margin-bottom:20px">¿Estás seguro? Esta acción no se puede deshacer. El usuario perderá acceso inmediatamente.</p>
-    <div style="background:var(--reddim);border:1px solid rgba(224,56,56,.25);border-radius:7px;padding:10px;font-size:12px;color:var(--red);margin-bottom:20px" id="del-user-info"></div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn-save" style="background:var(--red);color:#fff" onclick="confirmarBorrar()">Eliminar</button>
+<!-- MODAL CAMBIAR CONTRASEÑA RÁPIDO -->
+<div class="mov" id="m-pass">
+  <div class="mbox" style="max-width:380px">
+    <div class="mtitle">🔑 Cambiar contraseña</div>
+    <div class="ialert" id="mp-alert"></div>
+    <div style="font-size:12px;color:var(--m1);margin-bottom:16px">Usuario: <strong id="mp-email-lbl"></strong></div>
+    <div class="mfg"><label>Nueva contraseña (mín. 6 caracteres)</label><input type="text" id="mp-pass" placeholder="Nueva contraseña"/></div>
+    <div class="mfoot">
+      <button class="mcancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="msave green" onclick="guardarPass()">Cambiar contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CAMBIAR PLAN RÁPIDO -->
+<div class="mov" id="m-plan">
+  <div class="mbox" style="max-width:440px">
+    <div class="mtitle">💎 Cambiar plan</div>
+    <div style="font-size:12px;color:var(--m1);margin-bottom:16px">Usuario: <strong id="mpl-email-lbl"></strong></div>
+    <div class="plan-opts" style="margin-bottom:16px">
+      <div class="popt sel" id="mpl-free" onclick="selPlanModal('free')">
+        <div class="pck">✓</div><div class="pn">Gratis</div><div class="pp">$0</div><div class="pc">1 canal</div>
+      </div>
+      <div class="popt" id="mpl-hobby" onclick="selPlanModal('hobby')">
+        <div class="pck">✓</div><div class="pn">Hobbyist</div><div class="pp">$49</div><div class="pc">10 canales</div>
+      </div>
+      <div class="popt" id="mpl-pro" onclick="selPlanModal('pro')">
+        <div class="pck">✓</div><div class="pn">Pro</div><div class="pp">$149</div><div class="pc">Ilimitado</div>
+      </div>
+      <div class="popt" id="mpl-enterprise" onclick="selPlanModal('enterprise')">
+        <div class="pck">✓</div><div class="pn">Enterprise</div><div class="pp">$349</div><div class="pc">Ilimitado</div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="mcancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="msave" onclick="guardarPlan()">Aplicar plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR BORRAR -->
+<div class="mov" id="m-del">
+  <div class="mbox" style="max-width:360px">
+    <div class="mtitle" style="color:var(--red)">⚠️ Eliminar usuario</div>
+    <p style="font-size:13px;color:var(--m1);margin-bottom:16px">¿Seguro que quieres eliminar este usuario? No se puede deshacer y perderá acceso inmediatamente.</p>
+    <div style="background:var(--reddim);border:1px solid rgba(224,56,56,.25);border-radius:7px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px" id="del-info"></div>
+    <div class="mfoot">
+      <button class="mcancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="msave danger" onclick="confirmarDel()">Eliminar definitivamente</button>
     </div>
   </div>
 </div>
 
 <script>
-var PLAN_INFO = {
-  free:       {label:'Gratis',      canales:1,    cls:'plan-free'},
-  hobby:      {label:'Hobbyist',    canales:10,   cls:'plan-hobby'},
-  pro:        {label:'Pro',         canales:9999, cls:'plan-pro'},
-  enterprise: {label:'Enterprise',  canales:9999, cls:'plan-enterprise'},
-  admin:      {label:'Admin',       canales:9999, cls:'plan-admin'},
+/* ─── SEGURIDAD: solo admin ─── */
+var ME = null;
+try{ ME=JSON.parse(sessionStorage.getItem('pyro_session')||'null'); }catch(e){}
+if(!ME||!ME.email){ window.location.replace('auth.html'); throw 0; }
+if(ME.role!=='admin'){ alert('Solo administradores.'); window.location.replace('app.html'); throw 0; }
+document.getElementById('nav-name').textContent=ME.nombre||ME.email;
+
+/* ─── DATOS ─── */
+var PLAN_INFO={
+  free:      {lbl:'Gratis',     ch:1,    cls:'p-free'},
+  hobby:     {lbl:'Hobbyist',   ch:10,   cls:'p-hobby'},
+  pro:       {lbl:'Pro',        ch:9999, cls:'p-pro'},
+  enterprise:{lbl:'Enterprise', ch:9999, cls:'p-enterprise'},
 };
 
-var LOGS = JSON.parse(localStorage.getItem('pyro_logs')||'[]');
-var editEmail = null;
-var delEmail  = null;
+function getU(){ try{return JSON.parse(localStorage.getItem('pyro_users')||'{}');}catch(e){return{};} }
+function setU(u){ localStorage.setItem('pyro_users',JSON.stringify(u)); }
+function getLogs(){ try{return JSON.parse(localStorage.getItem('pyro_logs')||'[]');}catch(e){return[];} }
+function addLog(email,accion,plan){ var l=getLogs();l.push({ts:new Date().toISOString(),email,accion,plan});localStorage.setItem('pyro_logs',JSON.stringify(l.slice(-300))); }
 
-// ─── Verificar sesión de admin ───
-var sesion = JSON.parse(sessionStorage.getItem('pyro_session')||'null');
-if(!sesion){ window.location.href='auth.html'; }
-if(sesion.role!=='admin'){
-  alert('Acceso denegado. Solo administradores pueden ver esta página.');
-  window.location.href='app.html';
-}
-document.getElementById('nav-admin-name').textContent = sesion.nombre;
-
-// ─── Helpers ───
-function getUsers(){ try{return JSON.parse(localStorage.getItem('pyro_users')||'{}');}catch(e){return{};} }
-function saveUsers(u){ localStorage.setItem('pyro_users',JSON.stringify(u)); }
-function saveLogs(){ localStorage.setItem('pyro_logs',JSON.stringify(LOGS.slice(-200))); }
-
-function avatarColor(email){
-  var cols=['#e03838','#4d6ef5','#22c55e','#e8a020','#8b5cf6','#06b6d4','#ec4899'];
-  var i=0; for(var c of email) i+=c.charCodeAt(0);
-  return cols[i%cols.length];
-}
-
-// ─── Estadísticas ───
+/* ─── STATS ─── */
 function actualizarStats(){
-  var u=getUsers();
-  var keys=Object.keys(u);
-  document.getElementById('stat-total').textContent=keys.length;
-  document.getElementById('stat-pro').textContent=keys.filter(function(k){return u[k].plan==='pro'||u[k].plan==='enterprise';}).length;
-  document.getElementById('stat-hobby').textContent=keys.filter(function(k){return u[k].plan==='hobby';}).length;
-  document.getElementById('stat-free').textContent=keys.filter(function(k){return u[k].plan==='free';}).length;
+  var u=getU(),k=Object.keys(u);
+  document.getElementById('st-total').textContent=k.length;
+  document.getElementById('st-pro').textContent=k.filter(function(e){return u[e].plan==='pro'||u[e].plan==='enterprise';}).length;
+  document.getElementById('st-hobby').textContent=k.filter(function(e){return u[e].plan==='hobby';}).length;
+  document.getElementById('st-free').textContent=k.filter(function(e){return u[e].plan==='free';}).length;
 }
 
-// ─── Tabla ───
+/* ─── TABLA USUARIOS ─── */
+var sortCol='creado', sortAsc=false;
+function sortBy(col){ sortAsc=(col===sortCol)?!sortAsc:false; sortCol=col; renderTabla(); }
+
 function renderTabla(){
-  var q=document.getElementById('search-input').value.toLowerCase();
-  var pf=document.getElementById('filter-plan').value;
-  var u=getUsers();
-  var tbody=document.getElementById('users-tbody');
-  tbody.innerHTML='';
-  var items=Object.entries(u).filter(function(e){
-    var match=!q||(e[0].toLowerCase().includes(q)||e[1].nombre.toLowerCase().includes(q));
-    var planMatch=!pf||e[1].plan===pf;
-    return match&&planMatch;
+  var q=document.getElementById('q').value.toLowerCase();
+  var fp=document.getElementById('fplan').value;
+  var fe=document.getElementById('festado').value;
+  var u=getU();
+  var rows=Object.entries(u).filter(function(e){
+    var match=!q||(e[0].includes(q)||e[1].nombre.toLowerCase().includes(q));
+    var pm=!fp||e[1].plan===fp;
+    var activo=e[1].activo!==false;
+    var em=fe===''||(fe==='1'&&activo)||(fe==='0'&&!activo);
+    return match&&pm&&em;
   });
-  if(!items.length){
-    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--m2)">Sin usuarios que coincidan</td></tr>';
-    return;
-  }
-  items.forEach(function(e){
-    var email=e[0], ud=e[1];
-    var plan=PLAN_INFO[ud.plan]||PLAN_INFO.free;
+  // Sort
+  rows.sort(function(a,b){
+    var va=sortCol==='nombre'?a[1].nombre:sortCol==='estado'?(a[1].activo!==false?'1':'0'):a[1].creado||'';
+    var vb=sortCol==='nombre'?b[1].nombre:sortCol==='estado'?(b[1].activo!==false?'1':'0'):b[1].creado||'';
+    return sortAsc? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  var tb=document.getElementById('tbody'); tb.innerHTML='';
+  if(!rows.length){ tb.innerHTML='<tr><td colspan="6" class="empty"><div>🔍</div>Sin usuarios que coincidan</td></tr>'; }
+  rows.forEach(function(e){
+    var email=e[0],ud=e[1];
+    var pi=PLAN_INFO[ud.plan]||PLAN_INFO.free;
+    var activo=ud.activo!==false;
     var isAdmin=ud.role==='admin';
-    var canales=isAdmin?'∞':plan.canales>=9999?'∞':plan.canales;
-    var initials=(ud.nombre||'?').split(' ').map(function(p){return p[0];}).join('').substring(0,2).toUpperCase();
-    var col=avatarColor(email);
-    var fecha=ud.creado?new Date(ud.creado).toLocaleDateString('es-ES'):'—';
+    var ch=isAdmin?'∞':pi.ch>=9999?'∞':pi.ch;
+    var ini=(ud.nombre||'?').split(' ').map(function(p){return p[0]||'';}).join('').substring(0,2).toUpperCase();
+    var colors=['#e03838','#4d6ef5','#22c55e','#e8a020','#8b5cf6','#06b6d4','#ec4899'];
+    var col=colors[email.split('').reduce(function(a,c){return a+c.charCodeAt(0);},0)%colors.length];
+    var fecha=ud.creado?new Date(ud.creado).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}):'—';
     var tr=document.createElement('tr');
     tr.innerHTML=
-      '<td><div class="user-info">'+
-        '<div class="user-avatar" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'44">'+initials+'</div>'+
-        '<div><div class="user-name">'+escH(ud.nombre)+'</div><div class="user-email">'+escH(email)+'</div></div>'+
+      '<td><div class="uinfo">'+
+        '<div class="uav" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'44">'+ini+'</div>'+
+        '<div><div class="uname">'+h(ud.nombre)+'</div><div class="uemail">'+h(email)+'</div></div>'+
       '</div></td>'+
-      '<td><span class="plan-tag '+(isAdmin?'plan-admin':plan.cls)+'">'+
-        (isAdmin?'👑 Admin':plan.label)+
-      '</span></td>'+
-      '<td><span class="canales-badge">'+canales+' CH</span></td>'+
-      '<td><span class="status-dot status-active"></span><span style="font-size:12px;color:var(--m1)">Activo</span></td>'+
-      '<td style="font-size:12px;color:var(--m2)">'+fecha+'</td>'+
-      '<td><div class="row-actions">'+
-        '<button class="row-btn promote" onclick="editarUsuario(\''+escH(email)+'\')">✏ Editar</button>'+
-        '<button class="row-btn" onclick="cambiarPlan(\''+escH(email)+'\')">💎 Plan</button>'+
-        (email!==sesion.email?'<button class="row-btn danger" onclick="pedirBorrar(\''+escH(email)+'\')">✕ Borrar</button>':'')+
+      '<td><span class="ptag '+(isAdmin?'p-admin':pi.cls)+'">'+( isAdmin?'👑 Admin':pi.lbl)+'</span></td>'+
+      '<td><span class="chdot">'+ch+' CH</span></td>'+
+      '<td><div class="stag"><div class="sdot '+(activo?'s-on':'s-off')+'"></div><span style="font-size:12px;color:var(--m1)">'+(activo?'Activo':'Inactivo')+'</span></div></td>'+
+      '<td style="font-size:11px;color:var(--m2)">'+fecha+'</td>'+
+      '<td><div class="rbts">'+
+        '<button class="rb edit" onclick="editarU(\''+h(email)+'\')">✏ Editar</button>'+
+        '<button class="rb pass" onclick="cambiarPass(\''+h(email)+'\')">🔑 Pass</button>'+
+        '<button class="rb plan" onclick="cambiarPlan(\''+h(email)+'\')">💎 Plan</button>'+
+        '<button class="rb tog" onclick="toggleActivo(\''+h(email)+'\')">'+(activo?'⏸ Desactivar':'▶ Activar')+'</button>'+
+        (email!==ME.email?'<button class="rb del" onclick="pedirDel(\''+h(email)+'\')">✕</button>':'')+
       '</div></td>';
-    tbody.appendChild(tr);
+    tb.appendChild(tr);
   });
+  document.getElementById('tabla-info').textContent=rows.length+' usuario'+(rows.length===1?'':'s')+' mostrado'+(rows.length===1?'':'s');
 }
 
-function escH(s){ return String(s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
+function h(s){ return String(s).replace(/[<>&"]/g,function(c){return{'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];}); }
 
-// ─── Logs ───
-function agregarLog(email,accion,plan){
-  LOGS.push({email:email,accion:accion,plan:plan,ts:new Date().toISOString()});
-  saveLogs();
-}
-function renderLogs(){
-  var tbody=document.getElementById('logs-tbody'); tbody.innerHTML='';
-  LOGS.slice().reverse().slice(0,50).forEach(function(l){
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td style="font-size:12px">'+escH(l.email)+'</td>'+
-      '<td style="font-size:12px;color:var(--m1)">'+escH(l.accion)+'</td>'+
-      '<td style="font-size:11px;color:var(--m2);font-family:JetBrains Mono,monospace">'+new Date(l.ts).toLocaleString('es-ES')+'</td>'+
-      '<td><span class="plan-tag '+((PLAN_INFO[l.plan]||PLAN_INFO.free).cls)+'">'+((PLAN_INFO[l.plan]||PLAN_INFO.free).label)+'</span></td>';
-    tbody.appendChild(tr);
-  });
-}
+/* ─── CREAR / EDITAR ─── */
+var editEmail=null, planSel='free';
 
-// ─── Modales ───
-function abrirModalNuevo(){
-  editEmail=null;
-  document.getElementById('modal-title').textContent='Nuevo usuario';
+function abrirNuevo(){
+  editEmail=null; planSel='free';
+  document.getElementById('m-user-title').textContent='👤 Nuevo usuario';
   document.getElementById('m-nombre').value='';
   document.getElementById('m-email').value='';
+  document.getElementById('m-email').disabled=false;
   document.getElementById('m-pass').value='';
-  document.getElementById('m-plan').value='free';
+  document.getElementById('m-pass-lbl').textContent='Contraseña *';
+  document.getElementById('m-pass-hint').textContent='';
   document.getElementById('m-role').value='user';
-  document.getElementById('user-modal').classList.add('open');
+  document.getElementById('m-activo').value='1';
+  selPlan('free');
+  mostrarModal('m-user'); ocultarAlerta('m-alert');
 }
-function editarUsuario(email){
-  var u=getUsers(); var ud=u[email]; if(!ud) return;
-  editEmail=email;
-  document.getElementById('modal-title').textContent='Editar usuario';
-  document.getElementById('m-nombre').value=ud.nombre;
+
+function editarU(email){
+  var u=getU(),ud=u[email]; if(!ud)return;
+  editEmail=email; planSel=ud.plan||'free';
+  document.getElementById('m-user-title').textContent='✏ Editar usuario';
+  document.getElementById('m-nombre').value=ud.nombre||'';
   document.getElementById('m-email').value=email;
   document.getElementById('m-email').disabled=true;
-  document.getElementById('m-pass').value=ud.pass;
-  document.getElementById('m-plan').value=ud.plan||'free';
+  document.getElementById('m-pass').value='';
+  document.getElementById('m-pass-lbl').textContent='Contraseña (dejar vacío = no cambiar)';
+  document.getElementById('m-pass-hint').textContent='Solo escribe si quieres cambiarla';
   document.getElementById('m-role').value=ud.role||'user';
-  document.getElementById('user-modal').classList.add('open');
+  document.getElementById('m-activo').value=ud.activo!==false?'1':'0';
+  selPlan(planSel);
+  mostrarModal('m-user'); ocultarAlerta('m-alert');
 }
-function cambiarPlan(email){
-  var u=getUsers(); var ud=u[email]; if(!ud) return;
-  var nuevoPlan=prompt('Plan para '+ud.nombre+':\nfree | hobby | pro | enterprise',ud.plan||'free');
-  if(!nuevoPlan||!PLAN_INFO[nuevoPlan]){alert('Plan no válido');return;}
-  ud.plan=nuevoPlan; u[email]=ud; saveUsers(u);
-  agregarLog(email,'Cambio de plan → '+nuevoPlan,nuevoPlan);
-  renderTabla(); actualizarStats();
-  alert('Plan actualizado a '+PLAN_INFO[nuevoPlan].label);
+
+function selPlan(p){
+  planSel=p;
+  ['free','hobby','pro','enterprise'].forEach(function(id){
+    document.getElementById('po-'+id).classList.toggle('sel',id===p);
+  });
 }
+
 function guardarUsuario(){
   var nombre=document.getElementById('m-nombre').value.trim();
-  var email =document.getElementById('m-email').value.trim().toLowerCase();
-  var pass  =document.getElementById('m-pass').value;
-  var plan  =document.getElementById('m-plan').value;
-  var role  =document.getElementById('m-role').value;
-  if(!nombre||!email||!pass){alert('Completa todos los campos');return;}
-  var u=getUsers();
-  if(!editEmail&&u[email]){alert('Ya existe un usuario con ese correo');return;}
-  var target=editEmail||email;
-  u[target]={nombre:nombre,pass:pass,plan:plan,role:role,creado:u[target]?.creado||new Date().toISOString()};
-  saveUsers(u);
-  agregarLog(email,editEmail?'Editado por admin':'Creado por admin',plan);
-  document.getElementById('m-email').disabled=false;
+  var email=editEmail||document.getElementById('m-email').value.trim().toLowerCase();
+  var pass=document.getElementById('m-pass').value;
+  var role=document.getElementById('m-role').value;
+  var activo=document.getElementById('m-activo').value==='1';
+  ocultarAlerta('m-alert');
+  if(!nombre||!email){ mostrarAlerta('m-alert','Nombre y correo son obligatorios.','err'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ mostrarAlerta('m-alert','Correo no válido.','err'); return; }
+  var u=getU();
+  if(!editEmail&&u[email]){ mostrarAlerta('m-alert','Ya existe un usuario con ese correo.','err'); return; }
+  if(!editEmail&&!pass){ mostrarAlerta('m-alert','La contraseña es obligatoria para usuarios nuevos.','err'); return; }
+  var prev=u[email]||{};
+  u[email]={
+    nombre:nombre,
+    pass:pass||prev.pass,
+    plan:planSel,
+    role:role,
+    activo:activo,
+    creado:prev.creado||new Date().toISOString(),
+  };
+  setU(u);
+  addLog(email,editEmail?'Editado por admin':'Creado por admin',planSel);
   cerrarModal(); renderTabla(); actualizarStats();
-}
-function pedirBorrar(email){
-  delEmail=email;
-  var u=getUsers(); var ud=u[email];
-  document.getElementById('del-user-info').textContent=ud.nombre+' ('+email+') — Plan: '+(PLAN_INFO[ud.plan]||PLAN_INFO.free).label;
-  document.getElementById('delete-modal').classList.add('open');
-}
-function confirmarBorrar(){
-  if(!delEmail) return;
-  var u=getUsers(); delete u[delEmail]; saveUsers(u);
-  agregarLog(delEmail,'Eliminado por admin','—');
-  cerrarModal(); renderTabla(); actualizarStats();
-}
-function cerrarModal(){
-  document.querySelectorAll('.modal-overlay').forEach(function(m){m.classList.remove('open');});
-  document.getElementById('m-email').disabled=false;
-  delEmail=null;
+  mostrarToast(editEmail?'Usuario actualizado':'Usuario creado correctamente','ok');
 }
 
-// ─── Secciones ───
-function showSection(s){
-  ['users','plans','logs'].forEach(function(sec){
-    var el=document.getElementById('section-'+sec);
-    if(el) el.style.display=(sec===s?'block':'none');
-  });
-  document.querySelectorAll('.sidebar-item').forEach(function(item,i){
-    item.classList.remove('active');
-  });
-  document.querySelectorAll('.sidebar-item').forEach(function(item){
-    if(item.getAttribute('onclick')&&item.getAttribute('onclick').includes(s))
-      item.classList.add('active');
-  });
-  if(s==='logs') renderLogs();
+/* ─── CAMBIAR CONTRASEÑA RÁPIDO ─── */
+var passEmail=null;
+function cambiarPass(email){
+  passEmail=email;
+  document.getElementById('mp-email-lbl').textContent=email;
+  document.getElementById('mp-pass').value='';
+  ocultarAlerta('mp-alert');
+  mostrarModal('m-pass');
+}
+function guardarPass(){
+  var np=document.getElementById('mp-pass').value;
+  if(!np||np.length<6){ mostrarAlerta('mp-alert','Mínimo 6 caracteres.','err'); return; }
+  var u=getU();
+  if(!u[passEmail]){ mostrarAlerta('mp-alert','Usuario no encontrado.','err'); return; }
+  u[passEmail].pass=np; setU(u);
+  addLog(passEmail,'Contraseña cambiada por admin',u[passEmail].plan);
+  cerrarModal(); mostrarToast('Contraseña actualizada');
 }
 
-function exportarUsuarios(){
-  var u=getUsers();
-  var rows=['Nombre,Email,Plan,Canales,Rol,Registrado'];
+/* ─── CAMBIAR PLAN RÁPIDO ─── */
+var planEmail=null, planModalSel='free';
+function cambiarPlan(email){
+  planEmail=email;
+  var u=getU();
+  planModalSel=(u[email]||{}).plan||'free';
+  document.getElementById('mpl-email-lbl').textContent=email;
+  selPlanModal(planModalSel);
+  mostrarModal('m-plan');
+}
+function selPlanModal(p){
+  planModalSel=p;
+  ['free','hobby','pro','enterprise'].forEach(function(id){
+    document.getElementById('mpl-'+id).classList.toggle('sel',id===p);
+  });
+}
+function guardarPlan(){
+  var u=getU(); if(!u[planEmail])return;
+  u[planEmail].plan=planModalSel; setU(u);
+  addLog(planEmail,'Plan cambiado a '+planModalSel+' por admin',planModalSel);
+  cerrarModal(); renderTabla(); actualizarStats();
+  mostrarToast('Plan actualizado a '+PLAN_INFO[planModalSel].lbl);
+}
+
+/* ─── TOGGLE ACTIVO ─── */
+function toggleActivo(email){
+  var u=getU(); if(!u[email])return;
+  u[email].activo=!(u[email].activo!==false); setU(u);
+  addLog(email,(u[email].activo?'Activado':'Desactivado')+' por admin',u[email].plan);
+  renderTabla(); actualizarStats();
+  mostrarToast('Usuario '+(u[email].activo?'activado':'desactivado'));
+}
+
+/* ─── ELIMINAR ─── */
+var delEmail=null;
+function pedirDel(email){
+  delEmail=email; var u=getU(),ud=u[email]||{};
+  document.getElementById('del-info').textContent=ud.nombre+' — '+email+' — Plan: '+(PLAN_INFO[ud.plan]||PLAN_INFO.free).lbl;
+  mostrarModal('m-del');
+}
+function confirmarDel(){
+  var u=getU(); delete u[delEmail]; setU(u);
+  addLog(delEmail,'Eliminado por admin','—');
+  cerrarModal(); renderTabla(); actualizarStats();
+  mostrarToast('Usuario eliminado','err');
+}
+
+/* ─── EXPORTAR ─── */
+function exportar(){
+  var u=getU();
+  var rows=['Nombre,Email,Plan,Canales,Rol,Estado,Registrado'];
   Object.entries(u).forEach(function(e){
-    var ud=e[1], p=PLAN_INFO[ud.plan]||PLAN_INFO.free;
-    rows.push([ud.nombre,e[0],p.label,p.canales>=9999?'Ilimitado':p.canales,ud.role||'user',ud.creado||''].join(','));
+    var ud=e[1],pi=PLAN_INFO[ud.plan]||PLAN_INFO.free;
+    rows.push([ud.nombre,e[0],pi.lbl,pi.ch>=9999?'Ilimitado':pi.ch,ud.role||'user',ud.activo!==false?'Activo':'Inactivo',ud.creado||''].join(','));
   });
-  var blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
   a.download='usuarios_pyroshow.csv'; a.click();
 }
 
-function cerrarSesion(){
-  sessionStorage.removeItem('pyro_session');
-  window.location.href='auth.html';
+/* ─── LOGS ─── */
+function renderLogs(){
+  var l=getLogs(), cont=document.getElementById('logs-list');
+  cont.innerHTML='';
+  if(!l.length){ cont.innerHTML='<div class="empty"><div>📋</div>Sin registros</div>'; return; }
+  l.slice().reverse().slice(0,100).forEach(function(e){
+    var pi=PLAN_INFO[e.plan]||PLAN_INFO.free;
+    var d=document.createElement('div'); d.className='log-row';
+    d.innerHTML=
+      '<span class="log-time">'+new Date(e.ts).toLocaleString('es-MX')+'</span>'+
+      '<span class="log-email">'+h(e.email||'—')+'</span>'+
+      '<span class="log-action">'+h(e.accion||'—')+'</span>'+
+      '<span class="log-badge"><span class="ptag '+pi.cls+'">'+pi.lbl+'</span></span>';
+    cont.appendChild(d);
+  });
+}
+function limpiarLogs(){ if(confirm('¿Limpiar todo el registro?')){ localStorage.removeItem('pyro_logs'); renderLogs(); } }
+
+/* ─── LÍMITES ─── */
+function guardarLimites(){
+  var limites={free:+document.getElementById('lim-free').value||1,hobby:+document.getElementById('lim-hobby').value||10,pro:+document.getElementById('lim-pro').value||9999};
+  localStorage.setItem('pyro_limites',JSON.stringify(limites));
+  PLAN_INFO.free.ch=limites.free; PLAN_INFO.hobby.ch=limites.hobby; PLAN_INFO.pro.ch=limites.pro;
+  mostrarToast('Límites guardados');
+}
+(function(){
+  var l=JSON.parse(localStorage.getItem('pyro_limites')||'{}');
+  if(l.free){ document.getElementById('lim-free').value=l.free; PLAN_INFO.free.ch=l.free; }
+  if(l.hobby){ document.getElementById('lim-hobby').value=l.hobby; PLAN_INFO.hobby.ch=l.hobby; }
+  if(l.pro){ document.getElementById('lim-pro').value=l.pro; PLAN_INFO.pro.ch=l.pro; }
+})();
+
+/* ─── MI CUENTA ─── */
+function cargarMiCuenta(){
+  var u=getU(),ud=u[ME.email]||{};
+  document.getElementById('me-nombre').value=ud.nombre||ME.nombre||'';
+  document.getElementById('me-email').value=ME.email;
+}
+function guardarMiCuenta(){
+  var nombre=document.getElementById('me-nombre').value.trim();
+  var pass=document.getElementById('me-pass').value;
+  var pass2=document.getElementById('me-pass2').value;
+  ocultarAlerta('me-alert');
+  if(!nombre){ mostrarAlerta('me-alert','El nombre no puede estar vacío.','err'); return; }
+  if(pass&&pass.length<6){ mostrarAlerta('me-alert','La contraseña debe tener al menos 6 caracteres.','err'); return; }
+  if(pass&&pass!==pass2){ mostrarAlerta('me-alert','Las contraseñas no coinciden.','err'); return; }
+  var u=getU(); if(!u[ME.email])return;
+  u[ME.email].nombre=nombre;
+  if(pass) u[ME.email].pass=pass;
+  setU(u);
+  ME.nombre=nombre; sessionStorage.setItem('pyro_session',JSON.stringify(ME));
+  document.getElementById('nav-name').textContent=nombre;
+  document.getElementById('me-pass').value='';
+  document.getElementById('me-pass2').value='';
+  mostrarAlerta('me-alert','Cambios guardados correctamente.','ok');
 }
 
-// ─── Init ───
+/* ─── HELPERS UI ─── */
+function mostrarModal(id){ document.getElementById(id).classList.add('open'); }
+function cerrarModal(){ document.querySelectorAll('.mov').forEach(function(m){m.classList.remove('open');}); }
+document.querySelectorAll('.mov').forEach(function(m){ m.addEventListener('click',function(e){if(e.target===m)cerrarModal();}); });
+document.addEventListener('keydown',function(e){if(e.key==='Escape')cerrarModal();});
+
+function mostrarAlerta(id,msg,tipo){
+  var el=document.getElementById(id); if(!el)return;
+  el.textContent=msg; el.className='ialert '+(tipo||'err')+' show';
+}
+function ocultarAlerta(id){ var el=document.getElementById(id);if(el){el.className='ialert';el.textContent='';} }
+
+var _toastTimer=null;
+function mostrarToast(msg,tipo){
+  var t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast';
+    t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:10px 20px;font-size:13px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);transition:opacity .3s;color:var(--text)';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.borderColor=tipo==='err'?'rgba(224,56,56,.4)':'rgba(34,197,94,.4)';
+  t.style.color=tipo==='err'?'var(--red)':'var(--green)';
+  t.style.opacity='1';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){t.style.opacity='0';},2800);
+}
+
+function ver(s){
+  ['users','plans','logs','me'].forEach(function(id){
+    document.getElementById('sec-'+id).classList.toggle('on',id===s);
+    document.getElementById('si-'+id).classList.toggle('on',id===s);
+  });
+  if(s==='logs') renderLogs();
+  if(s==='me') cargarMiCuenta();
+}
+
+function salir(){ sessionStorage.removeItem('pyro_session'); window.location.replace('auth.html'); }
+
+/* ─── INIT ─── */
 actualizarStats();
 renderTabla();
-// Log de acceso admin
-agregarLog(sesion.email,'Acceso al panel admin',sesion.plan);
+addLog(ME.email,'Acceso al panel admin',ME.plan||'admin');
 </script>
 </body>
 </html>

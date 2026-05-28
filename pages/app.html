@@ -4104,9 +4104,17 @@ function initAuth(){
 }
 
 function puedeAgregarCanal(ch){
-  if(!S.maxCanales||ch<=S.maxCanales) return true;
-  var plan=PLANES[SESSION.plan]||PLANES.free;
-  notify('Plan '+plan.nombre+': máximo '+S.maxCanales+' canal'+(S.maxCanales===1?'':'es')+'. Actualiza tu plan.','error');
+  // Sin sesión o sin límite = permitir (modo demo)
+  if(!SESSION || !S.maxCanales) return true;
+  // Admin siempre puede
+  if(SESSION.role === 'admin') return true;
+  // Canal dentro del límite = OK
+  if(ch <= S.maxCanales) return true;
+  // Fuera del límite
+  var plan = PLANES[SESSION.plan] || PLANES.free;
+  var limite = S.maxCanales >= 9999 ? 'ilimitados' : 'máximo ' + S.maxCanales;
+  notify('Canal CH' + ch + ' bloqueado — tu plan ' + plan.nombre +
+         ' permite ' + limite + '. Actualiza tu licencia.', 'error');
   mostrarUpgradeModal(ch);
   return false;
 }

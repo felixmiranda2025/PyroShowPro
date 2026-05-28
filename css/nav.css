@@ -76,6 +76,22 @@
 }
 .btn-cta:hover { background: var(--gold2); }
 
+.btn-ghost {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted, #8890b0);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.12);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-ghost:hover {
+  color: #eef0f8;
+  border-color: rgba(255,255,255,.25);
+  background: rgba(255,255,255,.06);
+}
+
 .nav-hamburger {
   display: none;
   flex-direction: column;
